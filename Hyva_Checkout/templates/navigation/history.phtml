@@ -61,26 +61,26 @@ $checkout  = $navigator->getActiveCheckout();
         <div class="fixed bottom-0 left-0 right-0 z-40 bg-white p-1.5 w-full
                 sm:static sm:z-auto sm:bg-transparent sm:p-0 sm:m-0
                 shadow-[0px_-6px_13px_0px_rgba(0,0,0,0.10)] sm:shadow-none">
-        <button
-            type="button"
-            rel="next"
-            class="group flex items-center gap-x-1 w-full justify-center py-2.5 px-6 
+            <button
+                type="button"
+                rel="next"
+                class="group flex items-center gap-x-1 w-full justify-center py-2.5 px-6 
             rounded-lg uppercase disabled:opacity-10 disabled:cursor-not-allowed 
-            bg-teakea-red text-white font-normal text-base"
+            bg-techtic-red text-white font-normal text-base"
 
-            data-route="<?= $escaper->escapeHtmlAttr($next->getRoute()) ?>"
-            x-bind="buttonNext">
-            <span class="group-disabled:invisible pr-3">
-                <?= $escaper->escapeHtml(__('Proceed to checkout')) ?>
-            </span>
-            <svg width="19" height="10" viewBox="0 0 19 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M0.773438 4.91767H17.3381M17.3381 4.91767L13.197 0.776489M17.3381 4.91767L13.197 9.05884" stroke="white" stroke-width="1.55294" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
+                data-route="<?= $escaper->escapeHtmlAttr($next->getRoute()) ?>"
+                x-bind="buttonNext">
+                <span class="group-disabled:invisible pr-3">
+                    <?= $escaper->escapeHtml(__('Proceed to checkout')) ?>
+                </span>
+                <svg width="19" height="10" viewBox="0 0 19 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0.773438 4.91767H17.3381M17.3381 4.91767L13.197 0.776489M17.3381 4.91767L13.197 9.05884" stroke="white" stroke-width="1.55294" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
 
-            <span class="hidden group-disabled:flex absolute inset-0 justify-center items-center p-2">
-                <?= $block->getChildHtml('loader') ?>
-            </span>
-        </button>
+                <span class="hidden group-disabled:flex absolute inset-0 justify-center items-center p-2">
+                    <?= $block->getChildHtml('loader') ?>
+                </span>
+            </button>
         </div>
         <?= $block->getLayout()
             ->createBlock(\Magento\Cms\Block\Block::class)

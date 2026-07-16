@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Hyvä Themes - https://hyva.io
  * Copyright © Hyvä Themes 2022-present. All rights reserved.
@@ -25,19 +26,17 @@ $addressView = $viewModels->require(AddressView\AddressViewBilling::class);
 
     <?php if (! $addressView->isVirtual()): ?>
         <div class="flex items-start"
-             wire:target="billingAsShipping"
-             wire:loading.class="opacity-25"
-        >
+            wire:target="billingAsShipping"
+            wire:loading.class="opacity-25">
             <label class="inline-flex items-center gap-x-2.5 " for="billing-as-shipping">
                 <input id="billing-as-shipping"
-                       name="billing-as-shipping"
-                       class="h-4 w-4 rounded"
-                       type="checkbox"
-                       wire:model="billingAsShipping"
-                       wire:loading.attr="disabled"
-                />
+                    name="billing-as-shipping"
+                    class="h-4 w-4 rounded"
+                    type="checkbox"
+                    wire:model="billingAsShipping"
+                    wire:loading.attr="disabled" />
 
-                <span class="text-base font-normal text-teakea-neutral font-garamond hover:cursor-pointer">
+                <span class="text-base font-normal text-techtic-neutral font-garamond hover:cursor-pointer">
                     <?= $escaper->escapeHtml(__('My billing and shipping address are the same')) ?>
                 </span>
             </label>

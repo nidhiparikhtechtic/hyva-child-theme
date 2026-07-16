@@ -81,7 +81,7 @@ $hasCouponCode = (bool) strlen($block->getCouponCode() ?: "");
                                 <?= $escaper->escapeHtml(__('Enter code')) ?>
                             </label>
                             <input type="text"
-                                class="form-input w-full font-normal text-sm text-teak-muted disabled:opacity-75 disabled:bg-gray-100 border border-teakea-light-gray px-2.5 py-1 rounded-lg disabled:border-teakea-light-gray disabled:pointer-events-none shadow-none"
+                                class="form-input w-full font-normal text-sm text-teak-muted disabled:opacity-75 disabled:bg-gray-100 border border-techtic-light-gray px-2.5 py-1 rounded-lg disabled:border-techtic-light-gray disabled:pointer-events-none shadow-none"
                                 id="coupon_code"
                                 name="coupon_code"
                                 value="<?= $escaper->escapeHtmlAttr($block->getCouponCode()) ?>"
@@ -100,7 +100,7 @@ $hasCouponCode = (bool) strlen($block->getCouponCode() ?: "");
                                     <?= $escaper->escapeHtml(__('Apply')) ?>
                                 </button>
                             <?php else: ?>
-                                <button type="submit" class="rounded-lg py-2 px-4 w-full flex justify-center text-center text-sm items-center text-teakea-red bg-transparent border border-teakea-red hover:text-white hover:bg-teakea-red">
+                                <button type="submit" class="rounded-lg py-2 px-4 w-full flex justify-center text-center text-sm items-center text-techtic-red bg-transparent border border-techtic-red hover:text-white hover:bg-techtic-red">
                                     <?= $escaper->escapeHtml(__('Cancel Coupon')) ?>
                                 </button>
                             <?php endif; ?>

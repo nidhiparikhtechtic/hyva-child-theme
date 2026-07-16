@@ -62,9 +62,9 @@ if ($mainCategoryId != null) {
     }
 
     $activeCategoryId = array_key_first($level1Categories);
-    ?>
+?>
 
-    <div class="mt-6 lg:mt-7" 
+    <div class="mt-6 lg:mt-7"
         x-data="{
             active: <?= (int)$activeCategoryId ?>,
             scrollLeft(ref) {
@@ -73,13 +73,13 @@ if ($mainCategoryId != null) {
             scrollRight(ref) {
                 this.$refs[ref].scrollBy({ left: 400, behavior: 'smooth' })
             }
-        }" >
+        }">
 
         <!-- SUB CATEGORYS -->
         <div class="flex justify-center gap-3 flex-wrap">
             <?php foreach ($level1Categories as $catId => $category): ?>
                 <button @click="active = <?= (int)$catId ?>" :class="active === <?= (int)$catId ?>
-                        ? 'border-teakea-brown text-[#A5813B]' : 'border-[#CCCCCC] text-teakea-gray'"
+                        ? 'border-techtic-brown text-[#A5813B]' : 'border-[#CCCCCC] text-techtic-gray'"
                     class="p-[10px] sm:p-3 border border-lg text-xs sm:text-base font-light uppercase transition">
                     <?= $escaper->escapeHtml($category->getName()) ?>
                 </button>
@@ -89,36 +89,36 @@ if ($mainCategoryId != null) {
         <!-- PRODUCTS PER CATEGORY -->
         <div class="mt-10">
 
-        <?php foreach ($groupedProducts as $catId => $products): ?>
-            <div 
-                x-show="active === <?= (int)$catId ?>" 
-                x-transition.opacity
-                x-cloak >
-                <div x-ref="slider<?= (int)$catId ?>"
-                    class="flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth scrollbar-custom">
+            <?php foreach ($groupedProducts as $catId => $products): ?>
+                <div
+                    x-show="active === <?= (int)$catId ?>"
+                    x-transition.opacity
+                    x-cloak>
+                    <div x-ref="slider<?= (int)$catId ?>"
+                        class="flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth scrollbar-custom">
 
-                    <?php
-                    echo $sliderViewModel
-                        ->getSliderForItems(
-                            'Magento_Catalog::product/list/home-page-item.phtml',
-                            $products,
-                            'Magento_Catalog::product/slider/homepage-product-slider-container.phtml'
-                        )
-                        ->setData('name', 'slider-' . $catId)
-                        ->toHtml();
-                    ?>
+                        <?php
+                        echo $sliderViewModel
+                            ->getSliderForItems(
+                                'Magento_Catalog::product/list/home-page-item.phtml',
+                                $products,
+                                'Magento_Catalog::product/slider/homepage-product-slider-container.phtml'
+                            )
+                            ->setData('name', 'slider-' . $catId)
+                            ->toHtml();
+                        ?>
+
+                    </div>
 
                 </div>
 
-            </div>
-
-        <?php endforeach; ?>
+            <?php endforeach; ?>
 
 
         </div>
     </div>
 
-    <a href="<?= $escaper->escapeUrl($mainCategory->getUrl()) ?>" class="mt-5 lg:mt:7 block w-full text-center border border-teakea-light-gray py-4 text:base font-light
+    <a href="<?= $escaper->escapeUrl($mainCategory->getUrl()) ?>" class="mt-5 lg:mt:7 block w-full text-center border border-techtic-light-gray py-4 text:base font-light
             hover:bg-[#A01937] hover:text-white transition uppercase">
         <?= $escaper->escapeHtml(__('View All')) ?>
     </a>

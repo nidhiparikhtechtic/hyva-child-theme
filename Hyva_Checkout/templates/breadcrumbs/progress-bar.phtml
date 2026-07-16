@@ -50,7 +50,7 @@ $lineHtml = '<span class="progress-bar-line hidden lg:block absolute top-[calc(t
 </style>
 
 <ul class="progress-bar flex">
-    
+
     <?php foreach ($checkout->getAvailableSteps() as $step): ?>
         <?php $isCurrent = ($step->getPosition() === $currentStep->getPosition()) ?>
         <?php $isComplete = ($step->getPosition() < $currentStep->getPosition()); ?>
@@ -58,8 +58,8 @@ $lineHtml = '<span class="progress-bar-line hidden lg:block absolute top-[calc(t
 
         <li class="relative lg:flex-1 lg:flex lg:flex-col items-center lg:bg-transparent lg:p-0 p-2 first:[--line-before:#0000] last:[--line-after:#0000]
             <?= ($isPrevious) ? '' : 'hidden' ?>
-            <?= ($isCurrent) ? '[--line-before:theme(colors.background.teakea-red)]' : '' ?>
-            <?= ($isComplete) ? '[--line-before:theme(colors.background.teakea-red)] [--line-after:theme(colors.background.teakea-red)]' : '' ?>
+            <?= ($isCurrent) ? '[--line-before:theme(colors.background.techtic-red)]' : '' ?>
+            <?= ($isComplete) ? '[--line-before:theme(colors.background.techtic-red)] [--line-after:theme(colors.background.techtic-red)]' : '' ?>
         ">
             <?php if ($checkout->isStepBackwards($step, $currentStep) || $checkout->isComparison($step, $currentStep)): ?>
                 <button
@@ -73,11 +73,11 @@ $lineHtml = '<span class="progress-bar-line hidden lg:block absolute top-[calc(t
                     <div class="hidden lg:flex items-center justify-center w-6 h-6" aria-hidden="true">
                         <?= /* @noEscape */ $lineHtml; ?>
                         <?php if ($isCurrent): ?>
-                            <div class="border-2 border-teakea-red w-6 h-6 rounded-full bg-teakea-red z-[1]">
+                            <div class="border-2 border-techtic-red w-6 h-6 rounded-full bg-techtic-red z-[1]">
                                 <span class="flex justify-center font-garamond text-sm font-bold text-white"><?= (int) $step->getPosition() ?></span>
                             </div>
                         <?php elseif ($isComplete): ?>
-                            <div class="flex items-center justify-center w-6 h-6 rounded-full bg-teakea-red text-white z-[1]">
+                            <div class="flex items-center justify-center w-6 h-6 rounded-full bg-techtic-red text-white z-[1]">
                                 <?= $heroiconsSolid->checkHtml('', 14, 14, ['aria-hidden' => 'true']) ?>
                             </div>
                         <?php else: ?>
@@ -86,7 +86,7 @@ $lineHtml = '<span class="progress-bar-line hidden lg:block absolute top-[calc(t
                             </div>
                         <?php endif; ?>
                     </div>
-                    <div class="flex items-center gap-2 text-sm font-extrabold <?= ($isComplete || $isCurrent) ? 'text-teakea-red' : 'text-teakea-gray' ?>">
+                    <div class="flex items-center gap-2 text-sm font-extrabold <?= ($isComplete || $isCurrent) ? 'text-techtic-red' : 'text-techtic-gray' ?>">
                         <?php if ($isPrevious): ?>
                             <?= $heroiconsSolid->chevronLeftHtml(
                                 'group-hover:-translate-x-0.5 transition rtl:rotate-180 lg:hidden',
@@ -107,7 +107,7 @@ $lineHtml = '<span class="progress-bar-line hidden lg:block absolute top-[calc(t
                             <span class="flex justify-center font-garamond text-sm font-bold text-[#637381]"><?= (int) $step->getPosition() ?></span>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2 text-teakea-gray text-sm font-normal">
+                    <div class="flex items-center gap-2 text-techtic-gray text-sm font-normal">
                         <?= $escaper->escapeHtml(__($step->getLabel())) ?>
                     </div>
                 </div>

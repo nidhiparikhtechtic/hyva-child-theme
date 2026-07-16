@@ -91,7 +91,7 @@ $step = $stockItemViewModel->getQtyIncrements($product)
                     <?= $escaper->escapeHtml(__('Quantity')) ?>
                 </label>
 
-                <button aria-label="<?= $escaper->escapeHtmlAttr(__('Decrease quantity')) ?>" class="p-2 md:p-3 text-teakea-dark-gray" @click="if(qty > 1){ qty--; $dispatch('update-qty-<?= (int)$product->getId() ?>', qty);}">
+                <button aria-label="<?= $escaper->escapeHtmlAttr(__('Decrease quantity')) ?>" class="p-2 md:p-3 text-techtic-dark-gray" @click="if(qty > 1){ qty--; $dispatch('update-qty-<?= (int)$product->getId() ?>', qty);}">
                     <svg class="w-5 h-5" viewBox="0 0 24 25" xmlns="http://www.w3.org/2000/svg">
                         <path d="M20 12.5H4" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
@@ -128,7 +128,7 @@ $step = $stockItemViewModel->getQtyIncrements($product)
                     x-model.number="qty"
                     @change="$dispatch('update-qty-<?= (int)$product->getId() ?>', qty)" />
 
-                <button aria-label="<?= $escaper->escapeHtmlAttr(__('Increase quantity')) ?>" class="p-2 md:p-3 text-teakea-dark-gray" @click="qty++; $dispatch('update-qty-<?= (int)$product->getId() ?>', qty)">
+                <button aria-label="<?= $escaper->escapeHtmlAttr(__('Increase quantity')) ?>" class="p-2 md:p-3 text-techtic-dark-gray" @click="qty++; $dispatch('update-qty-<?= (int)$product->getId() ?>', qty)">
                     <svg class="w-5 h-5" viewBox="0 0 24 25" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12 4.5V20.5M20 12.5L4 12.5" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>

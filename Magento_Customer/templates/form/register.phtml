@@ -84,7 +84,7 @@ $passwordMinCharacterSets = $block->getRequiredCharacterClassesNumber();
                 value="<?= $escaper->escapeHtmlAttr($block->getFormData()->getEmail()) ?>"
                 title="<?= $escaper->escapeHtmlAttr(__('Email')) ?>"
                 placeholder="<?= $escaper->escapeHtmlAttr(__('naam@voorbeeld.nl')) ?>"
-                class="w-full border border-teakea-light-gray rounded-lg px-4 py-3 text-sm
+                class="w-full border border-techtic-light-gray rounded-lg px-4 py-3 text-sm
                        placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#163A20]/30 focus:border-[#163A20]"
                 @input.debounce="onChange" />
         </div>
@@ -114,7 +114,7 @@ $passwordMinCharacterSets = $block->getRequiredCharacterClassesNumber();
                     data-validate='{"password-strength": {"minCharacterSets": <?= (int) $passwordMinCharacterSets ?>}}'
                     @input.debounce="onChange"
                     autocomplete="off"
-                    class="w-full border border-teakea-light-gray rounded-lg px-4 py-3 text-sm pr-11
+                    class="w-full border border-techtic-light-gray rounded-lg px-4 py-3 text-sm pr-11
                            placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#163A20]/30 focus:border-[#163A20]">
                 <button
                     type="button"
@@ -160,7 +160,7 @@ $passwordMinCharacterSets = $block->getRequiredCharacterClassesNumber();
                     @input.debounce="onChange"
                     required
                     autocomplete="off"
-                    class="w-full border border-teakea-light-gray rounded-lg px-4 py-3 text-sm pr-11
+                    class="w-full border border-techtic-light-gray rounded-lg px-4 py-3 text-sm pr-11
                            placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#163A20]/30 focus:border-[#163A20]">
                 <button
                     type="button"
@@ -184,8 +184,8 @@ $passwordMinCharacterSets = $block->getRequiredCharacterClassesNumber();
                     title="<?= $escaper->escapeHtmlAttr(__('Sign Up for Newsletter')) ?>" value="1"
                     id="is_subscribed"
                     <?php if ($block->getFormData()->getIsSubscribed()): ?>checked="checked" <?php endif; ?>
-                    class="w-4 h-4 rounded border-teakea-light-gray text-[#163A20] focus:outline-none focus:ring-2 focus:ring-[#163A20]/30 focus:border-[#163A20]">
-                <span class="text-sm text-teakea-gray">
+                    class="w-4 h-4 rounded border-techtic-light-gray text-[#163A20] focus:outline-none focus:ring-2 focus:ring-[#163A20]/30 focus:border-[#163A20]">
+                <span class="text-sm text-techtic-gray">
                     <?= $escaper->escapeHtml(__('Keep me posted on offers')) ?>
                 </span>
             </label>
@@ -248,7 +248,7 @@ $passwordMinCharacterSets = $block->getRequiredCharacterClassesNumber();
                         value="<?= $escaper->escapeHtmlAttr($block->getFormData()->getStreet(0)) ?>"
                         title="<?= /* @noEscape */ $block->getAttributeData('street')->getFrontendLabel() ?>"
                         id="street_1"
-                        class="w-full border border-teakea-light-gray rounded-lg px-4 py-3 text-sm mb-3
+                        class="w-full border border-techtic-light-gray rounded-lg px-4 py-3 text-sm mb-3
                                focus:outline-none focus:ring-2 focus:ring-[#163A20]/30 focus:border-[#163A20] <?= $escaper->escapeHtmlAttr($streetValidationClass) ?>">
 
                     <?php $streetValidationClass = trim(str_replace('required-entry', '', $streetValidationClass)); ?>
@@ -260,7 +260,7 @@ $passwordMinCharacterSets = $block->getRequiredCharacterClassesNumber();
                             value="<?= $escaper->escapeHtmlAttr($block->getFormData()->getStreetLine($i - 1)) ?>"
                             title="<?= $escaper->escapeHtmlAttr(__('Street Address %1', $i)) ?>"
                             id="street_<?= (int) $i ?>"
-                            class="w-full border border-teakea-light-gray rounded-lg px-4 py-3 text-sm mb-3
+                            class="w-full border border-techtic-light-gray rounded-lg px-4 py-3 text-sm mb-3
                                    focus:outline-none focus:ring-2 focus:ring-[#163A20]/30 focus:border-[#163A20] <?= $escaper->escapeHtmlAttr($streetValidationClass) ?>">
                     <?php endfor; ?>
                 </div>
@@ -273,7 +273,7 @@ $passwordMinCharacterSets = $block->getRequiredCharacterClassesNumber();
                         value="<?= $escaper->escapeHtmlAttr($block->getFormData()->getCity()) ?>"
                         title="<?= /* @noEscape */ $block->getAttributeData('city')->getFrontendLabel() ?>"
                         id="city"
-                        class="w-full border border-teakea-light-gray rounded-lg px-4 py-3 text-sm
+                        class="w-full border border-techtic-light-gray rounded-lg px-4 py-3 text-sm
                                focus:outline-none focus:ring-2 focus:ring-[#163A20]/30 focus:border-[#163A20] <?= $escaper->escapeHtmlAttr($this->helper(Address::class)->getAttributeValidationClass('city')) ?>">
                 </div>
 
@@ -286,7 +286,7 @@ $passwordMinCharacterSets = $block->getRequiredCharacterClassesNumber();
                     <template x-if="hasAvailableRegions() && (isRegionRequired || showOptionalRegions)">
                         <select id="region_id" name="region_id"
                             title="<?= /* @noEscape */ $regionLabel ?>"
-                            class="w-full border border-teakea-light-gray rounded-lg px-4 py-3 text-sm bg-white
+                            class="w-full border border-techtic-light-gray rounded-lg px-4 py-3 text-sm bg-white
                                    focus:outline-none focus:ring-2 focus:ring-[#163A20]/30 focus:border-[#163A20]"
                             x-ref="region_id"
                             x-model="selectedRegion"
@@ -307,7 +307,7 @@ $passwordMinCharacterSets = $block->getRequiredCharacterClassesNumber();
                         x-ref="region"
                         value="<?= $escaper->escapeHtmlAttr($block->getRegion()) ?>"
                         title="<?= /* @noEscape */ $regionLabel ?>"
-                        class="w-full border border-teakea-light-gray rounded-lg px-4 py-3 text-sm
+                        class="w-full border border-techtic-light-gray rounded-lg px-4 py-3 text-sm
                                focus:outline-none focus:ring-2 focus:ring-[#163A20]/30 focus:border-[#163A20]"
                         :required="isRegionRequired" />
                 </div>
@@ -326,7 +326,7 @@ $passwordMinCharacterSets = $block->getRequiredCharacterClassesNumber();
                         :required="isZipRequired"
                         @change="onChange"
                         data-validate='{"postcode": true}'
-                        class="w-full border border-teakea-light-gray rounded-lg px-4 py-3 text-sm
+                        class="w-full border border-techtic-light-gray rounded-lg px-4 py-3 text-sm
                                focus:outline-none focus:ring-2 focus:ring-[#163A20]/30 focus:border-[#163A20]
                                <?= $escaper->escapeHtmlAttr($this->helper(Address::class)->getAttributeValidationClass('postcode')) ?>">
                 </div>
@@ -342,7 +342,7 @@ $passwordMinCharacterSets = $block->getRequiredCharacterClassesNumber();
                         id="country"
                         title="Country"
                         required
-                        class="w-full border border-teakea-light-gray rounded-lg px-4 py-3 text-sm bg-white
+                        class="w-full border border-techtic-light-gray rounded-lg px-4 py-3 text-sm bg-white
                                focus:outline-none focus:ring-2 focus:ring-[#163A20]/30 focus:border-[#163A20]"
                         x-ref="country_id"
                         @change="changeCountry($event.target)">

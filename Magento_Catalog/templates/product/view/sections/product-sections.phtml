@@ -35,7 +35,7 @@ $heroicons = $viewModels->require(HeroiconsSolid::class);
         <div
             x-data="{ open: (window.innerWidth < 768 && '<?= $escaper->escapeJs($title) ?>' === 'Snelle informatie') }"
             x-init="if ('<?= $escaper->escapeJs($title) ?>' === 'Meer informatie') { open = false; }"
-            class="border border-teakea-light-gray rounded-lg overflow-hidden">
+            class="border border-techtic-light-gray rounded-lg overflow-hidden">
 
             <!-- HEADER -->
             <button

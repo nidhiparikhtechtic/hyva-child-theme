@@ -75,7 +75,7 @@ if (!$itemCount = count($subcats)) {
     }
 </script>
 <section
-    class="w-full bg-teakea-cream py-[30px]"
+    class="w-full bg-techtic-cream py-[30px]"
     x-data="initSliderComponent()"
     x-init="calcPageSize();"
     @resize.window.debounce="calcPageSize(); $nextTick( function() { calcActive() })">
@@ -91,7 +91,7 @@ if (!$itemCount = count($subcats)) {
                                 $subcat_url = $subcat->getUrl();
                                 $categoryName = $subcat->getName();
                                 // SEO text
-                                $altTitle = $categoryName . ' - Teakea'; ?>
+                                $altTitle = $categoryName . ' - Techtic'; ?>
                                 <img class="rounded-lg w-[190px] h-[150px] object-cover mx-auto"
                                     src="<?php echo $sub_category->getImageUrl() ?>"
                                     alt="<?= $escaper->escapeHtmlAttr($altTitle) ?>"

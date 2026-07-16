@@ -150,7 +150,7 @@ $deliveryDate = $deliveryViewModel->getFormattedDeliveryDate();
                             <!-- STOCK STATUS -->
                             <?php if ($isInStock): ?>
                                 <?php if ($qty > 0 && $qty < 5 && $deliveryType !== 'Indonesia_En_Route'): ?>
-                                    <div class="text-teakea-highlight-red font-normal text-xs">
+                                    <div class="text-techtic-highlight-red font-normal text-xs">
                                         <?= __('Order quickly, only %1 left in stock', $qty) ?>
                                     </div>
                                 <?php else: ?>
@@ -166,8 +166,8 @@ $deliveryDate = $deliveryViewModel->getFormattedDeliveryDate();
                                 <?php endif; ?>
 
                             <?php else: ?>
-                                <div class="flex items-center gap-1 text-xs font-semibold text-teakea-tomato-red">
-                                    <svg class="w-1.5 h-1.5 text-teakea-tomato-red"
+                                <div class="flex items-center gap-1 text-xs font-semibold text-techtic-tomato-red">
+                                    <svg class="w-1.5 h-1.5 text-techtic-tomato-red"
                                         viewBox="0 0 6 7"
                                         fill="currentColor"
                                         aria-hidden="true">
@@ -183,40 +183,40 @@ $deliveryDate = $deliveryViewModel->getFormattedDeliveryDate();
                             <?php if ($isInStock): ?>
 
                                 <?php if ($deliveryType === 'Handmade_Production'): ?>
-                                    <div class="text-xs text-teakea-dark-gray">
+                                    <div class="text-xs text-techtic-dark-gray">
                                         <?= __('Production starts immediately') ?>
                                     </div>
                                 <?php elseif ($deliveryType === 'Indonesia_Workshop'): ?>
-                                    <div class="text-xs text-teakea-dark-gray">
+                                    <div class="text-xs text-techtic-dark-gray">
                                         <?= __('Production begins immediately after order placement') ?>
                                     </div>
                                 <?php elseif ($deliveryType === 'Indonesia_En_Route'): ?>
-                                    <div class="text-xs text-teakea-dark-gray">
+                                    <div class="text-xs text-techtic-dark-gray">
                                         <?= __('Already manufactured — on its way from our own factory in Indonesia.') ?>
                                     </div>
                                 <?php elseif ($deliveryType === 'Stock_Direct'): ?>
 
                                     <?php if ($isOneDayDelivery): ?>
 
-                                        <div class="text-xs text-teakea-dark-gray">
+                                        <div class="text-xs text-techtic-dark-gray">
                                             <?= __('Ordered before 15:00 is delivered the next working day.') ?>
                                         </div>
 
                                     <?php elseif ($isOnetothreeDayDelivery): ?>
 
-                                        <div class="text-xs text-teakea-dark-gray">
+                                        <div class="text-xs text-techtic-dark-gray">
                                             <?= __('Expected delivery: %1', $escaper->escapeHtml($deliveryDate)) ?>
                                         </div>
 
                                     <?php elseif ($isTwelveWeeks): ?>
 
-                                        <div class="text-xs text-teakea-dark-gray">
+                                        <div class="text-xs text-techtic-dark-gray">
                                             <?= __('Delivery time: 12 weeks') ?>
                                         </div>
 
                                     <?php elseif (!empty($deliveryTime)): ?>
 
-                                        <div class="text-xs text-teakea-dark-gray">
+                                        <div class="text-xs text-techtic-dark-gray">
                                             <?= __('Expected shipment:') ?>
                                             <?= $escaper->escapeHtml($deliveryTime) ?>
                                         </div>

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author Amasty Team
  * @copyright Copyright (c) Amasty (https://www.amasty.com)
@@ -32,46 +33,42 @@ $isInModal = $block->getData('is_in_modal');
 
 <?php if (count($enabledSocials)): ?>
     <div class="amsl-social-wrapper<?= $escaper->escapeHtmlAttr($enabledLabels ? ' with-labels' : '') ?> "
-            <?php if (!$isInModal): ?>
-                x-data="AmSocialLogin()"
-                x-init="initializeSocialLogin()"
-            <?php endif; ?>
-    >
+        <?php if (!$isInModal): ?>
+        x-data="AmSocialLogin()"
+        x-init="initializeSocialLogin()"
+        <?php endif; ?>>
         <div class="amsl-social-login <?= ($enabledLabels && $socialButtonsType) ? '-labeled-buttons' : '' ?>">
             <template x-if="socialErrorMessage">
                 <p class="amsl-error -social message error mb-4" x-text="socialErrorMessage"></p>
             </template>
             <div class="grid grid-cols-2 <?= ($enabledLabels && $socialButtonsType) ? 'gap-4' : 'gap-7' ?>"
-                    <?php if ($hasShowMoreLink): ?>
-                        :class="{'-show-all': canShowAllSocialIcons()}"
-                    <?php endif; ?>
-            >
+                <?php if ($hasShowMoreLink): ?>
+                :class="{'-show-all': canShowAllSocialIcons()}"
+                <?php endif; ?>>
                 <?php foreach ($enabledSocials as $social): ?>
                     <?php $buttonClassNames = '-' . $social['type'] . ' ' . $socialButtonsType; ?>
                     <div
-                            class="amsl-button-wrapper
-                            <?= $escaper->escapeHtmlAttr($enabledLabels ? 'with-label' : '') ?>"
-                    >
+                        class="amsl-button-wrapper
+                            <?= $escaper->escapeHtmlAttr($enabledLabels ? 'with-label' : '') ?>">
                         <form method="POST"
-                              action="<?= $escaper->escapeUrl($social['url']) ?>"
-                              class="amsl-button-form"
-                              aria-label="<?= $escaper->escapeHtml(__('Sign in with %1', $social['label'])) ?>"
-                              x-on:submit="socialLoginClick"
-                        >
+                            action="<?= $escaper->escapeUrl($social['url']) ?>"
+                            class="amsl-button-form"
+                            aria-label="<?= $escaper->escapeHtml(__('Sign in with %1', $social['label'])) ?>"
+                            x-on:submit="socialLoginClick">
                             <?= $block->getBlockHtml('formkey') ?>
                             <button
-                                    type="submit"
-                                    class="amsl-button overflow-hidden bg-white
+                                type="submit"
+                                class="amsl-button overflow-hidden bg-white
                                 hover:shadow-md transition-amsl-social-button
-                                <?= $enabledLabels ? 'w-full h-12 p-2 flex items-center text-sm border border-teakea-light-gray rounded-lg' : 'block w-10 h-10 p-2' ?><?php //phpcs:ignore ?>"
-                                    title="<?= $escaper->escapeHtml(__('Sign in with %1', $social['label'])) ?>"
-                            >
+                                <?= $enabledLabels ? 'w-full h-12 p-2 flex items-center text-sm border border-techtic-light-gray rounded-lg' : 'block w-10 h-10 p-2' ?><?php //phpcs:ignore 
+                                                                                                                                                                        ?>"
+                                title="<?= $escaper->escapeHtml(__('Sign in with %1', $social['label'])) ?>">
                                 <span
-                                        class="amsl-social-icon pointer-events-none
-                                        <?= $enabledLabels ? 'p-1 rounded-sm overflow-hidden mr-3' : '' ?>"<?php //phpcs:ignore ?>
+                                    class="amsl-social-icon pointer-events-none
+                                        <?= $enabledLabels ? 'p-1 rounded-sm overflow-hidden mr-3' : '' ?>" <?php //phpcs:ignore 
+                                                                                                            ?>
                                     role="img"
-                                        aria-label="<?= $escaper->escapeHtml(__('Sign in with %1', $social['label'])) ?>"
-                                >
+                                    aria-label="<?= $escaper->escapeHtml(__('Sign in with %1', $social['label'])) ?>">
                                     <?= $viewModelLogos->renderHtml($social['type']) ?>
                                 </span>
                                 <?php if ($socialButtonsType && $enabledLabels): ?>
@@ -86,17 +83,15 @@ $isInModal = $block->getData('is_in_modal');
             </div>
             <?php if (count($enabledSocials) > 3 && $hasShowMoreLink): ?>
                 <div class="amsl-showmore mt-12 mb-6 text-sm flex justify-center bg-gray-300 h-px"
-                     x-show="!canShowAllSocialIcons()"
-                     x-cloak
-                >
+                    x-show="!canShowAllSocialIcons()"
+                    x-cloak>
                     <button
-                            type="button"
-                            class="amsl-showmore-button flex items-center gap-1 text-blue-800 px-4
+                        type="button"
+                        class="amsl-showmore-button flex items-center gap-1 text-blue-800 px-4
                             py-2 bg-container-darker transform -translate-y-1/2"
-                            x-on:click="showAllSocialIcons()"
-                            role="button"
-                            :aria-expanded="socialIconsExpanded"
-                    >
+                        x-on:click="showAllSocialIcons()"
+                        role="button"
+                        :aria-expanded="socialIconsExpanded">
                         <?= $escaper->escapeHtml(__('Show More')) ?>
                         <?= $viewModelIcons->chevronUpHtml('w-4 h-4 transform rotate-180') ?>
                     </button>

@@ -7,3 +7,26 @@ var/
 .vscode/
 .DS_Store
 web/css/styles.css
+web/css/styles.min.css
+
+# Generic backup suffixes
+*_bkp
+*_bkp*
+*__bkp*
+*_backup*
+*_old*
+*_copy*
+* copy*
+*_new*
+*_new*
+*_oldbkp*
+*_oldbkp*
+*_orig*
+*_temp*
+*_tmp*
+*_clickable*
+*_hoverable*
+
+# Date-based backups
+*__*
+*_[0-9][0-9][0-9][0-9]*

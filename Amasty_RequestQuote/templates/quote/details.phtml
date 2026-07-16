@@ -20,7 +20,7 @@ $quoteIcons = $viewModels->require(QuoteIcons::class);
 $quoteViewModel = $viewModels->require(Quote::class);
 $block->getChildBlock('checkout.cart.details.form.email')->setData('email_title', $block->getData('email_title'));
 ?>
-<div id="quote-details" class="quote-details card mb-3 pt-3 p-2 border border-teakea-light-grey bg-teak-stone-light rounded-lg">
+<div id="quote-details" class="quote-details card mb-3 pt-3 p-2 border border-techtic-light-grey bg-teak-stone-light rounded-lg">
     <div class="flex flex-col">
         <h2 class="w-full text-lg xl:text-2xl font-medium title-font font-garamond text-center md:text-left font-base">
             <?= $escaper->escapeHtml($block->getData('title')) ?>
@@ -43,7 +43,7 @@ $block->getChildBlock('checkout.cart.details.form.email')->setData('email_title'
                             type="text"
                             name="firstname"
                             id="amquote-firstname"
-                            class="form-input required-entry w-full border border-teakea-light-gray rounded-lg focus:outline-none focus:ring-0 shadow-none"
+                            class="form-input required-entry w-full border border-techtic-light-gray rounded-lg focus:outline-none focus:ring-0 shadow-none"
                             title="<?= $escaper->escapeHtmlAttr($block->getData('first_name_title')) ?>"
                             required />
                     </div>
@@ -57,7 +57,7 @@ $block->getChildBlock('checkout.cart.details.form.email')->setData('email_title'
                             type="text"
                             name="lastname"
                             id="amquote-lastname"
-                            class="form-input required-entry w-full border border-teakea-light-gray rounded-lg focus:outline-none focus:ring-0 shadow-none"
+                            class="form-input required-entry w-full border border-techtic-light-gray rounded-lg focus:outline-none focus:ring-0 shadow-none"
                             title="<?= $escaper->escapeHtmlAttr($block->getData('last_name_title')) ?>"
                             required />
                     </div>
@@ -79,7 +79,7 @@ $block->getChildBlock('checkout.cart.details.form.email')->setData('email_title'
                         @input.debounce.1000ms="inputUpdate"
                         name="remarks"
                         id="quote-remark"
-                        class="form-input w-full border border-teakea-light-gray rounded-lg focus:outline-none focus:ring-0 shadow-none"
+                        class="form-input w-full border border-techtic-light-gray rounded-lg focus:outline-none focus:ring-0 shadow-none"
                         rows="3"
                         cols="25"></textarea>
                 </div>

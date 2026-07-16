@@ -180,7 +180,7 @@ $packIdsConfig = $bundlePackViewModel->getAllowedPackIds($bundles);
                                         class="amrelated-discount -main-product -product block -top-2.5
                                         -right-2.5 transition duration-300 text-xs absolute z-10 flex
                                         justify-center items-center box-border p-[5px] text-white
-                                        bg-teakea-terracotta rounded"
+                                        bg-techtic-terracotta rounded"
                                         x-show="pack.appliedForParent && pack.checkedItemsNumber !== 0 && pack.discountPercentage"
                                         x-text="pack.productsBundleDiscountType ? pack.mainDiscount + '%' : '-'
                                         + hyva.formatPrice(pack.mainDiscount)"></div>
@@ -314,7 +314,7 @@ $packIdsConfig = $bundlePackViewModel->getAllowedPackIds($bundles);
                                         <div
                                             class="amrelated-discount -product -top-2.5 -right-2.5 transition duration-300
                                             opacity-100 text-xs absolute z-10 flex justify-center items-center
-                                            box-border p-[5px] text-white bg-teakea-terracotta rounded">
+                                            box-border p-[5px] text-white bg-techtic-terracotta rounded">
                                             <template x-if="packProduct.discount_amount">
                                                 <span
                                                     x-text="pack.productsBundleDiscountType ?
@@ -429,7 +429,7 @@ $packIdsConfig = $bundlePackViewModel->getAllowedPackIds($bundles);
         md:left-1/2 md:-translate-x-1/2
         md:-translate-y-1/2
         transition duration-300 z-10 flex justify-center
-        items-center box-border text-white bg-teakea-terracotta rounded
+        items-center box-border text-white bg-techtic-terracotta rounded
         max-w-full py-[5px] px-[15px] text-base mt-0">
                                 <?= $escaper->escapeHtml(__('Bespaar')) ?>
                                 <span class="amount ml-[5px] font-bold" x-text="hyva.formatPrice(pack.discountPercentage)"></span>
@@ -438,7 +438,7 @@ $packIdsConfig = $bundlePackViewModel->getAllowedPackIds($bundles);
                         </div>
                         <div class="amrelated-tocart-wrapper w-full flex justify-end md:justify-center">
                             <button
-                                class="relative inline-flex flex bg-teakea-lime-green text-white text-sm font-semibold items-center py-3.5 px-7 gap-x-2.5 uppercase justify-center rounded-lg" type="button"
+                                class="relative inline-flex flex bg-techtic-lime-green text-white text-sm font-semibold items-center py-3.5 px-7 gap-x-2.5 uppercase justify-center rounded-lg" type="button"
                                 @click="addToCart($event.target)"
                                 title="<?= $escaper->escapeHtml(__('Add to Cart')) ?>">
                                 <?= $heroicons->shoppingCartHtml('border-current') ?>

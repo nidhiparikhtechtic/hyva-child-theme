@@ -108,7 +108,7 @@ $sku = $product->getSku();
                                 <div class="control">
                                     <textarea id="cart-<?= $escaper->escapeHtmlAttr($item->getId()) ?>-note"
                                         name="cart[<?= $escaper->escapeHtmlAttr($item->getId()) ?>][note]"
-                                        class="form-input w-full text-sm border border-teakea-light-gray rounded-lg focus:outline-none focus:ring-0 shadow-none"
+                                        class="form-input w-full text-sm border border-techtic-light-gray rounded-lg focus:outline-none focus:ring-0 shadow-none"
                                         aria-label="<?= $escaper->escapeHtml(__('Add Note')) ?>"
                                         rows="3"
                                         cols="25"><?= $escaper->escapeHtml($itemViewModel->retrieveCustomerNote($item->getAdditionalData())) ?></textarea>

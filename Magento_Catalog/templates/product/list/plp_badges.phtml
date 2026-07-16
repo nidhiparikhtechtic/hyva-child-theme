@@ -1,4 +1,5 @@
 <?php
+
 /** @var \Magento\Catalog\Block\Product\AbstractProduct $block */
 $product      = $block->getProduct();
 $deliveryType = $product->getAttributeText('delivery_type') ?? '';
@@ -21,14 +22,15 @@ if (!empty(trim($cjmExpecDate))) {
             $days        = (int)$startOfYear->diff($date)->days + 1;
             $weekNumber  = (int)ceil($days / 7);
         }
-    } catch (\Exception $e) {}
+    } catch (\Exception $e) {
+    }
 }
 $hasAtp = ($weekNumber !== null);
 
 if (!$deliveryType) return;
 ?>
 
-<div x-data="" x-cloak class="absolute inset-0 pointer-events-none z-10" >
+<div x-data="" x-cloak class="absolute inset-0 pointer-events-none z-10">
     <?php if ($deliveryType === 'Tower_Living_Stock'): ?>
 
         <div class="absolute bottom-2 left-2 pointer-events-none">
@@ -36,17 +38,24 @@ if (!$deliveryType) return;
             <?php if ($isInStock && $qty > 0): ?>
 
                 <!-- IN STOCK: Amber chip -->
-                <span class="inline-flex items-center gap-1.5 bg-[#dbede0] border border-teakea-lime-green text-teakea-lime-green text-xs font-semibold leading-4 rounded-full py-1 px-2.5 shadow-sm select-none cursor-default">
+                <span class="inline-flex items-center gap-1.5 bg-[#dbede0] border border-techtic-lime-green text-techtic-lime-green text-xs font-semibold leading-4 rounded-full py-1 px-2.5 shadow-sm select-none cursor-default">
                     <svg class="w-1.5 h-1.5 shrink-0" viewBox="0 0 6 6" fill="currentColor" aria-hidden="true">
-                        <circle cx="3" cy="3" r="3"/>
+                        <circle cx="3" cy="3" r="3" />
                     </svg>
                     <?= __('In stock') ?>
 
-                    <?php // if ($hasAtp): ?>
-                        <?php // __('Expected Wk') ?> <?php // (int)$weekNumber ?>
-                    <?php // else: ?>
-                        <?php // __('Expected') ?> <?php // $block->escapeHtml($deliveryTime) ?>
-                    <?php // endif; ?>
+                    <?php // if ($hasAtp): 
+                    ?>
+                    <?php // __('Expected Wk') 
+                    ?> <?php // (int)$weekNumber 
+                                                    ?>
+                    <?php // else: 
+                    ?>
+                    <?php // __('Expected') 
+                    ?> <?php // $block->escapeHtml($deliveryTime) 
+                                                ?>
+                    <?php // endif; 
+                    ?>
                 </span>
 
             <?php elseif ($isBackorder): ?>
@@ -54,16 +63,16 @@ if (!$deliveryType) return;
                 <?php if ($weekNumber): ?>
                     <span class="inline-flex items-center gap-1.5 bg-[#FAEEDA] border border-[#854F0B] text-[#854F0B] text-xs font-semibold leading-4 rounded-full py-1 px-2.5 shadow-sm select-none cursor-default">
                         <svg class="w-1.5 h-1.5 shrink-0" viewBox="0 0 6 6" fill="currentColor" aria-hidden="true">
-                            <circle cx="3" cy="3" r="3"/>
+                            <circle cx="3" cy="3" r="3" />
                         </svg>
                         <?= __('Week') ?> <?= (int)$weekNumber ?>
                     </span>
 
                 <?php else: ?>
                     <!-- OUT OF STOCK + NO ATP: Red chip -->
-                    <span class="inline-flex items-center gap-1.5 bg-[#FCEBEB] border border-teakea-red text-teakea-red text-xs font-semibold leading-4 rounded-full py-1 px-2.5 shadow-sm select-none cursor-default">
+                    <span class="inline-flex items-center gap-1.5 bg-[#FCEBEB] border border-techtic-red text-techtic-red text-xs font-semibold leading-4 rounded-full py-1 px-2.5 shadow-sm select-none cursor-default">
                         <svg class="w-1.5 h-1.5 shrink-0" viewBox="0 0 6 6" fill="currentColor" aria-hidden="true">
-                            <circle cx="3" cy="3" r="3"/>
+                            <circle cx="3" cy="3" r="3" />
                         </svg>
                         <?= __('Unavailable') ?>
                     </span>
@@ -74,16 +83,16 @@ if (!$deliveryType) return;
                     <!-- OUT OF STOCK + ATP: Amber chip -->
                     <span class="inline-flex items-center gap-1.5 bg-[#FAEEDA] border border-[#854F0B] text-[#854F0B] text-xs font-semibold leading-4 rounded-full py-1 px-2.5 shadow-sm select-none cursor-default">
                         <svg class="w-1.5 h-1.5 shrink-0" viewBox="0 0 6 6" fill="currentColor" aria-hidden="true">
-                            <circle cx="3" cy="3" r="3"/>
+                            <circle cx="3" cy="3" r="3" />
                         </svg>
                         <?= __('Week') ?> <?= (int)$weekNumber ?>
                     </span>
 
                 <?php else: ?>
                     <!-- OUT OF STOCK + NO ATP: Red chip -->
-                    <span class="inline-flex items-center gap-1.5 bg-[#FCEBEB] border border-teakea-red text-teakea-red text-xs font-semibold leading-4 rounded-full py-1 px-2.5 shadow-sm select-none cursor-default">
+                    <span class="inline-flex items-center gap-1.5 bg-[#FCEBEB] border border-techtic-red text-techtic-red text-xs font-semibold leading-4 rounded-full py-1 px-2.5 shadow-sm select-none cursor-default">
                         <svg class="w-1.5 h-1.5 shrink-0" viewBox="0 0 6 6" fill="currentColor" aria-hidden="true">
-                            <circle cx="3" cy="3" r="3"/>
+                            <circle cx="3" cy="3" r="3" />
                         </svg>
                         <?= __('Unavailable') ?>
                     </span>
@@ -96,9 +105,9 @@ if (!$deliveryType) return;
     <?php elseif ($deliveryType === 'Stock_Direct'): ?>
         <div class="absolute bottom-2 left-2 pointer-events-none">
             <?php if ($isInStock && $qty > 0 && $qty < 5): ?>
-                <span class="inline-flex items-center gap-1.5 bg-[#fceaee] border border-teakea-highlight-red text-teakea-highlight-red text-xs font-semibold leading-4 rounded-full py-1 px-2.5 shadow-sm select-none cursor-default">
+                <span class="inline-flex items-center gap-1.5 bg-[#fceaee] border border-techtic-highlight-red text-techtic-highlight-red text-xs font-semibold leading-4 rounded-full py-1 px-2.5 shadow-sm select-none cursor-default">
                     <svg class="w-1.5 h-1.5 shrink-0" viewBox="0 0 6 6" fill="currentColor" aria-hidden="true">
-                        <circle cx="3" cy="3" r="3"/>
+                        <circle cx="3" cy="3" r="3" />
                     </svg>
                     <?= __('Only') ?> <?= (int)$qty ?>
                 </span>
@@ -107,4 +116,3 @@ if (!$deliveryType) return;
     <?php endif; ?>
 
 </div>
-

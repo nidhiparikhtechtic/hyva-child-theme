@@ -61,7 +61,7 @@ $productName = $block->getProduct()->getName();
         <div class="w-full">
             <?php foreach ($items as $review): ?>
                 <div itemscope itemprop="review" itemtype="https://schema.org/Review"
-                    class="p-5 border border-teakea-light-gray rounded-lg mb-2.5 last:mb-0">
+                    class="p-5 border border-techtic-light-gray rounded-lg mb-2.5 last:mb-0">
                     <?php if (count($review->getRatingVotes())): ?>
                         <div class="table">
                             <?php foreach ($review->getRatingVotes() as $vote): ?>
@@ -84,7 +84,7 @@ $productName = $block->getProduct()->getName();
                                         aria-label="<?= $escaper->escapeHtmlAttr(__('%1 rating. %2 out of %3 stars', $productName, $starsFilled, $ratingSteps)) ?>">
                                         <?php $i = 0; ?>
                                         <?php while ($i < $starsFilled): ?>
-                                            <?= $heroiconsSolid->starHtml('text-teakea-gold', 24, 24, ["aria-hidden" => "true"]); ?>
+                                            <?= $heroiconsSolid->starHtml('text-techtic-gold', 24, 24, ["aria-hidden" => "true"]); ?>
                                             <?php $i++; ?>
                                         <?php endwhile; ?>
                                         <?php $i = 0; ?>

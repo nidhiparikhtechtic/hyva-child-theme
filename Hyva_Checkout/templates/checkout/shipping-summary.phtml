@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Hyvä Themes - https://hyva.io
  * Copyright © Hyvä Themes 2022-present. All rights reserved.
@@ -29,12 +30,12 @@ $carrier = $viewModel->getShippingCarrier();
     <?php if ($address->getFirstname() || $address->getLastname()): ?>
         <div class="pb-4">
             <div class="section-title border-b border-slate-300 pb-1 mb-2.5">
-                <h2 class="font-garamond text-2xl font-normal text-teakea-neutral">
+                <h2 class="font-garamond text-2xl font-normal text-techtic-neutral">
                     <?= $escaper->escapeHtml((__('Ship To'))) ?>
                 </h2>
             </div>
 
-            <address class="text-sm font-normal text-teakea-gray">
+            <address class="text-sm font-normal text-techtic-gray">
                 <?= /* @noEscape */ $addressRenderer->renderCustomerAddress($address) ?>
             </address>
         </div>
@@ -45,17 +46,17 @@ $carrier = $viewModel->getShippingCarrier();
     <?php endif ?>
 
     <?php if ($carrier): ?>
-    <div>
-        <div class="section-title border-b border-slate-300 pb-1 mb-2.5">
-            <h2 class="font-garamond text-2xl font-normal text-teakea-neutral">
-                <?= $escaper->escapeHtml((__('Shipping Method'))) ?>
-            </h2>
-        </div>
+        <div>
+            <div class="section-title border-b border-slate-300 pb-1 mb-2.5">
+                <h2 class="font-garamond text-2xl font-normal text-techtic-neutral">
+                    <?= $escaper->escapeHtml((__('Shipping Method'))) ?>
+                </h2>
+            </div>
 
-        <p class="text-sm font-normal text-teakea-gray">
-            <?= $escaper->escapeHtml($carrier) ?>
-        </p>
-    </div>
+            <p class="text-sm font-normal text-techtic-gray">
+                <?= $escaper->escapeHtml($carrier) ?>
+            </p>
+        </div>
     <?php else: ?>
         <p>
             <?= $escaper->escapeHtml(__('No shipping method selected.')) ?>

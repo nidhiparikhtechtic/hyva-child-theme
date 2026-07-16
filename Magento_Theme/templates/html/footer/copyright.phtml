@@ -23,19 +23,19 @@ $storeCode = $storeManager->getStore()->getCode();
 $baseUrl   = $storeManager->getStore()->getBaseUrl();
 
 $storeLinks = [
-    'teakea' => [
+    'techtic' => [
         'returns' => ['url' => 'herroeping-en-retour',         'label' => 'Retour & Herroepingsrecht'],
         'privacy' => ['url' => 'privacy-beleid',               'label' => 'Privacybeleid'],
     ],
-    'teakea_be' => [
+    'techtic_be' => [
         'returns' => ['url' => 'herroeping-en-retour',         'label' => 'Retour & Herroepingsrecht'],
         'privacy' => ['url' => 'privacy-beleid',               'label' => 'Privacybeleid'],
     ],
-    'teakea_dk' => [
+    'techtic_dk' => [
         'returns' => ['url' => 'returpolitik',                 'label' => 'Returpolitik & Fortrydelsesret'],
         'privacy' => ['url' => 'privatlivspolitik',            'label' => 'Privatlivspolitik'],
     ],
-    'teakea_de' => [
+    'techtic_de' => [
         'returns' => ['url' => 'widerrufsrecht-rueckgabe',     'label' => 'Widerruf & Rückgabe'],
         'privacy' => ['url' => 'datenschutzrichtlinie',        'label' => 'Datenschutzrichtlinie'],
     ],
@@ -43,22 +43,22 @@ $storeLinks = [
         'returns' => ['url' => 'return-policy',                'label' => 'Return Policy & Withdrawal'],
         'privacy' => ['url' => 'privacy-policy',               'label' => 'Privacy Policy'],
     ],
-    'teakea_fr' => [
+    'techtic_fr' => [
         'returns' => ['url' => 'politique-de-retour',          'label' => 'Retour & Rétractation'],
         'privacy' => ['url' => 'politique-de-confidentialite', 'label' => 'Politique de confidentialité'],
     ],
-    'teakea_lu' => [
+    'techtic_lu' => [
         'returns' => ['url' => 'politique-de-retour',          'label' => 'Retour & Rétractation'],
         'privacy' => ['url' => 'politique-de-confidentialite', 'label' => 'Politique de confidentialité'],
     ],
-    'teakea_es' => [
+    'techtic_es' => [
         'returns' => ['url' => 'politica-de-devolucion',       'label' => 'Devolución & Desistimiento'],
         'privacy' => ['url' => 'politica-de-privacidad',       'label' => 'Política de privacidad'],
     ],
 ];
 
 // Fallback to Nederland if store code not matched
-$links = $storeLinks[$storeCode] ?? $storeLinks['teakea'];
+$links = $storeLinks[$storeCode] ?? $storeLinks['techtic'];
 echo $storeCode;
 ?>
 
@@ -67,7 +67,7 @@ echo $storeCode;
 </small>
 
 <span class="flex justify-center lg:justify-start items-center gap-4 md:col-span-12 xl:w-[35%]">
-    <a class="" href="https://www.facebook.com/TeakeaNL/?locale=nl_NL" aria-label="<?= $escaper->escapeHtmlAttr(__('See our facebook profile!')) ?>" target="_blank">
+    <a class="" href="https://www.facebook.com/techticNL/?locale=nl_NL" aria-label="<?= $escaper->escapeHtmlAttr(__('See our facebook profile!')) ?>" target="_blank">
         <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">
             <rect x="0.5" y="0.5" width="50" height="50" rx="17.5" fill="white" />
             <rect x="0.5" y="0.5" width="50" height="50" rx="17.5" stroke="#F4F4F4" />
@@ -75,7 +75,7 @@ echo $storeCode;
         </svg>
     </a>
 
-    <a class="" href="https://www.instagram.com/accounts/login/?next=https%3A%2F%2Fwww.instagram.com%2Fteakeahomeliving%2F" aria-label="<?= $escaper->escapeHtmlAttr(__('See our instagram profile!')) ?>" target="_blank">
+    <a class="" href="https://www.instagram.com/accounts/login/?next=https%3A%2F%2Fwww.instagram.com%2Ftechtichomeliving%2F" aria-label="<?= $escaper->escapeHtmlAttr(__('See our instagram profile!')) ?>" target="_blank">
         <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">
             <rect x="0.5" y="0.5" width="50" height="50" rx="17.5" fill="white" />
             <rect x="0.5" y="0.5" width="50" height="50" rx="17.5" stroke="#F4F4F4" />
@@ -83,7 +83,7 @@ echo $storeCode;
         </svg>
     </a>
 
-    <a class="" href="https://nl.pinterest.com/teakealiving/" aria-label="<?= $escaper->escapeHtmlAttr(__('See our pinterest profile!')) ?>" target="_blank">
+    <a class="" href="https://nl.pinterest.com/techticliving/" aria-label="<?= $escaper->escapeHtmlAttr(__('See our pinterest profile!')) ?>" target="_blank">
         <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">
             <rect x="0.5" y="0.5" width="50" height="50" rx="17.5" fill="white" />
             <rect x="0.5" y="0.5" width="50" height="50" rx="17.5" stroke="#F4F4F4" />
@@ -91,7 +91,7 @@ echo $storeCode;
         </svg>
     </a>
 
-    <a class="" href="https://www.youtube.com/@TeakeaFurniture" aria-label="<?= $escaper->escapeHtmlAttr(__('See our youtube profile!')) ?>" target="_blank">
+    <a class="" href="https://www.youtube.com/@techticFurniture" aria-label="<?= $escaper->escapeHtmlAttr(__('See our youtube profile!')) ?>" target="_blank">
         <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">
             <rect x="0.5" y="0.5" width="50" height="50" rx="17.5" fill="white" />
             <rect x="0.5" y="0.5" width="50" height="50" rx="17.5" stroke="#F4F4F4" />
@@ -99,7 +99,7 @@ echo $storeCode;
         </svg>
     </a>
 
-    <a class="" href="https://nl.linkedin.com/company/teakea" aria-label="<?= $escaper->escapeHtmlAttr(__('See our linkedin profile!')) ?>" target="_blank">
+    <a class="" href="https://nl.linkedin.com/company/techtic" aria-label="<?= $escaper->escapeHtmlAttr(__('See our linkedin profile!')) ?>" target="_blank">
         <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">
             <rect x="0.5" y="0.5" width="50" height="50" rx="17.5" fill="white" />
             <rect x="0.5" y="0.5" width="50" height="50" rx="17.5" stroke="#F4F4F4" />

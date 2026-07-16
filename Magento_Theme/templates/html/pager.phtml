@@ -25,10 +25,10 @@ $paginationUrlAnchor = $block->hasData('pagination_url_anchor')
     ? '#' . $escaper->escapeHtmlAttr((string) $block->getData('pagination_url_anchor'))
     : '';
 
-$pagerItemClass = "relative inline-flex items-center text-base font-normal leading-5 bg-white border rounded-lg border-teakea-light-gray w-10 h-10 justify-around";
+$pagerItemClass = "relative inline-flex items-center text-base font-normal leading-5 bg-white border rounded-lg border-techtic-light-gray w-10 h-10 justify-around";
 $pagerItemBtnClass = $pagerItemClass
     . " hover:text-gray-400"
-    . " active:text-teakea-neutral";
+    . " active:text-techtic-neutral";
 ?>
 <?php if ($block->getCollection()->getSize()): ?>
 
@@ -133,7 +133,7 @@ $pagerItemBtnClass = $pagerItemClass
                                 <li class="item -ml-px">
                                     <a
                                         href="<?= $escaper->escapeUrl($block->getPageUrl($page)) . /* @noEscape */ $paginationUrlAnchor ?>"
-                                        class="page <?= /* @noEscape */ $pagerItemBtnClass ?> z-10 text-teakea-neutral font-medium	"
+                                        class="page <?= /* @noEscape */ $pagerItemBtnClass ?> z-10 text-techtic-neutral font-medium	"
                                         aria-current="page">
                                         <span class="sr-only label">
                                             <?= $escaper->escapeHtml(

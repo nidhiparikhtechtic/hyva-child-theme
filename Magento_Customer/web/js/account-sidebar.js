@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     sidebar.classList.add(
         'sm:border-r',
-        'border-teakea-light-gray',
+        'border-techtic-light-gray',
         'sm:sticky',
         'sm:top-6',
         'sm:h-screen'

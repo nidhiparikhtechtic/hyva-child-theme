@@ -85,9 +85,9 @@ mutation createProductReviewMutation(
                 <?= $block->getChildHtml('form_fields_before') ?>
                 <?= $recaptcha ? $recaptcha->getInputHtml(ReCaptcha::RECAPTCHA_FORM_ID_PRODUCT_REVIEW) : '' ?>
                 <div class="flex flex-col md:flex-row gap-5">
-                    <div class="w-full md:w-1/2 lg:w-1/4 p-5 border border-teakea-light-gray rounded-lg">
+                    <div class="w-full md:w-1/2 lg:w-1/4 p-5 border border-techtic-light-gray rounded-lg">
                         <fieldset>
-                            <legend class="text-base text-teakea-black">
+                            <legend class="text-base text-techtic-black">
                                 <span>
                                     <?= $escaper->escapeHtml(__("You're reviewing:")) ?>
                                 </span>
@@ -98,7 +98,7 @@ mutation createProductReviewMutation(
                             <?php if ($block->getRatings() && $block->getRatings()->getSize()): ?>
                                 <fieldset name="rating-group">
                                     <div class="flex flex-col mt-4 mb-3">
-                                        <div class="text-base font-semibold text-teakea-black <?php if ($block->getRatings()->getSize() <= 1): ?>hidden<?php endif ?>">
+                                        <div class="text-base font-semibold text-techtic-black <?php if ($block->getRatings()->getSize() <= 1): ?>hidden<?php endif ?>">
                                             <?= $escaper->escapeHtml(__('Your Rating')) ?>:
                                         </div>
                                         <div class="mt-4">
@@ -106,7 +106,7 @@ mutation createProductReviewMutation(
                                                 <?php foreach ($block->getRatings() as $rating): ?>
                                                     <div class="table-row mb-2">
                                                         <label
-                                                            class="table-cell pr-6 align-middle text-left text-base font-medium text-teakea-black"
+                                                            class="table-cell pr-6 align-middle text-left text-base font-medium text-techtic-black"
                                                             id="<?= $escaper->escapeHtmlAttr($rating->getRatingCode()) ?>_rating_label">
                                                             <span>
                                                                 <?php if ($block->getRatings()->getSize() <= 1): ?>
@@ -130,7 +130,7 @@ mutation createProductReviewMutation(
                                                                         for="<?= $escaper->escapeHtmlAttr($rating->getRatingCode() . '_' . $option->getValue()) ?>"
                                                                         id="<?= $escaper->escapeHtmlAttr($rating->getRatingCode() . '_' . $option->getValue()) ?>_label">
                                                                         <span :class="<?= (int)$iterator ?> <= clickedRatingId
-                                                                    ? 'text-teakea-gold'
+                                                                    ? 'text-techtic-gold'
                                                                     : 'text-gray-300'">
                                                                             <?= $heroiconsSolid->starHtml('', 28, 28, ["aria-hidden" => "true"]); ?>
                                                                         </span>
@@ -162,7 +162,7 @@ mutation createProductReviewMutation(
                             <?php endif ?>
                         </fieldset>
                     </div>
-                    <div class="w-full md:w-1/2 lg:w-3/4 p-5 border border-teakea-light-gray rounded-lg">
+                    <div class="w-full md:w-1/2 lg:w-3/4 p-5 border border-techtic-light-gray rounded-lg">
                         <fieldset>
                             <div>
                                 <div>
@@ -207,7 +207,7 @@ mutation createProductReviewMutation(
                         <div class="my-3">
                             <div>
                                 <button x-show="!displaySuccessMessage" type="submit"
-                                    class="bg-teakea-terracotta text-white text-sm font-semibold items-center py-3.5 px-7 gap-x-2.5 uppercase justify-center rounded-lg">
+                                    class="bg-techtic-terracotta text-white text-sm font-semibold items-center py-3.5 px-7 gap-x-2.5 uppercase justify-center rounded-lg">
                                     <span>
                                         <?= $escaper->escapeHtml(__('Submit your review')) ?>
                                     </span>

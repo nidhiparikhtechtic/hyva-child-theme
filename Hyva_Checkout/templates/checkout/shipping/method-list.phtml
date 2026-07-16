@@ -52,12 +52,12 @@ $methods = $viewModel->getList();
 
                     <div
                         id="shipping-method-option-<?= /* @noEscape */ $methodCode ?>"
-                        class="rounded-lg px-4 py-2 text-sm <?= $magewire->method === $methodCarrierCode . '_' . $methodCodeAttr ? 'active bg-teakea-red bg-opacity-10 border-teakea-red border' : 'inactive bg-teakea-lighter-gray' ?>"
+                        class="rounded-lg px-4 py-2 text-sm <?= $magewire->method === $methodCarrierCode . '_' . $methodCodeAttr ? 'active bg-techtic-red bg-opacity-10 border-techtic-red border' : 'inactive bg-techtic-lighter-gray' ?>"
                         wire:key="<?= /* @noEscape */ $methodCodeAttr ?>"
-                        x-data="mountainITTeakeaHyvaCheckoutShippingMethodList" data-hyvacsp1="<?= ! $method->getErrorMessage() ? 'false' : 'true' ?>">
-                        <label class="flex items-center gap-x-2 cursor-pointer text-teakea-gray text-sm font-normal rounded-lg <?php $magewire->method === $methodCarrierCode . '_' . $methodCodeAttr ? 'active bg-teakea-red bg-opacity-10' : 'inactive bg-teakea-lighter-gray' ?>">
+                        x-data="TechticHyvaChildHyvaCheckoutShippingMethodList" data-hyvacsp1="<?= ! $method->getErrorMessage() ? 'false' : 'true' ?>">
+                        <label class="flex items-center gap-x-2 cursor-pointer text-techtic-gray text-sm font-normal rounded-lg <?php $magewire->method === $methodCarrierCode . '_' . $methodCodeAttr ? 'active bg-techtic-red bg-opacity-10' : 'inactive bg-techtic-lighter-gray' ?>">
                             <input type="radio"
-                                class="form-radio border-[#C7C7C7] bg-teakea-lighter-gray"
+                                class="form-radio border-[#C7C7C7] bg-techtic-lighter-gray"
                                 id="shipping-method-<?= /* @noEscape */ $methodCodeAttr ?>"
                                 name="shipping-method-option"
                                 value="<?= $escaper->escapeHtmlAttr($methodCarrierCode . '_' . $methodCodeAttr) ?>"
@@ -66,7 +66,7 @@ $methods = $viewModel->getList();
                             <span
                                 class="flex flex-1 flex-wrap justify-between cursor-pointer gap-x-4 gap-y-2"
                                 for="shipping-method-<?= /* @noEscape */ $methodCodeAttr ?>">
-                                <span class="font-normal hyphens-auto break-words leading-relaxed <?= $magewire->method === $methodCarrierCode . '_' . $methodCodeAttr ? 'teakea-neutral' : 'teakea-gray' ?>">
+                                <span class="font-normal hyphens-auto break-words leading-relaxed <?= $magewire->method === $methodCarrierCode . '_' . $methodCodeAttr ? 'techtic-neutral' : 'techtic-gray' ?>">
                                     <?=
                                     /** @noEscape */
                                     $methodTitle ?>
@@ -127,7 +127,7 @@ $methods = $viewModel->getList();
         </div>
 
 
-        <div class="my-2.5 text-sm font-medium text-teakea-gray">
+        <div class="my-2.5 text-sm font-medium text-techtic-gray">
             <?= __('Gratis bezorgd in NL & BE vanaf €300,-') ?>
         </div>
 

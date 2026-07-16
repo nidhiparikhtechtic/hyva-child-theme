@@ -46,7 +46,7 @@ $qty = (int)$stockItemViewModel->getQty($product);
                         <button @click="submitForm"
                                 :disabled="isLoading"
                                 :class="{ 'opacity-70 cursor-not-allowed': isLoading }"
-                                class="relative flex bg-teakea-lime-green text-white text-sm font-semibold items-center py-3 px-5 gap-x-2.5 uppercase w-full justify-center rounded-lg"
+                                class="relative flex bg-techtic-lime-green text-white text-sm font-semibold items-center py-3 px-5 gap-x-2.5 uppercase w-full justify-center rounded-lg"
                                 id="product-addtocart-button-regular">
 
                                 <!-- Spinner -->
@@ -100,15 +100,15 @@ $qty = (int)$stockItemViewModel->getQty($product);
 
                         <div class="flex flex-col gap-3">
                                 <a href="<?= $escaper->escapeUrl($block->getUrl('checkout/cart')) ?>"
-                                        class="flex items-center justify-center gap-x-2.5 bg-teakea-gold text-teakea-black py-3.5 px-4 font-semibold rounded-lg uppercase">
+                                        class="flex items-center justify-center gap-x-2.5 bg-techtic-gold text-techtic-black py-3.5 px-4 font-semibold rounded-lg uppercase">
                                         <span><?= $escaper->escapeHtml(__('View Cart')) ?></span>
                                 </a>
                                 <a href="<?= $escaper->escapeUrl($block->getUrl('checkout')) ?>"
-                                        class="flex items-center justify-center gap-x-2.5 bg-teakea-red text-white font-semibold py-3.5 px-4 rounded-lg uppercase">
+                                        class="flex items-center justify-center gap-x-2.5 bg-techtic-red text-white font-semibold py-3.5 px-4 rounded-lg uppercase">
                                         <span><?= $escaper->escapeHtml(__('Proceed to Checkout')) ?></span>
                                 </a>
                                 <button @click="showModal = false"
-                                        class="flex items-center justify-center gap-x-2.5 bg-white border border-black text-teakea-dark-gray font-semibold py-3.5 px-4 rounded-lg uppercase">
+                                        class="flex items-center justify-center gap-x-2.5 bg-white border border-black text-techtic-dark-gray font-semibold py-3.5 px-4 rounded-lg uppercase">
                                         <span><?= $escaper->escapeHtml(__('Continue Shopping')) ?></span>
                                 </button>
                         </div>
@@ -134,7 +134,7 @@ $qty = (int)$stockItemViewModel->getQty($product);
 
                         <div class="flex flex-col gap-3">
                                 <button @click="showErrorModal = false"
-                                        class="flex items-center justify-center gap-x-2.5 bg-teakea-gold text-teakea-dark-gray font-semibold py-3.5 px-4 rounded-lg uppercase">
+                                        class="flex items-center justify-center gap-x-2.5 bg-techtic-gold text-techtic-dark-gray font-semibold py-3.5 px-4 rounded-lg uppercase">
                                         <span><?= $escaper->escapeHtml(__('Try Again')) ?></span>
                                 </button>
                         </div>

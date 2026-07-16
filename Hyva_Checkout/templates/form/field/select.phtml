@@ -37,15 +37,15 @@ $cssClassesFieldWrapperInner = $element->renderClass(['field'], 'field-wrapper-i
         <div class="space-y-2">
         <?php endif ?>
 
-        <div class="group input-group flex gap-4 focus-within:ring-0 focus-within:border-teakea-light-gray">
+        <div class="group input-group flex gap-4 focus-within:ring-0 focus-within:border-techtic-light-gray">
             <?php if ($element->hasIcon()): ?>
-                <div class="inline-flex gap-2 items-center bg-teakea-lighter-gray p-2 rounded-lg">
+                <div class="inline-flex gap-2 items-center bg-techtic-lighter-gray p-2 rounded-lg">
                     <?= /* @noEscape */ $renderer->renderIcon($element) ?>
                 </div>
             <?php endif ?>
 
             <select
-                class="<?= $escaper->escapeHtmlAttr($element->renderClass(['block w-full form-select bg-teakea-lighter-gray border border-teakea-light-gray rounded-lg h-[50px] text-teakea-gray text-sm font-normal '])) ?>"
+                class="<?= $escaper->escapeHtmlAttr($element->renderClass(['block w-full form-select bg-techtic-lighter-gray border border-techtic-light-gray rounded-lg h-[50px] text-techtic-gray text-sm font-normal '])) ?>"
                 <?php if ($element->hasAttributes()): ?>
                 <?= /* @noEscape */ $element->renderAttributes($escaper) ?>
                 <?php endif ?>>
@@ -67,7 +67,7 @@ $cssClassesFieldWrapperInner = $element->renderClass(['field'], 'field-wrapper-i
             </select>
 
             <?php if (!empty($renderer->renderTooltip($element))): ?>
-                <div class="inline-flex gap-2 items-center bg-teakea-lighter-gray p-2 rounded-lg">
+                <div class="inline-flex gap-2 items-center bg-techtic-lighter-gray p-2 rounded-lg">
                     <?= /* @noEscape */ $renderer->renderTooltip($element) ?>
                 </div>
             <?php endif ?>

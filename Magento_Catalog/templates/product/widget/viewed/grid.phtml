@@ -59,29 +59,28 @@ echo $block->assign(['uniqueId' => $uniqueId, 'title' => $title])
                 return this.$root.querySelector('.js_slides');
             },
             pageCount: 0,
-lastPageIndex: 0,
+            lastPageIndex: 0,
 
             calcPageSize() {
-    const slider = this.getSlider();
-    if (slider) {
-        this.itemCount = slider.querySelectorAll('.js_slide').length;
+                const slider = this.getSlider();
+                if (slider) {
+                    this.itemCount = slider.querySelectorAll('.js_slide').length;
 
-        // Compute size
-        this.pageSize = Math.round(
-            slider.clientWidth / slider.querySelector('.js_slide').clientWidth
-        );
+                    // Compute size
+                    this.pageSize = Math.round(
+                        slider.clientWidth / slider.querySelector('.js_slide').clientWidth
+                    );
 
-        // Fillers
-        this.pageFillers = (
-            this.pageSize * Math.ceil(this.itemCount / this.pageSize)
-        ) - this.itemCount;
+                    // Fillers
+                    this.pageFillers = (
+                        this.pageSize * Math.ceil(this.itemCount / this.pageSize)
+                    ) - this.itemCount;
 
-        // Compute pageCount & lastPageIndex
-        this.pageCount = Math.ceil(this.itemCount / this.pageSize);
-        this.lastPageIndex = (this.pageCount - 1) * this.pageSize;
-    }
-}
-,
+                    // Compute pageCount & lastPageIndex
+                    this.pageCount = Math.ceil(this.itemCount / this.pageSize);
+                    this.lastPageIndex = (this.pageCount - 1) * this.pageSize;
+                }
+            },
             calcActive() {
                 const slider = this.getSlider();
                 if (slider) {
@@ -123,7 +122,9 @@ lastPageIndex: 0,
 
 <section class="my-12 text-gray-700 body-font"
     x-data="{
-    ...initRecentlyViewedProductsComponent<?= /** @noEscape */ $uniqueId ?>({isSlider: true}),
+    ...initRecentlyViewedProductsComponent<?=
+                                            /** @noEscape */
+                                            $uniqueId ?>({isSlider: true}),
     ...initSliderComponents()
 }"
     x-defer="intersect"
@@ -204,7 +205,7 @@ lastPageIndex: 0,
                                         style="padding-top:100%"
                                         tabindex="-1">
                                         <span class="absolute top-0 left-0 flex flex-wrap content-center w-full
-                                                         h-full p-2 overflow-hidden align-center hover:shadow-sm border rounded-lg border-teakea-light-gray">
+                                                         h-full p-2 overflow-hidden align-center hover:shadow-sm border rounded-lg border-techtic-light-gray">
                                             <img class="self-center w-full h-auto"
                                                 :src="product.small_image.url"
                                                 :alt="product.small_image.label"
@@ -215,72 +216,72 @@ lastPageIndex: 0,
                                     </a>
                                     <div class="product-info flex flex-col grow mt-5 gap-y-2.5">
 
-                                    
-                                <?php endif; ?>
-                                <?php if (in_array("name", $widgetAttributesToShow)): ?>
-                                    <p class="flex justify-start text-black">
-                                        <a class="truncate product-item-link"
-                                            :href="'<?= $escaper->escapeJs($escaper->escapeUrl($block->getBaseUrl())) ?>' +
-                                                    product.url_key + (product.url_suffix || '')">
-                                            <span class="flex text-sm sm:text-base line-clamp-1 overflow-hidden" x-html="product.name"></span>
-                                        </a>
-                                    </p>
-                                <?php endif; ?>
-                                <?php if (in_array("price", $widgetAttributesToShow)): ?>
-                                    <div class="flex items-center font-bold text-base text-teakea-neutral-dark">
-                                        <div class="final-price">
-                                            <span class="price-wrapper title-font">
-                                                <span class="price" x-html="hyva.formatPrice(product.price_range.minimum_price.final_price.value)"></span>
-                                            </span>
-                                        </div>
-                                        <?php if ($productPrice->displayPriceInclAndExclTax()): ?>
-                                            <template x-if="product.price_range.minimum_price.base_price">
-                                                <div class="final-price-excl-tax">
-                                                    <span class="font-regular text-gray-900">
-                                                        <span><?= $escaper->escapeHtml(__('Excl. Tax')) ?>:</span>
-                                                        <span class="price" x-html="hyva.formatPrice(product.price_range.minimum_price.base_price.value)"></span>
-                                                    </span>
-                                                </div>
-                                            </template>
-                                        <?php endif; ?>
-                                    </div>
-                                <?php endif; ?>
-                                </div>
-                                <p class="flex flex-wrap gap-2 p-3">
-                                    <?php if (in_array("learn_more", $widgetAttributesToShow)): ?>
-                                        <a class="justify-center w-auto mr-auto btn btn-primary"
-                                            :href="'<?= $escaper->escapeJs($escaper->escapeUrl($block->getBaseUrl())) ?>' +
-                                                    product.url_key + (product.url_suffix || '')">
-                                            <span class="inline"><?= $escaper->escapeHtml(__('View Product')) ?></span>
-                                        </a>
+
                                     <?php endif; ?>
-                                    <span class="inline-flex gap-2">
-                                        <?php if (in_array("add_to_compare", $widgetButtonsToShow)): ?>
-                                            <?php if ($compareViewModel->showInProductList()): ?>
-                                                <button @click.prevent="addToCompare(product.id)"
-                                                    aria-label="<?= $escaper->escapeHtmlAttr(__('Add to Compare')) ?>"
-                                                    class="rounded-full w-10 h-10 bg-gray-200 p-0 border-0
+                                    <?php if (in_array("name", $widgetAttributesToShow)): ?>
+                                        <p class="flex justify-start text-black">
+                                            <a class="truncate product-item-link"
+                                                :href="'<?= $escaper->escapeJs($escaper->escapeUrl($block->getBaseUrl())) ?>' +
+                                                    product.url_key + (product.url_suffix || '')">
+                                                <span class="flex text-sm sm:text-base line-clamp-1 overflow-hidden" x-html="product.name"></span>
+                                            </a>
+                                        </p>
+                                    <?php endif; ?>
+                                    <?php if (in_array("price", $widgetAttributesToShow)): ?>
+                                        <div class="flex items-center font-bold text-base text-techtic-neutral-dark">
+                                            <div class="final-price">
+                                                <span class="price-wrapper title-font">
+                                                    <span class="price" x-html="hyva.formatPrice(product.price_range.minimum_price.final_price.value)"></span>
+                                                </span>
+                                            </div>
+                                            <?php if ($productPrice->displayPriceInclAndExclTax()): ?>
+                                                <template x-if="product.price_range.minimum_price.base_price">
+                                                    <div class="final-price-excl-tax">
+                                                        <span class="font-regular text-gray-900">
+                                                            <span><?= $escaper->escapeHtml(__('Excl. Tax')) ?>:</span>
+                                                            <span class="price" x-html="hyva.formatPrice(product.price_range.minimum_price.base_price.value)"></span>
+                                                        </span>
+                                                    </div>
+                                                </template>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endif; ?>
+                                    </div>
+                                    <p class="flex flex-wrap gap-2 p-3">
+                                        <?php if (in_array("learn_more", $widgetAttributesToShow)): ?>
+                                            <a class="justify-center w-auto mr-auto btn btn-primary"
+                                                :href="'<?= $escaper->escapeJs($escaper->escapeUrl($block->getBaseUrl())) ?>' +
+                                                    product.url_key + (product.url_suffix || '')">
+                                                <span class="inline"><?= $escaper->escapeHtml(__('View Product')) ?></span>
+                                            </a>
+                                        <?php endif; ?>
+                                        <span class="inline-flex gap-2">
+                                            <?php if (in_array("add_to_compare", $widgetButtonsToShow)): ?>
+                                                <?php if ($compareViewModel->showInProductList()): ?>
+                                                    <button @click.prevent="addToCompare(product.id)"
+                                                        aria-label="<?= $escaper->escapeHtmlAttr(__('Add to Compare')) ?>"
+                                                        class="rounded-full w-10 h-10 bg-gray-200 p-0 border-0
                                                             inline-flex items-center justify-center text-gray-500
                                                             hover:text-yellow-500"
-                                                    data-addto="compare">
-                                                    <?= $heroicons->scaleHtml('', 20, 20, ['aria-hidden' => 'true']) ?>
-                                                </button>
+                                                        data-addto="compare">
+                                                        <?= $heroicons->scaleHtml('', 20, 20, ['aria-hidden' => 'true']) ?>
+                                                    </button>
+                                                <?php endif; ?>
                                             <?php endif; ?>
-                                        <?php endif; ?>
-                                        <?php if (in_array("add_to_wishlist", $widgetButtonsToShow)): ?>
-                                            <?php if ($wishlistViewModel->isEnabled()): ?>
-                                                <button
-                                                    aria-label="<?= $escaper->escapeHtmlAttr(__('Add to Wish List')) ?>"
-                                                    @click.prevent="addToWishlist(product.id)"
-                                                    class="inline-flex items-center justify-center w-10 h-10 p-0 ml-auto
+                                            <?php if (in_array("add_to_wishlist", $widgetButtonsToShow)): ?>
+                                                <?php if ($wishlistViewModel->isEnabled()): ?>
+                                                    <button
+                                                        aria-label="<?= $escaper->escapeHtmlAttr(__('Add to Wish List')) ?>"
+                                                        @click.prevent="addToWishlist(product.id)"
+                                                        class="inline-flex items-center justify-center w-10 h-10 p-0 ml-auto
                                                     text-gray-500 bg-gray-200 border-0 rounded-full hover:text-red-600"
-                                                    data-addto="wishlist">
-                                                    <?= $heroicons->heartHtml('', 20, 20, ['aria-hidden' => 'true']) ?>
-                                                </button>
+                                                        data-addto="wishlist">
+                                                        <?= $heroicons->heartHtml('', 20, 20, ['aria-hidden' => 'true']) ?>
+                                                    </button>
+                                                <?php endif; ?>
                                             <?php endif; ?>
-                                        <?php endif; ?>
-                                    </span>
-                                </p>
+                                        </span>
+                                    </p>
                             </div>
                         </div>
                     </template>

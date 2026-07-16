@@ -1,4 +1,5 @@
 <?php
+
 /**
  * FurnitureStore Schema
  *
@@ -32,7 +33,7 @@ if (!$isAllowed) {
 
 // Reusable config getter
 $config = $objectManager->get(ScopeConfigInterface::class);
-$cfg = static fn (string $path) => $config->getValue($path, ScopeInterface::SCOPE_STORE);
+$cfg = static fn(string $path) => $config->getValue($path, ScopeInterface::SCOPE_STORE);
 
 $schema = [
     '@context'       => 'https://schema.org',
@@ -44,7 +45,7 @@ $schema = [
     'email'          => $cfg('trans_email/ident_general/email'),
     'foundingDate'   => '2002',
     'priceRange'     => '€€',
-    'image'          => "https://www.teakea.nl/media/logo/default/teakea_logo512x128.png",
+    'image'          => "#",
     'parentOrganization' => ['@id' => $store->getBaseUrl() . '#organization'],
     'address' => [
         '@type'           => 'PostalAddress',
@@ -62,15 +63,17 @@ $schema = [
     'hasMap' => 'https://maps.app.goo.gl/sApkkhy6N8ZnH5U2A',
     'openingHoursSpecification' => [],
     'sameAs' => [
-        'https://www.facebook.com/TeakeaNL/',
-        'https://www.instagram.com/teakeahomeliving/',
-        'https://nl.pinterest.com/teakealiving/',
-        'https://www.youtube.com/@TeakeaFurniture',
-        'https://nl.linkedin.com/company/teakea',
-        'https://www.webwinkelkeur.nl/webshop/Teakea_1215009',
+        'https://www.facebook.com/#/',
+        'https://www.instagram.com/#',
+        'https://nl.pinterest.com/#',
+        'https://www.youtube.com/@#',
+        'https://nl.linkedin.com/company/#',
+        'https://www.webwinkelkeur.nl/webshop/#',
     ],
 ];
 ?>
 <script type="application/ld+json">
-<?= /** @noEscape */ json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT); ?>
+    <?=
+    /** @noEscape */
+    json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT); ?>
 </script>

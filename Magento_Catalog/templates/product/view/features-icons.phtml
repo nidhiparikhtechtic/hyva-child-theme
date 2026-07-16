@@ -55,14 +55,14 @@ $features = [
 
 <div
     x-data="{ active: '<?= $selectedOptions[0] ?? '' ?>' }"
-    class="grid grid-cols-1 lg:grid-cols-3 border border-teakea-light-gray rounded-lg overflow-hidden mt-12">
+    class="grid grid-cols-1 lg:grid-cols-3 border border-techtic-light-gray rounded-lg overflow-hidden mt-12">
     <!-- Left Side (Tabs) -->
     <div class="lg:col-span-1">
         <?php foreach ($selectedOptions as $option): ?>
             <?php if (isset($features[$option])): ?>
                 <button
-                    class="flex w-full items-center gap-2.5 py-2.5 px-5 space-x-5 border-b lg:border-r border-teakea-light-gray cursor-pointer transition-colors"
-                    :class="active === '<?= $option ?>' ? 'bg-teakea-cream lg:border-r-0' : ''"
+                    class="flex w-full items-center gap-2.5 py-2.5 px-5 space-x-5 border-b lg:border-r border-techtic-light-gray cursor-pointer transition-colors"
+                    :class="active === '<?= $option ?>' ? 'bg-techtic-cream lg:border-r-0' : ''"
                     @click="active = '<?= $option ?>'">
                     <div class="w-14 h-14 bg-white border border-[#0000004D] rounded-full flex items-center justify-center">
                         <img src="<?= $block->getViewFileUrl('images/' . $features[$option]['icon']); ?>"
@@ -71,7 +71,7 @@ $features = [
                             class="h-8 w-8">
                     </div>
 
-                    <span class="text-base lg:text-lg font-medium leading-6 text-teakea-dark-gray"
+                    <span class="text-base lg:text-lg font-medium leading-6 text-techtic-dark-gray"
                         :class="active === '<?= $option ?>' ? 'font-bold' : ''">
                         <?= $escaper->escapeHtml(__($features[$option]['title'])); ?></span>
                 </button>
@@ -80,11 +80,11 @@ $features = [
     </div>
 
     <!-- Right Side (Content) -->
-    <div class="lg:col-span-2 bg-teakea-cream rounded-br-lg rounded-bl-lg lg:rounded-bl-none lg:rounded-tr-lg p-5 pb-7 lg:py-7 lg:pr-5 lg:pl-14">
+    <div class="lg:col-span-2 bg-techtic-cream rounded-br-lg rounded-bl-lg lg:rounded-bl-none lg:rounded-tr-lg p-5 pb-7 lg:py-7 lg:pr-5 lg:pl-14">
         <?php foreach ($selectedOptions as $option): ?>
             <?php if (isset($features[$option])): ?>
                 <div class="<?= $features[$option]['class'] ?>" x-show="active === '<?= $option ?>'" x-transition style="display:none;">
-                    <h3 class="text-lg lg:text-xl font-bold text-teakea-neutral-dark mb-5"><?= $escaper->escapeHtml(__($features[$option]['title'])); ?></h3>
+                    <h3 class="text-lg lg:text-xl font-bold text-techtic-neutral-dark mb-5"><?= $escaper->escapeHtml(__($features[$option]['title'])); ?></h3>
                     <p class="text-base text-[#666]"><?= $escaper->escapeHtml(__($features[$option]['desc'])); ?></p>
 
 

@@ -66,8 +66,8 @@ $block->setData('cache_tags', $viewModelNavigation->getIdentities());
                         type="button"
                         class="text-white level-0 group w-full flex justify-between items-center gap-1
                             transition py-6 text-neutral-950 font-medium text-sm not-italic leading-4
-                            aria-expanded:text-teakea-terracotta data-[has-current]:aria-expanded:text-teakea-terracotta
-                            data-[has-current]:hover:text-teakea-terracotta"
+                            aria-expanded:text-techtic-terracotta data-[has-current]:aria-expanded:text-techtic-terracotta
+                            data-[has-current]:hover:text-techtic-terracotta"
                         @click="open = !open"
                         aria-expanded="false"
                         :aria-expanded="open"
@@ -88,7 +88,7 @@ $block->setData('cache_tags', $viewModelNavigation->getIdentities());
                     </button>
                     <div
                         id="<?= $escaper->escapeHtml($menuId) ?>"
-                        class="z-30 absolute inset-x-0 flex gap-8 container py-6 min-h-64 border-t border-slate-100 rounded-b-lg shadow-md overflow-auto bg-teakea-cream pl-12 w-full"
+                        class="z-30 absolute inset-x-0 flex gap-8 container py-6 min-h-64 border-t border-slate-100 rounded-b-lg shadow-md overflow-auto bg-techtic-cream pl-12 w-full"
                         x-show="open === true"
                         x-transition
                         x-cloak>
@@ -143,8 +143,8 @@ $block->setData('cache_tags', $viewModelNavigation->getIdentities());
                         title="<?= $escaper->escapeHtmlAttr($item['name']) ?>"
                         class="text-white level-0 w-full flex justify-between items-center
                                 transition py-7 text-neutral-950 font-medium text-sm not-italic leading-4
-                                data-[has-current]:text-teakea-terracotta
-                            data-[has-current]:hover:text-teakea-terracotta
+                                data-[has-current]:text-techtic-terracotta
+                            data-[has-current]:hover:text-techtic-terracotta
                             <?= $item['name'] === $topMenuCtaItem ? 'text-neutral-950' : '' ?>">
                         <?= $escaper->escapeHtml($item['name']) ?>
                     </a>

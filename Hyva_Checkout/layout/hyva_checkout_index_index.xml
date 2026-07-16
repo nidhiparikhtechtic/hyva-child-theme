@@ -28,13 +28,13 @@
         <referenceBlock name="script-alpine-js">
             <block name="checkout-usp-csp-block"
                 template="Hyva_Checkout::page/js/checkout-usp-csp.phtml" />
-            <block name="teakea.checkout.customer-comment.csp-js"
+            <block name="hyvachild.checkout.customer-comment.csp-js"
                 template="Hyva_Checkout::checkout/customer-comment-csp-js.phtml" />
-            <block name="teakea.checkout.tooltip.csp-js"
+            <block name="hyvachild.checkout.tooltip.csp-js"
                 template="Hyva_Checkout::form/field/html/tooltip-csp-js.phtml" />
-            <block name="teakea.checkout.method-list.csp-js"
+            <block name="hyvachild.checkout.method-list.csp-js"
                 template="Hyva_Checkout::checkout/shipping/method-list-csp-js.phtml" />
-            <block name="teakea.checkout.terms-conditionlist.csp-js"
+            <block name="hyvachild.checkout.terms-conditionlist.csp-js"
                 template="Hyva_Checkout::checkout/terms-conditions/list-csp-js.phtml" />
         </referenceBlock>
 

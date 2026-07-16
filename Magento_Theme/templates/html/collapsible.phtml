@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Hyvä Themes - https://hyva.io
  * Copyright © Hyvä Themes. All rights reserved.
@@ -39,22 +40,22 @@ if ($customerSession->isLoggedIn()) {
 ?>
 
 <div class="mb-6 <?= $escaper->escapeHtmlAttr($blockClass) ?>"
-     x-data="initAccountNavigation()"
-     x-init="checkIsMobileResolution()"
-     @resize.window.debounce="checkIsMobileResolution()"
-     @visibilitychange.window.debounce="checkIsMobileResolution()">
+    x-data="initAccountNavigation()"
+    x-init="checkIsMobileResolution()"
+    @resize.window.debounce="checkIsMobileResolution()"
+    @visibilitychange.window.debounce="checkIsMobileResolution()">
 
-    <div class="flex flex-col items-start gap-1 px-4 pb-4 border-b border-teakea-light-gray">
-        <div class="w-12 h-12 rounded-full bg-teakea-deep-green flex items-center justify-center text-white text-xl font-bold select-none mb-2">
+    <div class="flex flex-col items-start gap-1 px-4 pb-4 border-b border-techtic-light-gray">
+        <div class="w-12 h-12 rounded-full bg-techtic-deep-green flex items-center justify-center text-white text-xl font-bold select-none mb-2">
             <?= $escaper->escapeHtml($avatarLetter) ?>
         </div>
-        <span class="text-xs italic text-teakea-deep-green font-medium leading-none">
+        <span class="text-xs italic text-techtic-deep-green font-medium leading-none">
             <?= $escaper->escapeHtml($blockTitle) ?>
         </span>
         <?php if ($customerName): ?>
-        <b class="text-base font-bold text-teakea-black leading-tight">
-            <?= $escaper->escapeHtml($customerName) ?>
-        </b>
+            <b class="text-base font-bold text-techtic-black leading-tight">
+                <?= $escaper->escapeHtml($customerName) ?>
+            </b>
         <?php endif; ?>
     </div>
 
@@ -62,7 +63,7 @@ if ($customerSession->isLoggedIn()) {
     <button
         type="button"
         id="<?= $escaper->escapeHtmlAttr($blockId) ?>-title"
-        class="md:hidden flex justify-between items-center w-full px-4 py-3 text-sm font-semibold text-teakea-black"
+        class="md:hidden flex justify-between items-center w-full px-4 py-3 text-sm font-semibold text-techtic-black"
         @click="blockOpen = !blockOpen"
         :aria-expanded="blockOpen">
         <span><?= $escaper->escapeHtml(__('Menu')) ?></span>
@@ -103,9 +104,9 @@ if ($customerSession->isLoggedIn()) {
             blockOpen: false,
             checkIsMobileResolution() {
                 const mobileElement = this.$refs.AccountNavigationMobileToggleIcon;
-                this.isMobile = mobileElement
-                    ? getComputedStyle(mobileElement).display !== 'none'
-                    : window.matchMedia('(max-width: 767px)').matches;
+                this.isMobile = mobileElement ?
+                    getComputedStyle(mobileElement).display !== 'none' :
+                    window.matchMedia('(max-width: 767px)').matches;
             }
         }
     }

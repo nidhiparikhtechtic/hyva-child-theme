@@ -27,7 +27,7 @@ $block->setData('cache_tags', $viewModelNavigation->getIdentities());
 $logoBlock = $block->getLayout()->getBlock('logo');
 $storeName = $logoBlock ? $logoBlock->getThemeName() : '';
 
-$logoAlt = $escaper->escapeHtmlAttr($storeName ?: 'Teakea');
+$logoAlt = $escaper->escapeHtmlAttr($storeName ?: 'Techtic');
 $logoTitle = $logoAlt . ' - Home';
 
 // ── Showroom status ───────────────────────────────────────────────────────
@@ -102,12 +102,12 @@ foreach ($menuItems as $menuItem) {
     </button>
 
     <div x-ref="mobileMenuNavLinks" x-cloak
-        class="fixed bg-teakea-cream inset-0 z-50 flex flex-col overflow-y-auto transition-transform duration-300 ease-in-out"
+        class="fixed bg-techtic-cream inset-0 z-50 flex flex-col overflow-y-auto transition-transform duration-300 ease-in-out"
         :class="open ? 'translate-x-0' : '-translate-x-full'"
         :aria-hidden="open ? 'false' : 'true'" role="dialog" aria-modal="true">
 
         <!-- Header -->
-        <div class="flex items-center justify-between px-5 py-4 border-b border-teakea-white">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-techtic-white">
             <a href="<?= $escaper->escapeUrl($block->getUrl('')) ?>" class="flex items-center justify-center">
                 <img src="<?= $escaper->escapeUrl($block->getViewFileUrl('images/mobile-menu-logo.svg')) ?>"
                     alt="<?= $logoAlt ?>"
@@ -144,8 +144,8 @@ foreach ($menuItems as $menuItem) {
             <!-- OUR COLLECTIONS — accordion -->
             <div class="px-5 pt-6 pb-2">
                 <div class="flex items-center gap-3 mb-4">
-                    <span class="text-xs font-semibold tracking-widest uppercase text-teakea-dark-brown"><?= $escaper->escapeHtml(__('Our collections')) ?></span>
-                    <div class="flex-1 h-px bg-teakea-dark-brown opacity-40"></div>
+                    <span class="text-xs font-semibold tracking-widest uppercase text-techtic-dark-brown"><?= $escaper->escapeHtml(__('Our collections')) ?></span>
+                    <div class="flex-1 h-px bg-techtic-dark-brown opacity-40"></div>
                 </div>
 
                 <ul class="flex flex-col gap-2" aria-label="<?= $escaper->escapeHtmlAttr(__('Site navigation links')) ?>">
@@ -197,7 +197,7 @@ foreach ($menuItems as $menuItem) {
                                 <?php if ($hasChildren): ?>
                                     <!-- Accordion body — expands inline below the card header -->
                                     <div x-show="activeAccordion === '<?= $accordionId ?>'" x-collapse x-cloak
-                                        class="border-t border-teakea-lighter-gray py-2 px-3 bg-[#f9f8f6]">
+                                        class="border-t border-techtic-lighter-gray py-2 px-3 bg-[#f9f8f6]">
 
                                         <div class="flex items-center gap-3 mb-3 py-1">
                                             <span class="text-xs font-semibold tracking-widest uppercase text-teak-muted">
@@ -214,7 +214,7 @@ foreach ($menuItems as $menuItem) {
                                                         title="<?= $escaper->escapeHtmlAttr($subMenuItem['name']) ?>"
                                                         class="flex items-center focus:outline-none focus:ring-0"
                                                         @click="gtag('event', 'subcategory_tile_click', { parent_category: '<?= $escaper->escapeJs($menuItem['name']) ?>', subcategory: '<?= $escaper->escapeJs($subMenuItem['name']) ?>', subcategory_url: '<?= $escaper->escapeJs($subMenuItem['url']) ?>' })">
-                                                        <span class="flex-1 text-base font-semibold text-teakea-deep-green">
+                                                        <span class="flex-1 text-base font-semibold text-techtic-deep-green">
                                                             <?= $escaper->escapeHtml(__($subMenuItem['name'])) ?>
                                                         </span>
                                                         <svg class="w-5 h-5 text-teak-muted flex-shrink-0" viewBox="0 0 24 24" fill="none">
@@ -226,7 +226,7 @@ foreach ($menuItems as $menuItem) {
                                         </ul>
 
                                         <!-- View all button -->
-                                        <div class="px-4 py-3 border-t border-teakea-lighter-gray">
+                                        <div class="px-4 py-3 border-t border-techtic-lighter-gray">
                                             <a href="<?= $escaper->escapeUrl($menuItem['url']) ?>"
                                                 class="flex items-center justify-center w-full py-3 rounded-xl border border-teak-green text-sm font-semibold text-teak-green bg-transparent focus:outline-none focus:ring-0"
                                                 @click="gtag('event', 'menu_click', { menu_item: '<?= $escaper->escapeJs($menuItem['name']) ?>', menu_section: 'collections', action: 'view_all' })">
@@ -248,12 +248,12 @@ foreach ($menuItems as $menuItem) {
             <!-- OUR STORY -->
             <div class="px-5 pt-6 pb-2">
                 <div class="flex items-center gap-3 mb-4">
-                    <span class="text-xs font-semibold tracking-widest uppercase text-teakea-dark-brown"><?= $escaper->escapeHtml(__('Our story')) ?></span>
-                    <div class="flex-1 h-px bg-teakea-dark-brown opacity-40"></div>
+                    <span class="text-xs font-semibold tracking-widest uppercase text-techtic-dark-brown"><?= $escaper->escapeHtml(__('Our story')) ?></span>
+                    <div class="flex-1 h-px bg-techtic-dark-brown opacity-40"></div>
                 </div>
                 <ul class="flex flex-col gap-2">
                     <li>
-                        <a href="/over-teakea" class="flex items-center gap-4 p-4 rounded-2xl bg-white shadow-sm focus:outline-none focus:ring-0">
+                        <a href="#" class="flex items-center gap-4 p-4 rounded-2xl bg-white shadow-sm focus:outline-none focus:ring-0">
                             <div class="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center text-teak-green bg-teak-light-green">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
                                     <path d="M3 17l8-8 4 4-8 8H3v-4z"></path>
@@ -280,7 +280,7 @@ foreach ($menuItems as $menuItem) {
                             <div class="flex-1 min-w-0">
                                 <span class="block text-base font-semibold leading-tight text-teak-green"><?= $escaper->escapeHtml(__('Our Showroom')) ?></span>
                                 <span class="flex items-center gap-1.5 text-xs mt-0.5">
-                                    <span class="inline-block w-2 h-2 rounded-full <?= $isOpen ? 'bg-teakea-lime-green' : 'bg-amber-500' ?>"></span>
+                                    <span class="inline-block w-2 h-2 rounded-full <?= $isOpen ? 'bg-techtic-lime-green' : 'bg-amber-500' ?>"></span>
                                     <span class="text-teak-muted"><?= $escaper->escapeHtml($statusText) ?> <?= $escaper->escapeHtml(__(' · Tolbert')) ?></span>
                                 </span>
                             </div>
@@ -318,7 +318,7 @@ foreach ($menuItems as $menuItem) {
                 <!-- Contact Buttons -->
                 <div class="grid grid-cols-2 gap-3">
                     <a href="tel:+31851302543"
-                        class="flex items-center justify-center gap-2 h-12 rounded-xl bg-teakea-deep-green text-white font-semibold"
+                        class="flex items-center justify-center gap-2 h-12 rounded-xl bg-techtic-deep-green text-white font-semibold"
                         @click="gtag('event', 'contact_intent', { contact_method: 'phone', contact_label: 'Call now' })">
                         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
                             <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" fill="currentColor" />
@@ -339,13 +339,13 @@ foreach ($menuItems as $menuItem) {
 
                 <!-- Showroom Card -->
                 <a href="https://maps.app.goo.gl/sApkkhy6N8ZnH5U2A" class="block rounded-2xl bg-[#efeadd] px-4 py-4">
-                    <div class="flex items-start gap-3 text-teakea-yellow">
+                    <div class="flex items-start gap-3 text-techtic-yellow">
                         <svg class="w-6 h-6 flex-shrink-0 mt-0.5" stroke="currentColor" viewBox="0 0 24 24" fill="none">
                             <path d="M12 21s7-6.2 7-12a7 7 0 10-14 0c0 5.8 7 12 7 12z" stroke-width="1.8" />
                             <circle cx="12" cy="9" r="2.5" stroke-width="1.8" />
                         </svg>
                         <div class="w-full">
-                            <div class="font-semibold text-teakea-deep-green">
+                            <div class="font-semibold text-techtic-deep-green">
                                 <?= $escaper->escapeHtml(__('Showroom Tolbert (Groningen)')) ?>
                             </div>
                             <div class="text-sm text-teak-muted mt-1 flex items-center gap-1">

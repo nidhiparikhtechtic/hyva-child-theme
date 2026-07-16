@@ -20,7 +20,7 @@ $product = $block->getProduct();
                 </a>
                 <div class="product details product-item-details space-y-2.5" style="vertical-align: middle;display: inline-block; padding-left: 10px;">
                     <strong class="product name product-item-name">
-                        <a class="product-item-link text-lg teakea-neutral font-normal leading-6 font-garamond line-clamp-2 hover:text-teakea-red hover:underline max-w-[260px]"
+                        <a class="product-item-link text-lg text-techtic-neutral font-normal leading-6 font-garamond line-clamp-2 hover:text-techtic-red hover:underline max-w-[260px]"
                             title="<?=
                                     /** @noEscape */
                                     $block->escapeHtml($product->getName()) ?>"
@@ -35,12 +35,12 @@ $product = $block->getProduct();
                     <div class="price font-normal text-base leading-5 text-[#282828]">
                         <?=
                         /** @noEscape */
-                        $block->getProductPrice($product) ?> 
+                        $block->getProductPrice($product) ?>
                     </div>
                     <!-- View Product Link -->
 
                     <a href="<?= $block->getProductUrl($product) ?>"
-                        class="inline-block text-sm sm:text-base font-medium text-teakea-dark-gray hover:text-teakea-red hover:underline">
+                        class="inline-block text-sm sm:text-base font-medium text-techtic-dark-gray hover:text-techtic-red hover:underline">
                         <?= $escaper->escapeHtml(__('View Product')) ?>
                     </a>
                 </div>

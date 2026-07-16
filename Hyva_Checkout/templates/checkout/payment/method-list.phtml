@@ -52,12 +52,12 @@ $methods = $viewModel->getList();
 
                 <div
                     id="payment-method-option-<?= /* @noEscape */ $methodCodeAttr ?>"
-                    class="rounded-lg px-4 py-2 text-sm <?= $magewire->method === $method->getCode() ? 'active bg-teakea-red bg-opacity-10 border-teakea-red border' : 'inactive bg-teakea-lighter-gray' ?>"
+                    class="rounded-lg px-4 py-2 text-sm <?= $magewire->method === $method->getCode() ? 'active bg-techtic-red bg-opacity-10 border-techtic-red border' : 'inactive bg-techtic-lighter-gray' ?>"
                     wire:key="<?= /* @noEscape */ $methodCodeAttr ?>">
-                    <label class="flex items-center gap-x-2 cursor-pointer text-teakea-gray text-sm font-normal rounded-lg <?php $magewire->method === $method->getCode() ? 'active bg-teakea-red bg-opacity-10' : 'inactive bg-teakea-lighter-gray' ?>">
+                    <label class="flex items-center gap-x-2 cursor-pointer text-techtic-gray text-sm font-normal rounded-lg <?php $magewire->method === $method->getCode() ? 'active bg-techtic-red bg-opacity-10' : 'inactive bg-techtic-lighter-gray' ?>">
                         <input
                             type="radio"
-                            class="form-radio border-[#C7C7C7] bg-teakea-lighter-gray"
+                            class="form-radio border-[#C7C7C7] bg-techtic-lighter-gray"
                             id="payment-method-<?= /* @noEscape */ $methodCodeAttr ?>"
                             name="payment-method-option"
                             value="<?= /* @noEscape */ $methodCodeAttr ?>"

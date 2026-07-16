@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author Amasty Team
  * @copyright Copyright (c) Amasty (https://www.amasty.com)
@@ -87,7 +88,9 @@ foreach ($filterPathItems as $filterItem) {
         <script>
             function initInput_<?= $escaper->escapeHtml($filterItemId); ?>() {
                 return deepMerge({}, initInput(), {
-                    isSelected: Boolean(<?= /** @noEscape */ $block->checkedFilter($filterItem)?>),
+                    isSelected: Boolean(<?=
+                                        /** @noEscape */
+                                        $block->checkedFilter($filterItem) ?>),
                     value: '<?= $escaper->escapeHtmlAttr($filterItem->getValueString()); ?>',
                     name: '<?= /* @noEscape */ $block->getFilter()->getRequestVar(); ?>',
                     type: '<?= /* @noEscape */ $block->getInputType() ?>'
@@ -103,17 +106,19 @@ foreach ($filterPathItems as $filterItem) {
                 <?= $block->isExpandByClick($currentPath) ? 'am-with-children' : 'am-without-children' ?>"
             data-label="<?= /* @noEscape */ $block->stripTags($filterItem->getOptionLabel()) ?>"
             <?php if ($isFlyOut): ?>
-                @mouseenter="positioned = true; leftPosition($el)"
-                @mouseleave="positioned = false; left = true"
-                :class="{ 'relative': positioned }"
+            @mouseenter="positioned = true; leftPosition($el)"
+            @mouseleave="positioned = false; left = true"
+            :class="{ 'relative': positioned }"
             <?php endif; ?>>
 
             <?php if ($block->isExpandByClick($currentPath)): ?>
                 <button type="button"
-                        class="filter-options-title absolute top-0 left-0 flex justify-between items-center cursor-pointer hover:text-secondary-darker border-container
-                        filter-options-title-level-<?= /**@noEscape */ $block->getLevel()?>"
-                        @click="open = !open" :class="{'collapsed' : !open, 'opened' : open}"
-                        :aria-expanded="open ? 'true' : 'false' ">
+                    class="filter-options-title absolute top-0 left-0 flex justify-between items-center cursor-pointer hover:text-secondary-darker border-container
+                        filter-options-title-level-<?=
+                                                    /**@noEscape */
+                                                    $block->getLevel() ?>"
+                    @click="open = !open" :class="{'collapsed' : !open, 'opened' : open}"
+                    :aria-expanded="open ? 'true' : 'false' ">
                     <span class="py-1 px-1 rounded border border-container">
                         <?= $heroicons->chevronDownHtml(
                             'transition-transform transform duration-300 ease-in-out',
@@ -126,76 +131,79 @@ foreach ($filterPathItems as $filterItem) {
             <?php endif; ?>
 
             <?php if ($filterItem->getCount() > 0): ?>
-        <?php $inputId = 'amshopby-' . $block->getFilter()->getRequestVar() . '-' . $filterItem->getValueString() . ' - ' . uniqid() ?>
-        <div class="filter-row category-filter-row flex max-w-full w-full
-                 role="radiogroup"
-            aria-label="<?= $escaper->escapeHtmlAttr($filterItem->getOptionLabel()) ?>">
-        <?php $filterUniqId = uniqid(); ?>
-            <label for="amfilter-id-<?= $escaper->escapeHtmlAttr($inputId) ?>">
+                <?php $inputId = 'amshopby-' . $block->getFilter()->getRequestVar() . '-' . $filterItem->getValueString() . ' - ' . uniqid() ?>
+                <div class="filter-row category-filter-row flex max-w-full w-full
+                 role=" radiogroup"
+                    aria-label="<?= $escaper->escapeHtmlAttr($filterItem->getOptionLabel()) ?>">
+                    <?php $filterUniqId = uniqid(); ?>
+                    <label for="amfilter-id-<?= $escaper->escapeHtmlAttr($inputId) ?>">
                         <span class="sr-only">
                             <?= $escaper->escapeHtmlAttr($filterItem->getOptionLabel()) ?>
                         </span>
-            </label>
-        <input class="am-input mt-1 mr-2"
-               id="amfilter-id-<?= $escaper->escapeHtmlAttr($inputId) ?>"
-               name="amshopby[<?= $escaper->escapeHtmlAttr($block->getFilter()->getRequestVar()); ?>][]"
-               value="<?= $escaper->escapeHtmlAttr($filterItem->getValueString()); ?>"
-               type="<?= /* @noEscape */ $block->getInputType() ?>"
-               @change="$dispatch('amApplyInputChanged', {
+                    </label>
+                    <input class="am-input mt-1 mr-2"
+                        id="amfilter-id-<?= $escaper->escapeHtmlAttr($inputId) ?>"
+                        name="amshopby[<?= $escaper->escapeHtmlAttr($block->getFilter()->getRequestVar()); ?>][]"
+                        value="<?= $escaper->escapeHtmlAttr($filterItem->getValueString()); ?>"
+                        type="<?= /* @noEscape */ $block->getInputType() ?>"
+                        @change="$dispatch('amApplyInputChanged', {
                             value: '<?= $escaper->escapeHtmlAttr($filterItem->getValueString()); ?>',
                             element: $el,
                             name: '<?= /* @noEscape */ $block->getFilter()->getRequestVar(); ?>'
                         })"
-               :checked="isSelected"
-        />
-            <a
-                    class="flex align-middle max-w-full w-full justify-start items-start
+                        :checked="isSelected" />
+                    <a
+                        class="flex align-middle max-w-full w-full justify-start items-start
                         <?= $isParent ? 'amshopby-filter-parent' : '' ?>
                     "
-                    data-am-js="filter-item-default"
-                    href="<?= $escaper->escapeUrl($filterItem->getUrl()) ?>"
-                    title="<?= $escaper->escapeHtmlAttr($filterItem->getOptionLabel()); ?>"
-                    :class="{ 'amshopby-link-selected text-teakea-black': isSelected }"
-                    @click.prevent.stop="$dispatch('amApplyInputChanged', {
+                        data-am-js="filter-item-default"
+                        href="<?= $escaper->escapeUrl($filterItem->getUrl()) ?>"
+                        title="<?= $escaper->escapeHtmlAttr($filterItem->getOptionLabel()); ?>"
+                        :class="{ 'amshopby-link-selected text-techtic-black': isSelected }"
+                        @click.prevent.stop="$dispatch('amApplyInputChanged', {
                        value: '<?= $escaper->escapeHtmlAttr($filterItem->getValueString()); ?>',
                        element: $event.currentTarget,
                        name: '<?= /* @noEscape */ $block->getFilter()->getRequestVar(); ?>'
                     })"
-                <?= $filterItem->isAddNofollow() ? ' rel="nofollow"' : '' ?>>
-                <?php endif; ?>
-
-                <?php if ($block->getFilter()->useLabelsOnly()): ?>
-                    <span class="label max-w-[90%] break-words <?= /**@noEscape */ $block->getLevel() == 1 ? 'font-semibold' : ''; ?>">
-                    <?= /* @noEscape */ $filterItem->getOptionLabel() ?></span>
-                <?php else: ?>
-                    <?php if ($block->isShowThumbnail($filterItem->getValue())): ?>
-                        <img src="<?= /* @noEscape */ $categoryHelper->getCategoryImageUrl($filterItem->getValue()) ?>"
-                             class="am-category-image mr-1 inline-block mt-[2px]"
-                             title="<?= $escaper->escapeHtmlAttr($filterItem->getOptionLabel()); ?>"
-                             alt="<?= $escaper->escapeHtmlAttr($filterItem->getOptionLabel()); ?>"
-                             height="<?= /* @noEscape */ $categoryHelper->getCategoryFilterImageSize(); ?>"
-                             width="<?= /* @noEscape */ $categoryHelper->getCategoryFilterImageSize(); ?>"/>
+                        <?= $filterItem->isAddNofollow() ? ' rel="nofollow"' : '' ?>>
                     <?php endif; ?>
-                    <?php if ($block->getFilter()->useLabelsAndImages()): ?>
-                        <span class="label <?= /**@noEscape */ $block->getLevel() == 1 ? 'font-semibold' : ''; ?>">
-                        <?= /* @noEscape */ $filterItem->getOptionLabel() ?></span>
+
+                    <?php if ($block->getFilter()->useLabelsOnly()): ?>
+                        <span class="label max-w-[90%] break-words <?=
+                                                                    /**@noEscape */
+                                                                    $block->getLevel() == 1 ? 'font-semibold' : ''; ?>">
+                            <?= /* @noEscape */ $filterItem->getOptionLabel() ?></span>
+                    <?php else: ?>
+                        <?php if ($block->isShowThumbnail($filterItem->getValue())): ?>
+                            <img src="<?= /* @noEscape */ $categoryHelper->getCategoryImageUrl($filterItem->getValue()) ?>"
+                                class="am-category-image mr-1 inline-block mt-[2px]"
+                                title="<?= $escaper->escapeHtmlAttr($filterItem->getOptionLabel()); ?>"
+                                alt="<?= $escaper->escapeHtmlAttr($filterItem->getOptionLabel()); ?>"
+                                height="<?= /* @noEscape */ $categoryHelper->getCategoryFilterImageSize(); ?>"
+                                width="<?= /* @noEscape */ $categoryHelper->getCategoryFilterImageSize(); ?>" />
+                        <?php endif; ?>
+                        <?php if ($block->getFilter()->useLabelsAndImages()): ?>
+                            <span class="label <?=
+                                                /**@noEscape */
+                                                $block->getLevel() == 1 ? 'font-semibold' : ''; ?>">
+                                <?= /* @noEscape */ $filterItem->getOptionLabel() ?></span>
+                        <?php endif; ?>
                     <?php endif; ?>
-                <?php endif; ?>
 
-                <?php if ($block->isShowProductQuantities($showProductQuantities)): ?>
-                    <span class="count ml-auto text-primary <?= /* @noEscape */ $isFlyOut ? 'fly-out-count' : '' ?>">
-                    <?= /* @noEscape */ "(" . $filterItem->getCount() . ")"; ?>
-                    <span class="filter-count-label sr-only">
-                        <?php $title = ($filterItem->getCount() == 1) ? __('item') : __('items');?>
-                        <?= /* @noEscape */ $escaper->escapeHtml($title) ?>
-                    </span>
-                </span>
-                <?php endif; ?>
+                    <?php if ($block->isShowProductQuantities($showProductQuantities)): ?>
+                        <span class="count ml-auto text-primary <?= /* @noEscape */ $isFlyOut ? 'fly-out-count' : '' ?>">
+                            <?= /* @noEscape */ "(" . $filterItem->getCount() . ")"; ?>
+                            <span class="filter-count-label sr-only">
+                                <?php $title = ($filterItem->getCount() == 1) ? __('item') : __('items'); ?>
+                                <?= /* @noEscape */ $escaper->escapeHtml($title) ?>
+                            </span>
+                        </span>
+                    <?php endif; ?>
 
-                <?php if ($filterItem->getCount() > 0): ?>
-            </a>
-            </div>
-        <?php endif; ?>
+                    <?php if ($filterItem->getCount() > 0): ?>
+                    </a>
+                </div>
+            <?php endif; ?>
 
 
             <?php if ($filterItems->getItemsCount($currentPath)): ?>
@@ -211,7 +219,7 @@ foreach ($filterPathItems as $filterItem) {
                 ?>
                 <ul class="<?= /* @noEscape */ $itemsClass ?> h-fit"
                     <?php if ($isFlyOut): ?>
-                        :class="{
+                    :class="{
                             'hidden': !positioned,
                             'block md:!-top-3': positioned,
                             'md:left-full': left,
@@ -219,7 +227,7 @@ foreach ($filterPathItems as $filterItem) {
                         }"
                     <?php endif; ?>
                     <?php if ($isByClickSetting): ?>
-                        x-show="open" x-cloak
+                    x-show="open" x-cloak
                     <?php endif; ?>>
                     <?= /* @noEscape */ $block->renderChildrenItems($currentPath); ?>
                 </ul>

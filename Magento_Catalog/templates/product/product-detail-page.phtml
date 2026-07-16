@@ -48,7 +48,7 @@ $imageUrl = $productViewModel->getImage($product, 'product_page_image_small')->g
             <?php if ($showShowroomButton): ?>
                 <div class="showroom-cta mt-4 mb-6">
                     <button type="button"
-                        onclick="window.location.href='<?= $escaper->escapeUrl('https://www.teakea.nl/showroom') ?>'"
+                        onclick="window.location.href='<?= $escaper->escapeUrl('showroom') ?>'"
                         class="flex items-center justify-center btn btn-secondary text-sm w-full mr-auto gap-x-2.5 uppercase">
 
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -82,7 +82,7 @@ $imageUrl = $productViewModel->getImage($product, 'product_page_image_small')->g
 $cmsBlockId = $productCmsBlockViewModel->getCmsBlockId($product);
 
 if ($cmsBlockId): ?>
-    <section class="why-choose-teakea">
+    <section class="why-choose-techtic">
         <?= $block->getLayout()
             ->createBlock(\Magento\Cms\Block\Block::class)
             ->setBlockId($cmsBlockId)
@@ -102,7 +102,7 @@ if ($cmsBlockId): ?>
     x-data="{ hasAi: false, checked: false }"
     x-init="
         const check = () => {
-            const el = document.querySelector('.doofinder-productpage-selector.text-teakea-white');
+            const el = document.querySelector('.doofinder-productpage-selector.text-techtic-white');
             if (el && el.innerHTML.trim() !== '') {
                 hasAi = true;
                 checked = true;
@@ -116,7 +116,7 @@ if ($cmsBlockId): ?>
     ">
      Show Doofinder when it has content 
 <section x-show="hasAi">
-    <section class="doofinder-productpage-selector text-teakea-white"></section>
+    <section class="doofinder-productpage-selector text-techtic-white"></section>
 </section>
 
 Show related products when Doofinder is empty or check is complete 

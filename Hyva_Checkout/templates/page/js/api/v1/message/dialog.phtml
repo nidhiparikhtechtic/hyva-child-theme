@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author Hyvä Themes <info@hyva.io>
  *
@@ -24,31 +25,27 @@ $heroiconsOutline = $viewModels->require(HeroiconsOutline::class);
 $heroiconsSolid = $viewModels->require(HeroiconsSolid::class);
 ?>
 <dialog x-data="initMessageDialog"
-        x-init="initialize"
-        x-bind="messageDialog"
-        aria-labelledby="message-dialog"
-        class="max-w-full max-h-full bg-transparent p-0 backdrop:backdrop outline-none overflow-visible"
->
+    x-init="initialize"
+    x-bind="messageDialog"
+    aria-labelledby="message-dialog"
+    class="max-w-full max-h-full bg-transparent p-0 backdrop:backdrop outline-none overflow-visible">
     <div class="relative w-full max-w-2xl max-h-screen overflow-y-auto shadow-xl rounded-lg p-6 bg-white text-gray-700 md:w-[50vw]"
-         x-ref="messageDialogContent"
-         x-show="hasMessages"
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0 translate-y-12"
-         x-transition:enter-end="opacity-100 translate-y-0"
-         x-transition:leave="transition ease-in duration-300"
-         x-transition:leave-start="opacity-100 translate-y-0"
-         x-transition:leave-end="opacity-0 translate-y-12"
-    >
+        x-ref="messageDialogContent"
+        x-show="hasMessages"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 translate-y-12"
+        x-transition:enter-end="opacity-100 translate-y-0"
+        x-transition:leave="transition ease-in duration-300"
+        x-transition:leave-start="opacity-100 translate-y-0"
+        x-transition:leave-end="opacity-0 translate-y-12">
         <?= $block->getChildHtml('before') ?>
 
         <div class="grid grid-cols-1
-                    md:grid-cols-2 md:gap-4 md:items-center"
-        >
+                    md:grid-cols-2 md:gap-4 md:items-center">
             <template x-for="({ actions, message, cancelable }, index) in messages" x-bind:key="index">
                 <div x-show="isActiveMessage" class="contents">
                     <div class="col-span-full flex flex-col items-center mb-6
-                                md:flex-row-reverse md:gap-4 md:justify-between"
-                    >
+                                md:flex-row-reverse md:gap-4 md:justify-between">
                         <div class="mb-4">
                             <?= $heroiconsSolid->exclamationHtml(
                                 'text-red-600',
@@ -81,7 +78,7 @@ $heroiconsSolid = $viewModels->require(HeroiconsSolid::class);
                                 ]
                             ) ?>
                             <?= $heroiconsSolid->informationCircleHtml(
-                                'text-teakea-red',
+                                'text-techtic-red',
                                 64,
                                 64,
                                 [
@@ -104,24 +101,21 @@ $heroiconsSolid = $viewModels->require(HeroiconsSolid::class);
                     </div>
 
                     <div class="order-last flex flex-col justify-end gap-4 mt-8
-                                md:flex-row md:items-center md:justify-self-end md:mt-0"
-                    >
+                                md:flex-row md:items-center md:justify-self-end md:mt-0">
                         <button type="button"
-                                class="justify-center text-teakea-red border rounded-lg border-teakea-red py-2 px-6"
-                                title="<?= $escaper->escapeHtmlAttr(__('Cancel')) ?>"
-                                aria-label="<?= $escaper->escapeHtmlAttr(__('Cancel')) ?>"
-                                x-bind="navButtonCancelMessage"
-                                x-show="cancelable"
-                        >
+                            class="justify-center text-techtic-red border rounded-lg border-techtic-red py-2 px-6"
+                            title="<?= $escaper->escapeHtmlAttr(__('Cancel')) ?>"
+                            aria-label="<?= $escaper->escapeHtmlAttr(__('Cancel')) ?>"
+                            x-bind="navButtonCancelMessage"
+                            x-show="cancelable">
                             <?= $escaper->escapeHtml(__('Cancel')) ?>
                         </button>
 
                         <button type="button"
-                                class="justify-center text-white bg-teakea-red rounded-lg py-2 px-6"
-                                title="<?= $escaper->escapeHtmlAttr(__('Confirm')) ?>"
-                                aria-label="<?= $escaper->escapeHtmlAttr(__('Confirm')) ?>"
-                                x-bind="navButtonConfirmMessage"
-                        >
+                            class="justify-center text-white bg-techtic-red rounded-lg py-2 px-6"
+                            title="<?= $escaper->escapeHtmlAttr(__('Confirm')) ?>"
+                            aria-label="<?= $escaper->escapeHtmlAttr(__('Confirm')) ?>"
+                            x-bind="navButtonConfirmMessage">
                             <?= $escaper->escapeHtml(__('OK')) ?>
                         </button>
                     </div>
@@ -131,15 +125,13 @@ $heroiconsSolid = $viewModels->require(HeroiconsSolid::class);
             <div class="justify-self-center md:justify-self-start">
                 <template x-if="needsNavigation">
                     <nav class="inline-flex justify-between items-center gap-1 select-none"
-                         aria-label="<?= $escaper->escapeHtmlAttr(__('Checkout Message navigation')) ?>"
-                    >
+                        aria-label="<?= $escaper->escapeHtmlAttr(__('Checkout Message navigation')) ?>">
                         <button
                             type="button"
                             class="p-2 text-gray-500 disabled:opacity-60"
                             title="<?= $escaper->escapeHtmlAttr(__('Previous Message')) ?>"
                             aria-label="<?= $escaper->escapeHtmlAttr(__('Previous Message')) ?>"
-                            x-bind="navButtonPreviousMessage"
-                        >
+                            x-bind="navButtonPreviousMessage">
                             <?= $heroiconsOutline->chevronLeftHtml('', 20, 20, ['aria-hidden' => 'true']) ?>
                         </button>
 
@@ -148,11 +140,10 @@ $heroiconsSolid = $viewModels->require(HeroiconsSolid::class);
                         </span>
 
                         <button type="button"
-                                class="p-2 text-gray-500 disabled:opacity-60"
-                                title="<?= $escaper->escapeHtmlAttr(__('Next Message')) ?>"
-                                aria-label="<?= $escaper->escapeHtmlAttr(__('Next Message')) ?>"
-                                x-bind="navButtonNextMessage"
-                        >
+                            class="p-2 text-gray-500 disabled:opacity-60"
+                            title="<?= $escaper->escapeHtmlAttr(__('Next Message')) ?>"
+                            aria-label="<?= $escaper->escapeHtmlAttr(__('Next Message')) ?>"
+                            x-bind="navButtonNextMessage">
                             <?= $heroiconsOutline->chevronRightHtml('', 20, 20, ['aria-hidden' => 'true']) ?>
                         </button>
                     </nav>

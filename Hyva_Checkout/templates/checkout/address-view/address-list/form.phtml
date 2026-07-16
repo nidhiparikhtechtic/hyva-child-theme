@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Hyvä Themes - https://hyva.io
  * Copyright © Hyvä Themes 2022-present. All rights reserved.
@@ -37,63 +38,71 @@ $namespace = $form->getNamespace();
     <form
         <?= /* @noEscape */ $form->renderAttributes($escaper) ?>
         class="space-y-6 address-form"
-        x-data="mountainITTeakeaHyvaCheckoutAddressViewAddressListForm"
-        novalidate
-    >
+        x-data="TechticHyvaChildHyvaCheckoutAddressViewAddressListForm"
+        novalidate>
         <div class="grid grid-cols-12 gap-x-3">
-            <?= /** @noEscape */ $block->getChildHtml('address-form.before') ?>
+            <?=
+            /** @noEscape */
+            $block->getChildHtml('address-form.before') ?>
 
             <?php if ($form->hasFields()): ?>
                 <?php foreach ($form->getFields() as $field): ?>
                     <?php if ($field->canRender()): ?>
                         <?php /** @purge: md:col-span-3 md:col-span-6 md:col-span-9 md:col-span-12 */ ?>
                         <div class="<?= $escaper->escapeHtmlAttr($field->renderWrapperClass(['col-span-12'])) ?>"
-                             <?= /* @noEscape */ $field->renderAttributes($escaper, 'wrapper') ?>
-                        >
+                            <?= /* @noEscape */ $field->renderAttributes($escaper, 'wrapper') ?>>
                             <?= /* @noEscape */ $field->render() ?>
 
                             <?php if ($magewire->hasError($field->getId())): ?>
-                                <?= /** @noEscape */ $magewire->getError($field->getId()) ?>
+                                <?=
+                                /** @noEscape */
+                                $magewire->getError($field->getId()) ?>
                             <?php endif ?>
                         </div>
                     <?php endif ?>
                 <?php endforeach ?>
             <?php endif ?>
 
-            <?= /** @noEscape */ $block->getChildHtml('address-form.after') ?>
+            <?=
+            /** @noEscape */
+            $block->getChildHtml('address-form.after') ?>
         </div>
 
         <div class="flex space-x-4 items-center">
             <button
                 type="button"
-                class="btn btn-primary bg-teakea-gold hover:bg-teakea-gold hover:text-black hover:shadow-none rounded-lg text-black shadow-none focus:ring-transparent"
-                x-on:click="mountainITTeakeaHyvaCheckoutAddressViewAddressListFormClick217"
-                wire:loading.attr="disabled"
-            >
+                class="btn btn-primary bg-techtic-gold hover:bg-techtic-gold hover:text-black hover:shadow-none rounded-lg text-black shadow-none focus:ring-transparent"
+                x-on:click="TechticHyvaChildHyvaCheckoutAddressViewAddressListFormClick217"
+                wire:loading.attr="disabled">
                 <?= $escaper->escapeHtml(__('Save')) ?>
             </button>
 
             <button
                 type="button"
-                class="btn btn-secondary rounded-lg border-teakea-gold text-teakea-gold hover:border-teakea-gold hover:text-teakea-gold shadow-none hover:shadow-none focus:ring-transparent"
-                x-on:click="mountainITTeakeaHyvaCheckoutAddressViewAddressListFormClick218"
-            >
+                class="btn btn-secondary rounded-lg border-techtic-gold text-techtic-gold hover:border-techtic-gold hover:text-techtic-gold shadow-none hover:shadow-none focus:ring-transparent"
+                x-on:click="TechticHyvaChildHyvaCheckoutAddressViewAddressListFormClick218">
                 <?= $escaper->escapeHtml(__('Cancel')) ?>
             </button>
         </div>
     </form>
 </div>
 <script>
-<?php /** Generated with hyva-csp-helper.php */ ?>
-function mountainITTeakeaHyvaCheckoutAddressViewAddressListForm() {
-    return Object.assign(
-        hyva.formValidation(this.$el)
-        ,{
-            ['mountainITTeakeaHyvaCheckoutAddressViewAddressListFormClick217'](event) {return this.validate().then(() => this.$wire.submit()).catch(() => {})},
-            ['mountainITTeakeaHyvaCheckoutAddressViewAddressListFormClick218'](event) {return window.hyva.modal.pop()},
-        }
-    )
-}
-window.addEventListener('alpine:init', () => Alpine.data('mountainITTeakeaHyvaCheckoutAddressViewAddressListForm', mountainITTeakeaHyvaCheckoutAddressViewAddressListForm), {once: true});
+    <?php /** Generated with hyva-csp-helper.php */ ?>
+
+    function TechticHyvaChildHyvaCheckoutAddressViewAddressListForm() {
+        return Object.assign(
+            hyva.formValidation(this.$el), {
+                ['TechticHyvaChildHyvaCheckoutAddressViewAddressListFormClick217'](event) {
+                    return this.validate().then(() => this.$wire.submit()).catch(() => {})
+                },
+                ['TechticHyvaChildHyvaCheckoutAddressViewAddressListFormClick218'](event) {
+                    return window.hyva.modal.pop()
+                },
+            }
+        )
+    }
+    window.addEventListener('alpine:init', () => Alpine.data('TechticHyvaChildHyvaCheckoutAddressViewAddressListForm', TechticHyvaChildHyvaCheckoutAddressViewAddressListForm), {
+        once: true
+    });
 </script>
 <?php $hyvaCsp->registerInlineScript() ?>

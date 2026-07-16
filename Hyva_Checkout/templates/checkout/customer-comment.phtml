@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 use Hyva\Checkout\Magewire\Checkout\CustomerComment;
@@ -12,18 +13,17 @@ use Magento\Framework\Escaper;
 $viewModel = $viewModels->require(\Hyva\Checkout\ViewModel\Checkout\CustomerComment::class);
 ?>
 
-<div class="border border-teakea-light-gray rounded-lg mt-4" x-data="mountainITTeakeaHyvaCheckoutCustomerComment" data-limit="250">
+<div class="border border-techtic-light-gray rounded-lg mt-4" x-data="TechticHyvaChildHyvaCheckoutCustomerComment" data-limit="250">
     <button type="button"
-            class="cursor-pointer flex gap-1.5 items-center text-slate-700 w-full py-3.5 sm:px-5 px-3"
-            aria-controls="checkout-customer-comment-details"
-            x-on:click="toggleVisible"
-            x-bind:aria-expanded="visible"
-    >
+        class="cursor-pointer flex gap-1.5 items-center text-slate-700 w-full py-3.5 sm:px-5 px-3"
+        aria-controls="checkout-customer-comment-details"
+        x-on:click="toggleVisible"
+        x-bind:aria-expanded="visible">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-blue-900" width="18" height="18" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h10M7 16h6"></path>
         </svg>
 
-        <span class="text-teakea-neutral font-bold text-sm font-garamond">
+        <span class="text-techtic-neutral font-bold text-sm font-garamond">
             <?= $escaper->escapeHtml(__('Order Comment')) ?>
             (<?= /* @noEscape */ mb_strtolower($escaper->escapeHtml(__('Optional'), 'UTF-8')) ?>)
         </span>
@@ -36,50 +36,45 @@ $viewModel = $viewModels->require(\Hyva\Checkout\ViewModel\Checkout\CustomerComm
     </button>
 
     <div id="checkout-customer-comment-details"
-         class="flex flex-col gap-2"
-         aria-label="<?= $escaper->escapeHtmlAttr(__('Order Comment')) ?>"
-         x-show="visible"
-         x-cloak
-    >
+        class="flex flex-col gap-2"
+        aria-label="<?= $escaper->escapeHtmlAttr(__('Order Comment')) ?>"
+        x-show="visible"
+        x-cloak>
         <div class="text-green-500 space-x-4 text-sm">
             <span class="hidden"
-                  wire:loading
-                  wire:target="comment"
-                  wire:loading.class.remove="hidden"
-            >
+                wire:loading
+                wire:target="comment"
+                wire:loading.class.remove="hidden">
                 ...<?= $escaper->escapeHtml(__('saving')) ?>
             </span>
 
             <?php if ($magewire->saved): ?>
                 <span wire:target="comment" class="inline-flex"
-                      wire:loading.class="hidden"
-                >
+                    wire:loading.class="hidden">
                     <?= $escaper->escapeHtml(__('saved successfully')) ?>
                 </span>
             <?php endif ?>
         </div>
 
         <textarea id="order-comment"
-                  wire:model.delay.750ms="comment"
-                  x-ref="content"
-                  x-bind:maxlength="limit"
-                  :value="content"
-                  @input="mountainITTeakeaHyvaCheckoutCustomerCommentInput226"
-                  rows="3"
-                  class="text-sm font-normal text-teakea-gray border border-[#E0E0E0] rounded-lg py-3.5 sm:px-5 mx-5 mb-1"
-                  <?php if ($viewModel->hasPlaceholderText()): ?>
-                      placeholder="<?= $escaper->escapeHtmlAttr($viewModel->getPlaceholderText()) ?>"
-                  <?php endif ?>
-        ></textarea>
+            wire:model.delay.750ms="comment"
+            x-ref="content"
+            x-bind:maxlength="limit"
+            :value="content"
+            @input="TechticHyvaChildHyvaCheckoutCustomerCommentInput226"
+            rows="3"
+            class="text-sm font-normal text-techtic-gray border border-[#E0E0E0] rounded-lg py-3.5 sm:px-5 mx-5 mb-1"
+            <?php if ($viewModel->hasPlaceholderText()): ?>
+            placeholder="<?= $escaper->escapeHtmlAttr($viewModel->getPlaceholderText()) ?>"
+            <?php endif ?>></textarea>
 
         <div class="w-full flex flex-row-reverse mt-0.5 font" x-ref="remaining" x-cloak>
-            <span x-text="mountainITTeakeaHyvaCheckoutCustomerCommentText227"
-                  x-show="mountainITTeakeaHyvaCheckoutCustomerCommentShow228"
-                  x-bind:class="mountainITTeakeaHyvaCheckoutCustomerCommentClass229"
-            ></span>
+            <span x-text="TechticHyvaChildHyvaCheckoutCustomerCommentText227"
+                x-show="TechticHyvaChildHyvaCheckoutCustomerCommentShow228"
+                x-bind:class="TechticHyvaChildHyvaCheckoutCustomerCommentClass229"></span>
 
             <div>
-                <p class="text-red-700" x-show="mountainITTeakeaHyvaCheckoutCustomerCommentShow230">
+                <p class="text-red-700" x-show="TechticHyvaChildHyvaCheckoutCustomerCommentShow230">
                     <?= $escaper->escapeHtml(__('You\'ve reached the maximum amount of characters')) ?>
                 </p>
             </div>

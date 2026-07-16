@@ -251,7 +251,7 @@ $deliveryViewModel = $viewModels->require(ProductDelivery::class);
                     <?php else: ?>
                         <button
                             class="hidden md:flex items-center justify-center w-full 
-                                bg-teakea-red text-white text-sm uppercase 
+                                bg-techtic-red text-white text-sm uppercase 
                                 py-2.5 px-7 gap-x-1.5 
                                 md:absolute bottom-0 
                                 md:opacity-0 md:group-hover:opacity-100 
@@ -273,9 +273,9 @@ $deliveryViewModel = $viewModels->require(ProductDelivery::class);
         <div class="mt-4 text-base space-y-1">
 
             <!-- Product Name -->
-            <div class="flex justify-start text-teakea-dark-gray">
+            <div class="flex justify-start text-techtic-dark-gray">
                 <a
-                    class="product-item-link hover:underline font-garamond hover:text-teakea-red"
+                    class="product-item-link hover:underline font-garamond hover:text-techtic-red"
                     aria-hidden="false"
                     href="<?= $escaper->escapeUrl($product->getProductUrl()) ?>"
                     :id="`slide-desc-<?= $escaper->escapeHtmlAttr($product->getId()) ?>-${$id('slider-id')}`">
@@ -287,32 +287,32 @@ $deliveryViewModel = $viewModels->require(ProductDelivery::class);
             <div class="product-stock-delivery-info flex justify-between">
 
                 <!-- Category name -->
-                <?php 
-                    $categories = $product->getCategoryCollection()
-                        ->addAttributeToSelect('name')
-                        ->setPageSize(1);
-                    $categoryName = $categories->getFirstItem()->getName();
+                <?php
+                $categories = $product->getCategoryCollection()
+                    ->addAttributeToSelect('name')
+                    ->setPageSize(1);
+                $categoryName = $categories->getFirstItem()->getName();
                 ?>
                 <?php if ($categoryName): ?>
                     <p class="inline-block text-[14px] text-[#A5813B]">
                         <?= $escaper->escapeHtml($categoryName) ?>
                     </p>
                 <?php endif; ?>
-                
+
                 <!-- Stock Status Badge -->
                 <?php if ($inStock && $deliveryTime && !$isLongDelivery && !($isValidDate && !$expiratedDate)): ?>
                     <div class="inline-block items-center" title="<?= $escaper->escapeHtmlAttr(__('Availability')) ?>">
                         <span class="font-garamond flex py-0.5 px-1.5  text-[10px] text-[#13895C] flex items-center gap-1">
                             <svg width="5" height="5" viewBox="0 0 5 5" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="2.44764" cy="2.44764" r="2.44764" fill="#13895C" />
-                                </svg>
+                                <circle cx="2.44764" cy="2.44764" r="2.44764" fill="#13895C" />
+                            </svg>
                             <?= $escaper->escapeHtml(__('Directly available')) ?>
                         </span>
                     </div>
                 <?php elseif (!$inStock): ?>
                     <div class="inline-block items-center">
                         <a href="<?= $escaper->escapeUrl($product->getProductUrl()) ?>">
-                            <span class="font-garamond flex text-teakea-brown py-1 px-2  text-xs text-[#13895C] flex items-center gap-1">
+                            <span class="font-garamond flex text-techtic-brown py-1 px-2  text-xs text-[#13895C] flex items-center gap-1">
                                 <?= $escaper->escapeHtml(__('Order on request')) ?>
                             </span>
                         </a>

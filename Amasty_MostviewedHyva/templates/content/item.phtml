@@ -116,7 +116,7 @@ $product = $productRepository->getById($product->getId(), false, 1);
             <?php endif; ?>
             <?php endforeach; ?>>
         <?php endif; ?>
-        <div class="flex flex-col relative group border rounded-lg border-teakea-light-gray overflow-hidden">
+        <div class="flex flex-col relative group border rounded-lg border-techtic-light-gray overflow-hidden">
             <?php /* Product Image */ ?>
             <a href="<?= $escaper->escapeUrl($product->getProductUrl()) ?>"
                 title="<?= $escaper->escapeHtmlAttr($product->getName()) ?>"
@@ -134,7 +134,7 @@ $product = $productRepository->getById($product->getId(), false, 1);
                     <?php if ($isProductGroupedOrBundle): ?>
                         <a
                             href="<?= $escaper->escapeUrl($product->getProductUrl()) ?>"
-                            class="w-auto btn bg-teakea-gold text-black text-sm font-semibold items-center py-3 px-7 justify-center text-sm <?= $viewIsGrid ? 'mr-auto' : 'mr-auto md:mr-0' ?>"
+                            class="w-auto btn bg-techtic-gold text-black text-sm font-semibold items-center py-3 px-7 justify-center text-sm <?= $viewIsGrid ? 'mr-auto' : 'mr-auto md:mr-0' ?>"
                             title="<?= $escaper->escapeHtmlAttr(__('Configure %1 on the product page')) ?>"
                             aria-label="<?= $escaper->escapeHtmlAttr(__('Configure %1 on the product page', $productName)) ?>">
                             <svg class="w-5 h-5" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -146,7 +146,7 @@ $product = $productRepository->getById($product->getId(), false, 1);
                         </a>
                     <?php else: ?>
                         <button
-                            class="w-full bg-teakea-gold text-black text-sm font-semibold items-center py-3 px-7 opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute bottom-0 flex gap-x-1.5 justify-center"
+                            class="w-full bg-techtic-gold text-black text-sm font-semibold items-center py-3 px-7 opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute bottom-0 flex gap-x-1.5 justify-center"
                             title="<?= $escaper->escapeHtmlAttr(__('Add to Cart') . ' ' . $productName) ?>"
                             aria-label="<?= $escaper->escapeHtmlAttr(__('Add to Cart') . ' ' . $productName) ?>"
                             data-addto="cart">
@@ -188,7 +188,7 @@ $product = $productRepository->getById($product->getId(), false, 1);
                 </span>
             <?php endif; ?>
 
-            <div class="flex items-center font-bold text-base text-teakea-neutral-dark"
+            <div class="flex items-center font-bold text-base text-techtic-neutral-dark"
                 x-data="initPriceBox()"
                 x-defer="intersect">
                 <?= /* @noEscape */ $productListItemViewModel->getProductPriceHtml($product) ?>

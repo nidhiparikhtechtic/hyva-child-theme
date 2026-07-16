@@ -15,17 +15,17 @@ use Magento\Checkout\Block\Onepage\Success;
 /** @var Success $block */
 /** @var Escaper $escaper */
 ?>
-<div class="flex flex-col gap-y-1.5 bg-teakea-warm-white rounded-lg shadow-sm border border-teakea-light-gray mb-3 sm:mb-5 p-6 max-w-2xl mx-auto text-center checkout-success">
+<div class="flex flex-col gap-y-1.5 bg-techtic-warm-white rounded-lg shadow-sm border border-techtic-light-gray mb-3 sm:mb-5 p-6 max-w-2xl mx-auto text-center checkout-success">
 
     <div class="flex items-center justify-center mb-2">
-        <div class="flex w-14 h-14 rounded rounded-full items-center justify-center text-white bg-teakea-lime-green">
+        <div class="flex w-14 h-14 rounded rounded-full items-center justify-center text-white bg-techtic-lime-green">
             <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M19 29L25 35L37 22" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M19 29L25 35L37 22" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
         </div>
     </div>
 
-    <h1 class="text-lg font-extrabold text-teakea-black">
+    <h1 class="text-lg font-extrabold text-techtic-black">
         <?= $escaper->escapeHtml(__('Thank you for your purchase!')) ?>
     </h1>
 
@@ -40,7 +40,7 @@ use Magento\Checkout\Block\Onepage\Success;
                 ) ?>
                 &middot;
                 <a href="<?= $escaper->escapeUrl($block->getViewOrderUrl()) ?>"
-                    class="underline hover:text-teakea-black transition-colors">
+                    class="underline hover:text-techtic-black transition-colors">
                     <?= $escaper->escapeHtml(__('View order')) ?>
                 </a>
             <?php else: ?>

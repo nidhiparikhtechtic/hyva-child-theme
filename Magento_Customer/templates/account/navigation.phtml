@@ -31,11 +31,11 @@ $links = $block->getLinks();
         }
 
         $isLogout = strpos((string)$link->getHref(), 'customer/account/logout') !== false;
-        $linkClasses = $isLogout ? 'text-teakea-terracotta' : 'text-teak-ink';
+        $linkClasses = $isLogout ? 'text-techtic-terracotta' : 'text-teak-ink';
         ?>
         <?php if ($isCurrent): ?>
-            <li class="nav item current border-l-4 border-teakea-deep-green">
-                <a class="flex px-4 py-2 hover:bg-teakea-lighter-gray font-bold text-teak-green bg-teak-light-green" href="<?= $escaper->escapeUrl($link->getHref()) ?>"
+            <li class="nav item current border-l-4 border-techtic-deep-green">
+                <a class="flex px-4 py-2 hover:bg-techtic-lighter-gray font-bold text-teak-green bg-teak-light-green" href="<?= $escaper->escapeUrl($link->getHref()) ?>"
                     <?php if ($link->getTitle()): ?>
                     title="<?= $escaper->escapeHtmlAttr($link->getTitle()) ?>"
                     <?php endif; ?>>
@@ -46,7 +46,7 @@ $links = $block->getLinks();
         <?php else: ?>
             <?php if ($link->getHref()): ?>
                 <li class="nav item">
-                    <a class="flex px-4 py-2 hover:bg-teakea-lighter-gray <?= $escaper->escapeHtmlAttr($linkClasses) ?>" href="<?= $escaper->escapeUrl($link->getHref()) ?>"
+                    <a class="flex px-4 py-2 hover:bg-techtic-lighter-gray <?= $escaper->escapeHtmlAttr($linkClasses) ?>" href="<?= $escaper->escapeUrl($link->getHref()) ?>"
                         <?php if ($link->getTitle()): ?>
                         title="<?= $escaper->escapeHtmlAttr($link->getTitle()) ?>"
                         <?php endif; ?>>

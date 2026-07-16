@@ -86,8 +86,8 @@ $availabilityFlags = determineAvailabilityFlags(
 // CONSTANTS AND CONFIGURATION
 // ============================================================================
 
-const DIRECT_AVAILABILITY_CLASSES = 'flex text-teakea-lime-green items-center gap-1 text-sm font-semibold leading-4 capitalize';
-const OUT_OF_STOCK_CLASSES = 'flex text-teakea-tomato-red items-center gap-1 text-sm font-semibold leading-4 unavailable capitalize';
+const DIRECT_AVAILABILITY_CLASSES = 'flex text-techtic-lime-green items-center gap-1 text-sm font-semibold leading-4 capitalize';
+const OUT_OF_STOCK_CLASSES = 'flex text-techtic-tomato-red items-center gap-1 text-sm font-semibold leading-4 unavailable capitalize';
 
 // ============================================================================
 // HELPER FUNCTIONS
@@ -167,7 +167,7 @@ function determineAvailabilityFlags(bool $inStock, ?string $deliveryTime): array
 function renderLowStockWarning(array $productData): void
 {
     if ($productData['isInStock'] && $productData['qty'] > 0 && $productData['qty'] < 5 && $productData['deliveryType'] != 'Indonesia_En_Route'): ?>
-        <div class="text-teakea-highlight-red font-normal text-xs">
+        <div class="text-techtic-highlight-red font-normal text-xs">
             <?= __('Order quickly, only %1 left in stock', $productData['qty']) ?>
         </div>
     <?php endif;
@@ -186,20 +186,20 @@ function renderPreorderBadge(array $productData, array $dateData, array $availab
             <span class="flex items-center">
                 <?php renderPreorderIcon(); ?>
             </span>
-            <span class="flex items-center text-teakea-dark-gray text-sm leading-4 font-semibold capitalize">
+            <span class="flex items-center text-techtic-dark-gray text-sm leading-4 font-semibold capitalize">
                 <?= __('Pre-order |') ?>
             </span>
         </div>
         <div class="delivery_info flex flex-row gap-x-1.5">
             <?php if ($showDateInfo): ?>
                 <div class="deliverytimelabel flex relative w-max gap-x-2.5 items-center">
-                    <div class="flex gap-x-1 items-center text-sm font-semibold text-teakea-dark-gray capitalize">
+                    <div class="flex gap-x-1 items-center text-sm font-semibold text-techtic-dark-gray capitalize">
                         <?= __('Available from:') ?> <?= $dateData['visibleDate'] ?>
                     </div>
                 </div>
             <?php else: ?>
                 <div class="deliverytimelabel flex relative w-max gap-x-2.5 items-center">
-                    <div class="flex gap-x-1 items-center text-sm font-semibold text-teakea-dark-gray capitalize">
+                    <div class="flex gap-x-1 items-center text-sm font-semibold text-techtic-dark-gray capitalize">
                         <span class="flex items-center">
                             <?php renderTruckIcon(); ?>
                         </span>
@@ -236,7 +236,7 @@ function renderDeliveryTimeContent(
     if ($productData['deliveryType'] === 'Handmade_Production'): ?>
 
         <div class="space-y-1 mt-1">
-            <div class="flex gap-x-1 items-center text-sm font-semibold text-teakea-dark-gray capitalize">
+            <div class="flex gap-x-1 items-center text-sm font-semibold text-techtic-dark-gray capitalize">
                 <span class="flex items-center">
                     <svg class="w-4 h-4" viewBox="0 -2.667 48 48" xmlns="http://www.w3.org/2000/svg">
                         <path fill="#393939" d="m47.609 16.162 -1.886 -1.886c-0.521 -0.521 -1.365 -0.521 -1.886 0l-0.943 0.943 -2.408 -2.408c0.469 -1.776 0.03 -3.742 -1.363 -5.134l-3.771 -3.771c-5.207 -5.207 -13.649 -5.207 -18.857 0l7.543 3.771v1.563c0 1.414 0.562 2.771 1.563 3.771l4.095 4.095c1.393 1.393 3.358 1.832 5.134 1.363l2.408 2.408 -0.943 0.943c-0.521 0.521 -0.521 1.365 0 1.886l1.886 1.886c0.521 0.521 1.365 0.521 1.886 0l7.543 -7.543c0.519 -0.52 0.519 -1.364 -0.002 -1.885m-23.893 -1.267c-0.308 -0.308 -0.57 -0.649 -0.821 -0.996L1.637 33.747c-2.131 1.99 -2.188 5.349 -0.128 7.411s5.421 2.004 7.411 -0.128l19.844 -21.256c-0.33 -0.242 -0.658 -0.489 -0.953 -0.784z" />
@@ -247,7 +247,7 @@ function renderDeliveryTimeContent(
                 </span>
                 <div class="relative group">
                     <?php renderTooltipIcon(); ?>
-                    <div class="stock-tooltip pointer-events-none absolute bottom-[150%] left-[-140px] sm:left-[-100px] lg:left-[-77px] top-auto mt-1 w-44 lg:w-64 xl:w-96 bg-white text-teakea-dark-gray text-xs p-3.5 leading-4 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-[100]">
+                    <div class="stock-tooltip pointer-events-none absolute bottom-[150%] left-[-140px] sm:left-[-100px] lg:left-[-77px] top-auto mt-1 w-44 lg:w-64 xl:w-96 bg-white text-techtic-dark-gray text-xs p-3.5 leading-4 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-[100]">
                         <strong><?= __('Directly from our own workshop in Tolbert') ?></strong>
                         <p>
                             <?= __('While others wait for containers, our craftsmen start finishing your furniture immediately after your order. No mass storage, but personal craftsmanship.') ?>
@@ -267,7 +267,7 @@ function renderDeliveryTimeContent(
     elseif ($productData['deliveryType'] === 'Indonesia_Workshop'): ?>
 
         <div class="space-y-1 mt-1">
-            <div class="flex gap-x-1 items-center text-sm font-semibold text-teakea-dark-gray capitalize">
+            <div class="flex gap-x-1 items-center text-sm font-semibold text-techtic-dark-gray capitalize">
                 <span class="flex items-center">
                     <svg class="w-4 h-4" viewBox="0 -2.667 48 48" xmlns="http://www.w3.org/2000/svg">
                         <path fill="#393939" d="m47.609 16.162 -1.886 -1.886c-0.521 -0.521 -1.365 -0.521 -1.886 0l-0.943 0.943 -2.408 -2.408c0.469 -1.776 0.03 -3.742 -1.363 -5.134l-3.771 -3.771c-5.207 -5.207 -13.649 -5.207 -18.857 0l7.543 3.771v1.563c0 1.414 0.562 2.771 1.563 3.771l4.095 4.095c1.393 1.393 3.358 1.832 5.134 1.363l2.408 2.408 -0.943 0.943c-0.521 0.521 -0.521 1.365 0 1.886l1.886 1.886c0.521 0.521 1.365 0.521 1.886 0l7.543 -7.543c0.519 -0.52 0.519 -1.364 -0.002 -1.885m-23.893 -1.267c-0.308 -0.308 -0.57 -0.649 -0.821 -0.996L1.637 33.747c-2.131 1.99 -2.188 5.349 -0.128 7.411s5.421 2.004 7.411 -0.128l19.844 -21.256c-0.33 -0.242 -0.658 -0.489 -0.953 -0.784z" />
@@ -278,7 +278,7 @@ function renderDeliveryTimeContent(
                 </span>
             </div>
 
-            <div class="flex gap-x-1 items-center text-sm font-semibold text-teakea-dark-gray capitalize">
+            <div class="flex gap-x-1 items-center text-sm font-semibold text-techtic-dark-gray capitalize">
                 <span class="flex items-center">
                     <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none">
                         <path d="M3 17l6-6 4 4 8-8M14 7h7v7" stroke="#8B6914" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -297,7 +297,7 @@ function renderDeliveryTimeContent(
     elseif ($productData['deliveryType'] === 'Indonesia_En_Route'): ?>
         <div class="space-y-1 mt-1">
             <div class="flex relative gap-x-2.5 items-center">
-                <div class="flex gap-x-1 items-center text-sm font-semibold text-teakea-dark-gray capitalize">
+                <div class="flex gap-x-1 items-center text-sm font-semibold text-techtic-dark-gray capitalize">
                     <span class="flex items-center">
                         <?php renderTruckIcon(); ?>
                     </span>
@@ -312,7 +312,7 @@ function renderDeliveryTimeContent(
             </div>
             <?php renderIndonesiaEnRoutestockAvailabilityBadge($productData, $dateData) ?>
             <div class="flex relative gap-x-2.5 items-center">
-                <div class="flex gap-x-1 items-center text-sm font-semibold text-teakea-dark-gray capitalize">
+                <div class="flex gap-x-1 items-center text-sm font-semibold text-techtic-dark-gray capitalize">
                     <span class="flex items-center text-teak-green">
                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none">
                             <path d="M3 9h18v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9zM3 9l2-5h14l2 5M12 12v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -330,14 +330,14 @@ function renderDeliveryTimeContent(
         <?php elseif ($productData['deliveryType'] === 'Stock_Direct'):
 
         if ($availabilityFlags['isOneDayDelivery']): ?>
-            <div class="onedaydeliverylabel text-teakea-neutral">
+            <div class="onedaydeliverylabel text-techtic-neutral">
                 <?= $escaper->escapeHtml(__('Ordered before 15:00 is delivered the next working day.')) ?>
             </div>
         <?php elseif ($availabilityFlags['isOnetothreeDayDelivery']): ?>
 
             <!-- 1–3 Working Days Delivery (NOW DYNAMIC) -->
             <div class="space-y-1 mt-1">
-                <div class="flex gap-x-1 items-center text-sm font-semibold text-teakea-dark-gray capitalize hidden">
+                <div class="flex gap-x-1 items-center text-sm font-semibold text-techtic-dark-gray capitalize hidden">
                     <span class="flex items-center">
                         <?php renderTruckIcon(); ?>
                     </span>
@@ -347,7 +347,7 @@ function renderDeliveryTimeContent(
                 </div>
 
                 <!-- Category-based CRO text -->
-                <div class="flex gap-x-1 items-center text-sm font-semibold text-teakea-dark-gray">
+                <div class="flex gap-x-1 items-center text-sm font-semibold text-techtic-dark-gray">
                     <span class="flex items-center">
                         <?php renderTruckIcon(); ?>
                     </span>
@@ -367,11 +367,11 @@ function renderDeliveryTimeContent(
                 </div>
 
                 <!-- Shipping -->
-                <!-- <div class="flex items-center gap-x-1 text-sm font-medium <? //= $shippingInfo['isFree'] ? 'text-teakea-lime-green' : 'text-teakea-dark-gray' 
+                <!-- <div class="flex items-center gap-x-1 text-sm font-medium <? //= $shippingInfo['isFree'] ? 'text-techtic-lime-green' : 'text-techtic-dark-gray' 
                                                                                 ?>">
                     <?php //if ($shippingInfo['isFree']): 
                     ?>
-                        <svg class="w-4 h-4 text-teakea-lime-green" viewBox="0 0 20 20" fill="currentColor">
+                        <svg class="w-4 h-4 text-techtic-lime-green" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rulie="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                         </svg>
                     <?php //endif; 
@@ -383,7 +383,7 @@ function renderDeliveryTimeContent(
         <?php elseif ($availabilityFlags['isTwelveWeeks']): ?>
             <!-- 12 weeks Delivery -->
             <div class="space-y-1 mt-1">
-                <div class="flex gap-x-2.5 items-center py-0.5 px-1.5 bg-[#F7F3E8] text-xs font-normal text-teakea-dark-gray leading-4 capitalize rounded">
+                <div class="flex gap-x-2.5 items-center py-0.5 px-1.5 bg-[#F7F3E8] text-xs font-normal text-techtic-dark-gray leading-4 capitalize rounded">
                     <svg class="w-5 h-5" viewBox="0 0 23 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g clip-path="url(#clip0_4019_805)">
                             <path d="M19.9735 8.73013C19.8436 8.10291 19.4938 7.79277 18.934 7.79025C17.9153 7.78584 16.896 7.78836 15.8774 7.78962C15.8068 7.78962 15.7355 7.7997 15.6309 7.80727C15.6309 7.9346 15.6309 8.04744 15.6309 8.15964C15.6309 9.73557 15.6321 11.3109 15.6309 12.8868C15.6296 13.8468 15.0629 14.4173 14.106 14.4186C12.3095 14.4211 10.5136 14.4192 8.717 14.4192C8.66468 14.4192 8.61173 14.4211 8.55941 14.4179C8.26188 14.4022 8.06898 14.2232 8.06268 13.959C8.05638 13.6804 8.25053 13.4806 8.56761 13.4768C9.28181 13.468 9.99602 13.4736 10.7102 13.4736C11.8342 13.4736 12.9581 13.4749 14.0821 13.473C14.524 13.4724 14.6866 13.3085 14.6866 12.8641C14.6879 10.4271 14.6879 7.99008 14.6866 5.55307C14.6866 5.10173 14.5322 4.94476 14.0852 4.94413C10.2198 4.94287 6.35375 4.94287 2.48833 4.94413C2.05023 4.94413 1.89011 5.11118 1.89011 5.56C1.88885 7.32504 1.89011 9.08944 1.88948 10.8545C1.88948 10.949 1.89516 11.0442 1.88507 11.1381C1.85481 11.4048 1.70415 11.5573 1.43436 11.5731C1.17275 11.5882 0.981122 11.413 0.950233 11.1394C0.942039 11.0669 0.945821 10.9925 0.945821 10.9188C0.945821 9.13293 0.94456 7.3471 0.945821 5.56127C0.945191 4.56087 1.50496 4.0011 2.50472 4.00047C6.37014 3.99984 10.2362 3.99984 14.1016 4.00047C15.0648 4.00047 15.6271 4.56276 15.6303 5.52281C15.6315 5.95083 15.6303 6.37948 15.6303 6.84407C15.7702 6.84407 15.8818 6.84407 15.994 6.84407C16.971 6.84407 17.9481 6.84659 18.9246 6.84343C19.7819 6.84091 20.3839 7.23363 20.7394 8.00773C21.3256 9.28485 21.9119 10.5626 22.488 11.8441C22.5902 12.0711 22.6973 12.3188 22.7068 12.5609C22.7389 13.4094 22.7786 14.2635 22.7194 15.1082C22.6689 15.8224 22.0581 16.2971 21.33 16.3122C20.8478 16.3223 20.365 16.3141 19.8714 16.3141C19.6854 17.0176 19.3135 17.5673 18.6787 17.9171C17.3726 18.637 15.7198 17.9808 15.2842 16.5568C15.2268 16.3689 15.1524 16.3109 14.9621 16.3109C12.5673 16.3166 10.1719 16.3154 7.77712 16.3135C7.6334 16.3135 7.53569 16.321 7.47707 16.5026C7.1228 17.5994 6.25857 18.2197 5.14344 18.2027C4.09514 18.1869 3.24667 17.5149 2.91509 16.4383C2.90564 16.4086 2.8924 16.3803 2.86844 16.321C2.34776 16.321 1.80943 16.3393 1.38267 15.9252C0.964102 15.5186 0.916194 15.0073 0.946451 14.4167C0.774991 14.4167 0.622442 14.4242 0.470523 14.4148C0.198834 14.399 0.00783264 14.2093 0.000268214 13.959C-0.00792658 13.7075 0.172359 13.4894 0.445308 13.4806C0.938257 13.4642 1.43499 13.4491 1.92478 13.4945C2.07292 13.5083 2.2551 13.6993 2.32696 13.8538C2.41647 14.0454 2.32507 14.2755 2.11263 14.3505C1.74765 14.4791 1.89137 14.7615 1.91028 14.9777C1.93235 15.221 2.11768 15.3559 2.3755 15.3572C2.54254 15.3578 2.70959 15.3572 2.86908 15.3572C3.31853 14.099 4.12288 13.4636 5.23359 13.4743C6.32602 13.485 7.14171 14.1412 7.53821 15.3402H15.2022C15.6366 14.1103 16.4365 13.4737 17.5365 13.4743C18.6371 13.4743 19.4364 14.1116 19.8752 15.3547C20.3681 15.3547 20.8724 15.3824 21.371 15.3377C21.5192 15.3244 21.7637 15.1126 21.7682 14.9846C21.7959 14.1998 21.7669 13.4125 21.7555 12.6264C21.7555 12.5987 21.7329 12.5716 21.7102 12.5212C21.0766 12.5212 20.4368 12.5212 19.7976 12.5212C19.2095 12.5212 18.6214 12.5268 18.0332 12.5193C17.4646 12.5117 17.0801 12.1329 17.0732 11.5737C17.0656 10.9434 17.0656 10.313 17.0732 9.68261C17.0795 9.12474 17.4678 8.73769 18.0294 8.73076C18.6699 8.72319 19.3097 8.72887 19.9735 8.72887V8.73013ZM16.1219 15.8552C16.1276 16.645 16.758 17.2659 17.5478 17.2603C18.3289 17.2546 18.963 16.6104 18.9554 15.83C18.9479 15.0496 18.3024 14.4142 17.5233 14.4205C16.7429 14.4268 16.1163 15.0685 16.1213 15.8558L16.1219 15.8552ZM5.21089 17.2603C5.99948 17.2578 6.62355 16.6299 6.62292 15.8394C6.62292 15.0546 5.98751 14.4186 5.20522 14.4198C4.42735 14.4211 3.78689 15.0653 3.78878 15.8451C3.79004 16.6274 4.42861 17.2628 5.21089 17.2603ZM18.0257 11.546H21.3061C21.0376 10.9503 20.7911 10.3848 20.5232 9.82886C20.4872 9.75448 20.3473 9.69522 20.2534 9.69144C19.8758 9.67568 19.4976 9.68514 19.1193 9.68514C18.7563 9.68514 18.3932 9.68514 18.0257 9.68514V11.546Z" fill="black" />
@@ -401,7 +401,7 @@ function renderDeliveryTimeContent(
         <?php else: ?>
             <div class="space-y-1 mt-1">
                 <div class="flex relative gap-x-2.5 items-center">
-                    <div class="flex gap-x-1 items-center text-sm font-semibold text-teakea-dark-gray capitalize">
+                    <div class="flex gap-x-1 items-center text-sm font-semibold text-techtic-dark-gray capitalize">
                         <span class="flex items-center">
                             <?php renderTruckIcon(); ?>
                         </span>
@@ -425,7 +425,7 @@ function renderHandmadeBadge(string $handmadeText, Escaper $escaper): void
         return;
     }
     ?>
-    <span class="flex bg-amber-100 rounded py-0.5 px-1.5 gap-x-1 text-teakea-dark-gray text-sm font-semibold leading-4 capitalize">
+    <span class="flex bg-amber-100 rounded py-0.5 px-1.5 gap-x-1 text-techtic-dark-gray text-sm font-semibold leading-4 capitalize">
         <span class="flex items-center">
             <?php renderHandmadeIcon(); ?>
         </span>
@@ -505,7 +505,7 @@ function renderTooltip(?string $tooltipText, Escaper $escaper): void
 
     <div class="relative group">
         <?php renderTooltipIcon(); ?>
-        <div class="stock-tooltip pointer-events-none absolute bottom-[150%] left-[-140px] sm:left-[-100px] lg:left-[-77px] top-auto mt-1 w-44 lg:w-64 xl:w-96 bg-white text-teakea-dark-gray text-xs p-3.5 leading-4 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-[100]">
+        <div class="stock-tooltip pointer-events-none absolute bottom-[150%] left-[-140px] sm:left-[-100px] lg:left-[-77px] top-auto mt-1 w-44 lg:w-64 xl:w-96 bg-white text-techtic-dark-gray text-xs p-3.5 leading-4 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-[100]">
             <?= $escapedText ?>
         </div>
     </div>
@@ -536,8 +536,8 @@ function renderDirectAvailabilityBadge(array $productData, array $dateData, Esca
     if ($productData['deliveryType'] === 'Handmade_Production'):
     ?>
         <div class="flex gap-x-2.5 items-center">
-            <span class="flex text-teakea-lime-green items-center gap-1 text-sm font-semibold leading-4">
-                <svg class="w-3 h-3 text-teakea-lime-green" viewBox="0 0 6 7" fill="currentColor" aria-hidden="true">
+            <span class="flex text-techtic-lime-green items-center gap-1 text-sm font-semibold leading-4">
+                <svg class="w-3 h-3 text-techtic-lime-green" viewBox="0 0 6 7" fill="currentColor" aria-hidden="true">
                     <rect y="0.5" width="6" height="6" rx="3" />
                 </svg>
                 <?= __('Production starts immediately') ?>
@@ -548,8 +548,8 @@ function renderDirectAvailabilityBadge(array $productData, array $dateData, Esca
     elseif ($productData['deliveryType'] === 'Indonesia_Workshop'):
     ?>
         <div class="flex gap-x-2.5 items-center">
-            <span class="flex text-teakea-lime-green items-center gap-1 text-sm font-semibold leading-4">
-                <svg class="w-3 h-3 text-teakea-lime-green" viewBox="0 0 6 7" fill="currentColor" aria-hidden="true">
+            <span class="flex text-techtic-lime-green items-center gap-1 text-sm font-semibold leading-4">
+                <svg class="w-3 h-3 text-techtic-lime-green" viewBox="0 0 6 7" fill="currentColor" aria-hidden="true">
                     <rect y="0.5" width="6" height="6" rx="3" />
                 </svg>
                 <?= __('Production begins immediately after order placement') ?>
@@ -566,7 +566,7 @@ function renderDirectAvailabilityBadge(array $productData, array $dateData, Esca
     ?>
         <div class="flex gap-x-2.5 items-center">
             <span class="flex <?= DIRECT_AVAILABILITY_CLASSES; ?>">
-                <svg class="w-3 h-3 text-teakea-lime-green" viewBox="0 0 6 7" fill="currentColor" aria-hidden="true">
+                <svg class="w-3 h-3 text-techtic-lime-green" viewBox="0 0 6 7" fill="currentColor" aria-hidden="true">
                     <rect y="0.5" width="6" height="6" rx="3" />
                 </svg>
                 <?= __('Directly available') ?>
@@ -582,20 +582,20 @@ function renderRestockAvailabilityBadge(array $productData, array $dateData): vo
     if ($showDateInfo): ?>
         <div class="flex flex-col relative w-max gap-x-2.5 gap-y-1 items-start">
             <?php if ($dateData['daysLeft'] !== null && $dateData['daysLeft'] <= 7): ?>
-                <div class="text-teakea-highlight-red font-normal text-xs">
+                <div class="text-techtic-highlight-red font-normal text-xs">
                     <?= __('%1 days left - reserve now', $dateData['daysLeft']) ?>
                 </div>
 
             <?php elseif ($dateData['daysLeft'] !== null && $dateData['daysLeft'] > 7): ?>
-                <div class="text-teakea-yellow font-normal text-xs">
+                <div class="text-techtic-yellow font-normal text-xs">
                     <?= __('%1 days left - reserve now', $dateData['daysLeft']) ?>
                 </div>
             <?php endif; ?>
 
-            <div class="flex gap-x-1 items-center text-sm font-semibold bg-[#EBEBEB] rounded py-0.5 px-1.5 text-teakea-dark-gray">
+            <div class="flex gap-x-1 items-center text-sm font-semibold bg-[#EBEBEB] rounded py-0.5 px-1.5 text-techtic-dark-gray">
                 <?= __('Expected on') ?> <?= $dateData['visibleDate'] ?>
             </div>
-            <div class="flex gap-x-1 items-center text-sm font-semibold text-teakea-dark-gray">
+            <div class="flex gap-x-1 items-center text-sm font-semibold text-techtic-dark-gray">
                 <?= __('Reserve now - Receive on the delivery date') ?>
             </div>
         </div>
@@ -603,7 +603,7 @@ function renderRestockAvailabilityBadge(array $productData, array $dateData): vo
         <!-- Standard Delivery Times -->
     <?php elseif (!$showDateInfo && $productData['qty'] > 0): ?>
         <div class="deliverytimelabel flex flex-col relative w-max gap-x-2.5 gap-y-1 items-start">
-            <div class="flex gap-x-1 items-center text-sm font-semibold bg-[#EBEBEB] rounded py-0.5 px-1.5 text-teakea-dark-gray">
+            <div class="flex gap-x-1 items-center text-sm font-semibold bg-[#EBEBEB] rounded py-0.5 px-1.5 text-techtic-dark-gray">
                 <?= __('Only %1 items left - Hurry!', $productData['qty']) ?>
             </div>
         </div>
@@ -721,7 +721,7 @@ function renderTowerLivingStockDelivery(array $productData, array $dateData, Esc
     <div class="space-y-2 mt-1">
         <?php if ($productData['isInStock'] && $qty > 0): ?>
             <!-- IN STOCK CHIP -->
-            <div class="inline-flex items-center gap-1.5 bg-[#dbede0] border border-teakea-lime-green text-teakea-lime-green text-sm font-semibold leading-4 rounded-full py-1 px-2.5">
+            <div class="inline-flex items-center gap-1.5 bg-[#dbede0] border border-techtic-lime-green text-techtic-lime-green text-sm font-semibold leading-4 rounded-full py-1 px-2.5">
                 <svg class="w-2 h-2 shrink-0" viewBox="0 0 6 6" fill="currentColor" aria-hidden="true">
                     <circle cx="3" cy="3" r="3" />
                 </svg>
@@ -731,18 +731,18 @@ function renderTowerLivingStockDelivery(array $productData, array $dateData, Esc
             <!-- Info pills -->
             <div class="flex flex-wrap gap-2">
                 <?php if ($deliveryTime): ?>
-                    <span class="inline-flex items-center gap-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-teakea-dark-gray py-1 px-2.5">
+                    <span class="inline-flex items-center gap-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-techtic-dark-gray py-1 px-2.5">
                         <?= $deliveryTime ?> <?= __('delivery time') ?>
                     </span>
                 <?php endif; ?>
-                <span class="inline-flex items-center gap-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-teakea-dark-gray py-1 px-2.5">
+                <span class="inline-flex items-center gap-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-techtic-dark-gray py-1 px-2.5">
                     <?php renderTruckIcon(); ?>
                     <?= __('We’ll schedule delivery') ?>
                 </span>
-                <span class="inline-flex items-center gap-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-teakea-dark-gray py-1 px-2.5">
+                <span class="inline-flex items-center gap-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-techtic-dark-gray py-1 px-2.5">
                     <?= __('Verified in Tolbert') ?>
                 </span>
-                <span class="inline-flex items-center gap-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-teakea-dark-gray py-1 px-2.5">
+                <span class="inline-flex items-center gap-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-techtic-dark-gray py-1 px-2.5">
                     &#8617; <?= __('30-day return policy') ?>
                 </span>
             </div>
@@ -777,20 +777,20 @@ function renderTowerLivingStockDelivery(array $productData, array $dateData, Esc
 
             <!-- Info pills -->
             <div class="flex flex-wrap gap-2">
-                <span class="inline-flex items-center gap-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-teakea-dark-gray py-1 px-2.5">
+                <span class="inline-flex items-center gap-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-techtic-dark-gray py-1 px-2.5">
                     <?= __('Order now · ~3 weeks total') ?>
                 </span>
-                <span class="inline-flex items-center gap-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-teakea-dark-gray py-1 px-2.5">
+                <span class="inline-flex items-center gap-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-techtic-dark-gray py-1 px-2.5">
                     <?= __("We'll set one aside for you") ?>
                 </span>
-                <span class="inline-flex items-center gap-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-teakea-dark-gray py-1 px-2.5">
+                <span class="inline-flex items-center gap-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-techtic-dark-gray py-1 px-2.5">
                     <?php renderTruckIcon(); ?>
                     <?= __("We'll schedule delivery") ?>
                 </span>
-                <span class="inline-flex items-center gap-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-teakea-dark-gray py-1 px-2.5">
+                <span class="inline-flex items-center gap-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-techtic-dark-gray py-1 px-2.5">
                     &#8617; <?= __('30-day return policy') ?>
                 </span>
-                <span class="inline-flex items-center gap-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-teakea-dark-gray py-1 px-2.5">
+                <span class="inline-flex items-center gap-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-techtic-dark-gray py-1 px-2.5">
                     <?= __('Pay on delivery') ?>
                 </span>
             </div>
@@ -813,7 +813,7 @@ function renderTowerLivingStockDelivery(array $productData, array $dateData, Esc
             <!-- OUT OF STOCK CHIP -->
 
             <!-- cjmExpectedDate empty → tijdelijk niet leverbaar (red) -->
-            <div class="inline-flex items-center gap-1.5 bg-[#FCEBEB] border border-teakea-red text-teakea-red text-sm font-semibold leading-4 rounded-full py-1 px-3">
+            <div class="inline-flex items-center gap-1.5 bg-[#FCEBEB] border border-techtic-red text-techtic-red text-sm font-semibold leading-4 rounded-full py-1 px-3">
                 <svg class="w-2 h-2 shrink-0" viewBox="0 0 6 6" fill="currentColor" aria-hidden="true">
                     <circle cx="3" cy="3" r="3" />
                 </svg>
@@ -824,7 +824,7 @@ function renderTowerLivingStockDelivery(array $productData, array $dateData, Esc
             <!-- OUT OF STOCK CHIP -->
 
             <!-- cjmExpectedDate empty → tijdelijk niet leverbaar (red) -->
-            <div class="inline-flex items-center gap-1.5 bg-[#FCEBEB] border border-teakea-red text-teakea-red text-sm font-semibold leading-4 rounded-full py-1 px-3">
+            <div class="inline-flex items-center gap-1.5 bg-[#FCEBEB] border border-techtic-red text-techtic-red text-sm font-semibold leading-4 rounded-full py-1 px-3">
                 <svg class="w-2 h-2 shrink-0" viewBox="0 0 6 6" fill="currentColor" aria-hidden="true">
                     <circle cx="3" cy="3" r="3" />
                 </svg>
@@ -947,7 +947,7 @@ function renderTruckIcon(): void
                         <!-- Custom Date Availability -->
                         <?php if ($showDateInfo): ?>
                             <div class="deliverytimelabel flex relative w-max gap-x-2.5 items-center">
-                                <div class="flex gap-x-1 items-center text-sm font-semibold bg-[#EBEBEB] rounded py-0.5 px-1.5 text-teakea-dark-gray">
+                                <div class="flex gap-x-1 items-center text-sm font-semibold bg-[#EBEBEB] rounded py-0.5 px-1.5 text-techtic-dark-gray">
                                     <?= __('Available from:') ?> <?= $dateData['visibleDate'] ?>
                                 </div>
                                 <?php renderTooltip($productData['tooltipText'], $escaper); ?>
@@ -971,12 +971,12 @@ function renderTruckIcon(): void
         </div>
 
         <?php if (!($showDateInfo) && $availabilityFlags['isTwelveWeeks']): ?>
-            <div class="text-sm font-semibold text-teakea-dark-gray capitalize">
+            <div class="text-sm font-semibold text-techtic-dark-gray capitalize">
                 <strong><?= __('Smart Choice: Not in a hurry?') ?></strong><br>
                 <?= __('Use discount code') ?>
-                <code class="bg-white font-bold border border-dashed border-teakea-gold rounded py-0.5 px-1">PREORDER10</code>
+                <code class="bg-white font-bold border border-dashed border-techtic-gold rounded py-0.5 px-1">PREORDER10</code>
                 <?= __('at checkout and receive immediately') ?>
-                <strong class="text-teakea-gold"><?= __('10% discount') ?></strong>
+                <strong class="text-techtic-gold"><?= __('10% discount') ?></strong>
                 <?= __('on this piece of furniture!') ?>
             </div>
         <?php endif; ?>

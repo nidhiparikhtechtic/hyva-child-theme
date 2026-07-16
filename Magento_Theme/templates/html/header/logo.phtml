@@ -35,7 +35,7 @@ $logoSrc = $logoPathResolver && method_exists($logoPathResolver, 'getLogoSrc')
     ? $logoPathResolver->getLogoSrc($block->getData('logo_file'))
     : $block->getLogoSrc();
 
-$logoAlt = $escaper->escapeHtmlAttr($storeName ?: 'Teakea');
+$logoAlt = $escaper->escapeHtmlAttr($storeName ?: 'Techtic');
 $logoTitle = $logoAlt . ' - Home';
 ?>
 <div class="lg:order-1 md:order-2 order-2">

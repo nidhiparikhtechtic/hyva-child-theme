@@ -56,7 +56,7 @@ $recaptcha = $block->getData('viewModelRecaptcha');
                         required
                         title="<?= $escaper->escapeHtmlAttr(__('Name')) ?>"
                         value="<?= $escaper->escapeHtmlAttr($contactHelper->getPostValue('name') ?: $contactHelper->getUserName()) ?>"
-                        class="input w-full mt-2.5 mr-0 bg-transparent border border-teakea-light-gray rounded-lg"
+                        class="input w-full mt-2.5 mr-0 bg-transparent border border-techtic-light-gray rounded-lg"
                         type="text" />
                 </div>
                 <div class="field telephone p-2 w-1/2 text-left">
@@ -73,7 +73,7 @@ $recaptcha = $block->getData('viewModelRecaptcha');
                         autocomplete="tel-national"
                         title="<?= $escaper->escapeHtmlAttr(__('Phone number')) ?>"
                         value="<?= $escaper->escapeHtmlAttr($contactHelper->getPostValue('telephone')) ?>"
-                        class="input w-full mt-2.5 mr-0 bg-transparent border border-teakea-light-gray rounded-lg" />
+                        class="input w-full mt-2.5 mr-0 bg-transparent border border-techtic-light-gray rounded-lg" />
                 </div>
                 <div class="field email required p-2 w-full text-left">
                     <label
@@ -92,7 +92,7 @@ $recaptcha = $block->getData('viewModelRecaptcha');
                         value="<?= $escaper->escapeHtmlAttr(
                                     $contactHelper->getPostValue('email') ?: $contactHelper->getUserEmail()
                                 ) ?>"
-                        class="input w-full mt-2.5 mr-0 bg-transparent border border-teakea-light-gray rounded-lg" />
+                        class="input w-full mt-2.5 mr-0 bg-transparent border border-techtic-light-gray rounded-lg" />
                 </div>
                 <div class="field comment required pt-2 px-2 w-full text-left">
                     <label
@@ -104,7 +104,7 @@ $recaptcha = $block->getData('viewModelRecaptcha');
                         id="comment"
                         required
                         title="<?= $escaper->escapeHtmlAttr(__('Your question or message')) ?>"
-                        class="input w-full mt-2.5 mr-0 p-0 bg-transparent border border-teakea-light-gray rounded-lg"
+                        class="input w-full mt-2.5 mr-0 p-0 bg-transparent border border-techtic-light-gray rounded-lg"
                         cols="5"
                         rows="3">
                         <?= $escaper->escapeHtml($contactHelper->getPostValue('comment')) ?>
@@ -116,7 +116,7 @@ $recaptcha = $block->getData('viewModelRecaptcha');
         </fieldset>
         <div class="w-full mt-7">
             <?= $block->getBlockHtml('formkey') ?>
-            <button type="submit" title="<?= $escaper->escapeHtmlAttr(__('Send message')) ?>" class="bg-teakea-terracotta px-16 rounded-lg h-12">
+            <button type="submit" title="<?= $escaper->escapeHtmlAttr(__('Send message')) ?>" class="bg-techtic-terracotta px-16 rounded-lg h-12">
                 <span class="text-white text-sm font-semibold leading-5 uppercase whitespace-nowrap"><?= $escaper->escapeHtml(__('Send message')) ?></span>
             </button>
         </div>

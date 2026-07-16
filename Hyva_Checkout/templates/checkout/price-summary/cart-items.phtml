@@ -42,12 +42,12 @@ $quoteItems = $magewire->getQuoteItemData();
 $quoteItemsCount = $quoteItems ? count($quoteItems) : 0;
 ?>
 
-<div x-data="mountainITTeakeaHyvaCheckoutPriceSummaryCartItems" x-bind:open="expand" class=" border border-teakea-light-gray mb-5 rounded-lg">
+<div x-data="TechticHyvaChildHyvaCheckoutPriceSummaryCartItems" x-bind:open="expand" class=" border border-techtic-light-gray mb-5 rounded-lg">
     <button
         type="button"
         class="group w-full flex items-center justify-between cursor-pointer py-3 px-3"
         aria-controls="checkout-cart-details"
-        x-on:click="mountainITTeakeaHyvaCheckoutPriceSummaryCartItemsClick231"
+        x-on:click="TechticHyvaChildHyvaCheckoutPriceSummaryCartItemsClick231"
         x-bind:aria-expanded="expand"
         aria-label="<?= $escaper->escapeHtmlAttr(__('Cart') . ' ' . ($quoteItemsCount > 1
                         ? __('%1 Items', $quoteItemsCount)
@@ -57,19 +57,19 @@ $quoteItemsCount = $quoteItems ? count($quoteItems) : 0;
 
                 <?= $heroicons->shoppingCartHtml('', 20, 20, ['aria-hidden' => 'true']) ?>
                 <span class="absolute top-0 left-4 h-4 w-4 py-1 -mt-3 -mr-3 text-xs font-bold text-center text-white leading-none
-                    rounded-full block transform -translate-x-1 translate-y-1 text-[10px] bg-teakea-red"
+                    rounded-full block transform -translate-x-1 translate-y-1 text-[10px] bg-techtic-red"
                     aria-hidden="true">
                     <?= /* @noEscape */
                     $quoteItemsCount ?>
                 </span>
             </span>
 
-            <span class="h-fit text-teakea-neutral font-bold text-sm font-garamond">
+            <span class="h-fit text-techtic-neutral font-bold text-sm font-garamond">
                 <?= $escaper->escapeHtml(__('Your Order')) ?>
             </span>
         </span>
 
-        <span class="transform transition duration-300" :class="mountainITTeakeaHyvaCheckoutPriceSummaryCartItemsClass232">
+        <span class="transform transition duration-300" :class="TechticHyvaChildHyvaCheckoutPriceSummaryCartItemsClass232">
             <?= $heroicons->chevronDownHtml('', 16, 16, ['aria-hidden' => 'true']) ?>
         </span>
 
@@ -97,7 +97,7 @@ $quoteItemsCount = $quoteItems ? count($quoteItems) : 0;
                                                 text-xs text-center text-white
                                                 leading-none font-bold
                                                 rounded-full
-                                                bg-teakea-red
+                                                bg-techtic-red
                                                 block absolute
                                                 top-16 left-1/2 transform -translate-x-1/2 -translate-y-1/2
                                                 shadow-md
@@ -150,21 +150,21 @@ $quoteItemsCount = $quoteItems ? count($quoteItems) : 0;
 <script>
     <?php /** Generated with hyva-csp-helper.php */ ?>
 
-    function mountainITTeakeaHyvaCheckoutPriceSummaryCartItems() {
+    function TechticHyvaChildHyvaCheckoutPriceSummaryCartItems() {
         return Object.assign({
             expand: this.$wire.expand
         }, {
-            ['mountainITTeakeaHyvaCheckoutPriceSummaryCartItemsClass232']() {
+            ['TechticHyvaChildHyvaCheckoutPriceSummaryCartItemsClass232']() {
                 return {
                     'rotate-180': this.expand
                 }
             },
-            ['mountainITTeakeaHyvaCheckoutPriceSummaryCartItemsClick231'](event) {
+            ['TechticHyvaChildHyvaCheckoutPriceSummaryCartItemsClick231'](event) {
                 return this.expand = !this.expand
             },
         })
     }
-    window.addEventListener('alpine:init', () => Alpine.data('mountainITTeakeaHyvaCheckoutPriceSummaryCartItems', mountainITTeakeaHyvaCheckoutPriceSummaryCartItems), {
+    window.addEventListener('alpine:init', () => Alpine.data('TechticHyvaChildHyvaCheckoutPriceSummaryCartItems', TechticHyvaChildHyvaCheckoutPriceSummaryCartItems), {
         once: true
     });
 </script>

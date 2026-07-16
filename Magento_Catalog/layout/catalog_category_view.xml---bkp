@@ -7,10 +7,12 @@
  * See https://hyva.io/license
  */
 -->
-<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="2columns-left"
+    xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <update handle="catalog_list_item" />
     <body>
-        <referenceContainer name="category.view.container" htmlId="category-view-container" htmlClass="category-view container"/>
+        <referenceContainer name="category.view.container" htmlId="category-view-container"
+            htmlClass="category-view container" />
 
         <referenceBlock name="page.main.title" remove="true" />
         <referenceContainer name="content">
@@ -20,11 +22,11 @@
                 </arguments>
             </block>
         </referenceContainer>
-        <referenceBlock name="category.image" remove="true"/>
+        <referenceBlock name="category.image" remove="true" />
         <move element="slider" destination="category.view.container" before="category.description" />
         <move element="category.description" destination="content" before="teak-tiles" />
         <referenceContainer name="content">
-            <block name="slider" template="Magento_Theme::elements/categorie-slider.phtml"/>
+            <block name="slider" template="Magento_Theme::elements/categorie-slider.phtml" />
             <block class="Magento\Cms\Block\Block" name="usp">
                 <arguments>
                     <argument name="block_id" xsi:type="string">cat-usp</argument>
@@ -35,16 +37,16 @@
         <referenceContainer name="content">
             <block class="Magento\Cms\Block\Block" name="teak-tiles">
                 <arguments>
-                    <argument name="block_id" xsi:type="string">product-page-usp-bottom-teakea</argument>
+                    <argument name="block_id" xsi:type="string">product-page-usp-bottom-techtic</argument>
                 </arguments>
             </block>
         </referenceContainer>
-<!--        <referenceContainer name="content">-->
-<!--            <block class="Magento\Cms\Block\Block" name="gen-desc">-->
-<!--                <arguments>-->
-<!--                    <argument name="block_id" xsi:type="string">general-description</argument>-->
-<!--                </arguments>-->
-<!--            </block>-->
-<!--        </referenceContainer>-->
+        <!--        <referenceContainer name="content">-->
+        <!--            <block class="Magento\Cms\Block\Block" name="gen-desc">-->
+        <!--                <arguments>-->
+        <!--                    <argument name="block_id" xsi:type="string">general-description</argument>-->
+        <!--                </arguments>-->
+        <!--            </block>-->
+        <!--        </referenceContainer>-->
     </body>
 </page>

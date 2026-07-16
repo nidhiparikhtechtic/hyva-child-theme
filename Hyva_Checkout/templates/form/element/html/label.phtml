@@ -24,7 +24,7 @@ $attributes = $element->getAttributes();
 ?>
 <label
     for="<?= $escaper->escapeHtmlAttr($attributes['id'] ?? $element->getId()) ?>"
-    class="<?= $escaper->escapeHtmlAttr($element->renderClass(['label'], 'label')) ?>  text-sm font-normal !text-teakea-neutral pb-2.5">
+    class="<?= $escaper->escapeHtmlAttr($element->renderClass(['label'], 'label')) ?>  text-sm font-normal !text-techtic-neutral pb-2.5">
     <span>
         <?= $escaper->escapeHtml(__($element->getLabel())) ?>
     </span>

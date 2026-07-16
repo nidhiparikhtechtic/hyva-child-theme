@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 use Hyva\Theme\Model\ViewModelRegistry;
@@ -9,24 +10,30 @@ use Magento\Framework\Escaper;
 
 $hyvaCsp = $viewModels->require(\Hyva\Theme\ViewModel\HyvaCsp::class);
 ?>
-    <script>
-        window.addEventListener('checkout:step:loaded', () => {
-            const checked = document.querySelector('#shipping-method-list input[name="shipping-method-option"]:checked');
-            if (!checked) return;
+<script>
+    window.addEventListener('checkout:step:loaded', () => {
+        const checked = document.querySelector('#shipping-method-list input[name="shipping-method-option"]:checked');
+        if (!checked) return;
 
-            window.dispatchEvent(new CustomEvent('checkout:shipping:method-activate', {
-                detail: { method: checked.value }
-            }));
-        }, { once: true });
+        window.dispatchEvent(new CustomEvent('checkout:shipping:method-activate', {
+            detail: {
+                method: checked.value
+            }
+        }));
+    }, {
+        once: true
+    });
 
-        function mountainITTeakeaHyvaCheckoutShippingMethodList() {
-            return {
-                disabled: (this.$el.dataset.hyvacsp1 === 'true')
-            };
-        }
+    function TechticHyvaChildHyvaCheckoutShippingMethodList() {
+        return {
+            disabled: (this.$el.dataset.hyvacsp1 === 'true')
+        };
+    }
 
-        window.addEventListener('alpine:init', () => {
-            Alpine.data('mountainITTeakeaHyvaCheckoutShippingMethodList', mountainITTeakeaHyvaCheckoutShippingMethodList);
-        }, { once: true });
-    </script>
+    window.addEventListener('alpine:init', () => {
+        Alpine.data('TechticHyvaChildHyvaCheckoutShippingMethodList', TechticHyvaChildHyvaCheckoutShippingMethodList);
+    }, {
+        once: true
+    });
+</script>
 <?php $hyvaCsp->registerInlineScript(); ?>

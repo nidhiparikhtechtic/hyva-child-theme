@@ -26,7 +26,7 @@ $customerRegistration = $viewModels->require(CustomerRegistration::class);
     @click.outside="isOpen = false"
     class="relative flex"
     :class="{
-            'bg-teakea-terracotta rounded-lg p-1': isOpen
+            'bg-techtic-terracotta rounded-lg p-1': isOpen
         }">
 
     <!-- Toggle Button -->
@@ -54,24 +54,24 @@ $customerRegistration = $viewModels->require(CustomerRegistration::class);
                 <b class="font-semibold text-base text-white" x-text="customer.fullname || (customer.firstname + ' ' + customer.lastname)"></b>
             </div>
             <a href="<?= $escaper->escapeUrl($block->getUrl('customer/account')) ?>"
-                class="block py-2 sm:py-2.5 px-2.5 sm:px-4 text-sm font-semibold border-t border-[#eee8da] hover:bg-teakea-white-beige"
+                class="block py-2 sm:py-2.5 px-2.5 sm:px-4 text-sm font-semibold border-t border-[#eee8da] hover:bg-techtic-white-beige"
                 role="menuitem"><?= $escaper->escapeHtml(__('My Account')) ?></a>
             <a href="<?= $escaper->escapeUrl($block->getUrl('wishlist')) ?>"
-                class="block py-2 sm:py-2.5 px-2.5 sm:px-4 text-sm font-semibold border-t border-[#eee8da] hover:bg-teakea-white-beige"
+                class="block py-2 sm:py-2.5 px-2.5 sm:px-4 text-sm font-semibold border-t border-[#eee8da] hover:bg-techtic-white-beige"
                 role="menuitem"><?= $escaper->escapeHtml(__('My Wish List')) ?></a>
             <a href="<?= $escaper->escapeUrl($block->getUrl('sales/order/history')) ?>"
-                class="block py-2 sm:py-2.5 px-2.5 sm:px-4 text-sm font-semibold border-t border-[#eee8da] hover:bg-teakea-white-beige"
+                class="block py-2 sm:py-2.5 px-2.5 sm:px-4 text-sm font-semibold border-t border-[#eee8da] hover:bg-techtic-white-beige"
                 role="menuitem"><?= $escaper->escapeHtml(__('My Orders')) ?></a>
             <a href="<?= $escaper->escapeUrl($block->getUrl('customer/address')) ?>"
-                class="block py-2 sm:py-2.5 px-2.5 sm:px-4 text-sm font-semibold border-t border-[#eee8da] hover:bg-teakea-white-beige"
+                class="block py-2 sm:py-2.5 px-2.5 sm:px-4 text-sm font-semibold border-t border-[#eee8da] hover:bg-techtic-white-beige"
                 role="menuitem"><?= $escaper->escapeHtml(__('Address Book')) ?></a>
             <a href="<?= $escaper->escapeUrl($block->getUrl('customer/account/logout')) ?>"
-                class="block py-2 sm:py-2.5 px-2.5 sm:px-4 text-sm font-semibold border-t border-[#eee8da] hover:bg-teakea-white-beige text-teakea-terracotta"
+                class="block py-2 sm:py-2.5 px-2.5 sm:px-4 text-sm font-semibold border-t border-[#eee8da] hover:bg-techtic-white-beige text-techtic-terracotta"
                 role="menuitem"><?= $escaper->escapeHtml(__('Sign Out')) ?></a>
         <?php else: ?>
 
             <!-- <a href="<?= $escaper->escapeUrl($block->getUrl('customer/account/index')) ?>"
-                class="block py-2 sm:py-2.5 px-2.5 sm:px-4 text-sm font-semibold hover:bg-teakea-white-beige"
+                class="block py-2 sm:py-2.5 px-2.5 sm:px-4 text-sm font-semibold hover:bg-techtic-white-beige"
                 role="menuitem"
                 onclick="hyva.setCookie && hyva.setCookie(
                    '<? //= Redirect::LOGIN_REDIRECT_URL 
@@ -85,7 +85,7 @@ $customerRegistration = $viewModels->require(CustomerRegistration::class);
             ?>
             <!-- <a href="<? //= $escaper->escapeUrl($block->getUrl('customer/account/create')) 
                             ?>"
-                    class="block py-2 sm:py-2.5 px-2.5 sm:px-4 text-sm font-semibold border-t border-[#eee8da] hover:bg-teakea-white-beige"
+                    class="block py-2 sm:py-2.5 px-2.5 sm:px-4 text-sm font-semibold border-t border-[#eee8da] hover:bg-techtic-white-beige"
                     role="menuitem"><? //= $escaper->escapeHtml(__('Create an Account')) 
                                     ?>
                 </a> -->
@@ -93,7 +93,7 @@ $customerRegistration = $viewModels->require(CustomerRegistration::class);
             ?>
 
             <a href="<?= $escaper->escapeUrl($block->getUrl('customer/account/index')) ?>"
-                class="block py-2 sm:py-2.5 px-2.5 sm:px-4 text-sm font-semibold hover:bg-teakea-white-beige"
+                class="block py-2 sm:py-2.5 px-2.5 sm:px-4 text-sm font-semibold hover:bg-techtic-white-beige"
                 role="menuitem"
                 @click.prevent="hyva.setCookie && 
                                 hyva.setCookie('<?= Redirect::LOGIN_REDIRECT_URL ?>',window.location.href,1);
@@ -103,7 +103,7 @@ $customerRegistration = $viewModels->require(CustomerRegistration::class);
             </a>
             <?php if ($customerRegistration->isAllowed()): ?>
                 <a href="<?= $escaper->escapeUrl($block->getUrl('customer/account/create')) ?>"
-                    class="block py-2 sm:py-2.5 px-2.5 sm:px-4 text-sm font-semibold border-t border-[#eee8da] hover:bg-teakea-white-beige"
+                    class="block py-2 sm:py-2.5 px-2.5 sm:px-4 text-sm font-semibold border-t border-[#eee8da] hover:bg-techtic-white-beige"
                     role="menuitem"
                     @click.prevent="$store.authModal.show('register'); isOpen = false"><?= $escaper->escapeHtml(__('Create an Account')) ?></a>
             <?php endif; ?>

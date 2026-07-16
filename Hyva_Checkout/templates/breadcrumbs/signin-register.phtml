@@ -23,15 +23,15 @@ $viewModel = $viewModels->require(SigninRegister::class);
 ?>
 <?php if ($viewModel->getCustomerSession()->isLoggedIn() === false): ?>
     <div>
-        <p class="pb-4 text-sm font-normal text-teakea-neutral font-garamond">
+        <p class="pb-4 text-sm font-normal text-techtic-neutral font-garamond">
             <?= $escaper->escapeHtml(__('Regular shopper? ')) ?>
             <a
                 href="<?= $escaper->escapeUrl($block->getUrl('customer/account/login', ['referer' => base64_encode($block->getUrl('checkout'))])) ?>"
                 class="underline text-[#A5813B] text-sm font-normal font-garamond">
                 <?= $escaper->escapeHtml(__('Sign in')) ?>
             </a>
-            <span class="text-sm font-normal text-teakea-neutral font-garamond">
-            <?= $escaper->escapeHtml(__('or')) ?>
+            <span class="text-sm font-normal text-techtic-neutral font-garamond">
+                <?= $escaper->escapeHtml(__('or')) ?>
             </span>
             <a
                 href="<?= $escaper->escapeUrl($block->getUrl('customer/account/create', ['referer' => base64_encode($block->getUrl('checkout'))])) ?>"
@@ -41,4 +41,3 @@ $viewModel = $viewModels->require(SigninRegister::class);
         </p>
     </div>
 <?php endif ?>
-

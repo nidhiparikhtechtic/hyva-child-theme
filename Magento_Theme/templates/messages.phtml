@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Hyvä Themes - https://hyva.io
  * Copyright © Hyvä Themes 2020-present. All rights reserved.
@@ -25,15 +26,16 @@ $defaultSuccessMessageTimeout = $storeConfig->getStoreConfig('hyva_theme_general
 ?>
 <script>
     <?php if ($defaultSuccessMessageTimeout): ?>
-    window.defaultSuccessMessageTimeout = <?= (int) $defaultSuccessMessageTimeout ?>;
+        window.defaultSuccessMessageTimeout = <?= (int) $defaultSuccessMessageTimeout ?>;
     <?php endif; ?>
+
     function initMessages() {
         "use strict";
         return {
             messages: window.mageMessages || [],
             isEmpty() {
                 return this.messages.reduce(
-                    function (isEmpty, message) {
+                    function(isEmpty, message) {
                         return isEmpty && message === undefined
                     }, true
                 )
@@ -48,7 +50,7 @@ $defaultSuccessMessageTimeout = $storeConfig->getStoreConfig('hyva_theme_general
                         hideAfter = window.defaultSuccessMessageTimeout;
                     }
                     if (hideAfter) {
-                        this.setHideTimeOut(this.messages.length -1, hideAfter);
+                        this.setHideTimeOut(this.messages.length - 1, hideAfter);
                     }
                 });
             },
@@ -80,27 +82,24 @@ $defaultSuccessMessageTimeout = $storeConfig->getStoreConfig('hyva_theme_general
 </script>
 <?php $hyvaCsp->registerInlineScript() ?>
 <section id="messages"
-         x-data="mountainITTeakeaHyvaMessages"
-         x-bind="eventListeners"
-         aria-live="assertive"
-         role="alert"
->
-    <template x-if="mountainITTeakeaHyvaMessagesIf748">
+    x-data="mountainITHyvaChildHyvaMessages"
+    x-bind="eventListeners"
+    aria-live="assertive"
+    role="alert">
+    <template x-if="mountainITHyvaChildHyvaMessagesIf748">
         <div class="w-full">
             <div class="messages px-2.5 md:px-6 mx-auto py-3 container">
                 <template x-for="(message, index) in messages" :key="index">
                     <div>
                         <template x-if="message">
-                            <div class="message" :class="mountainITTeakeaHyvaMessagesClass749"
-                                 :ui-id="mountainITTeakeaHyvaMessagesUiId750"
-                            >
-                                <span x-html="mountainITTeakeaHyvaMessagesHtml751"></span>
+                            <div class="message" :class="mountainITHyvaChildHyvaMessagesClass749"
+                                :ui-id="mountainITHyvaChildHyvaMessagesUiId750">
+                                <span x-html="mountainITHyvaChildHyvaMessagesHtml751"></span>
                                 <button
                                     type="button"
                                     class="text-gray-600 hover:text-black"
                                     aria-label="<?= $escaper->escapeHtml(__('Close message')) ?>"
-                                    @click.prevent="mountainITTeakeaHyvaMessagesClickPrevent752"
-                                >
+                                    @click.prevent="mountainITHyvaChildHyvaMessagesClickPrevent752">
                                     <?= $heroicons->xHtml('stroke-current', 18, 18, ['aria-hidden' => 'true']); ?>
                                 </button>
                             </div>
@@ -112,19 +111,31 @@ $defaultSuccessMessageTimeout = $storeConfig->getStoreConfig('hyva_theme_general
     </template>
 </section>
 <script>
-<?php /** Generated with hyva-csp-helper.php */ ?>
-function mountainITTeakeaHyvaMessages() {
-    return Object.assign(
-        initMessages()
-        ,{
-            ['mountainITTeakeaHyvaMessagesClass749']() {return this.message.type},
-            ['mountainITTeakeaHyvaMessagesClickPrevent752'](event) {return this.removeMessage(this.index)},
-            ['mountainITTeakeaHyvaMessagesHtml751']() {return this.message.text},
-            ['mountainITTeakeaHyvaMessagesIf748']() {return !this.isEmpty()},
-            ['mountainITTeakeaHyvaMessagesUiId750']() {return 'message-' + this.message.type},
-        }
-    )
-}
-window.addEventListener('alpine:init', () => Alpine.data('mountainITTeakeaHyvaMessages', mountainITTeakeaHyvaMessages), {once: true});
+    <?php /** Generated with hyva-csp-helper.php */ ?>
+
+    function mountainITHyvaChildHyvaMessages() {
+        return Object.assign(
+            initMessages(), {
+                ['mountainITHyvaChildHyvaMessagesClass749']() {
+                    return this.message.type
+                },
+                ['mountainITHyvaChildHyvaMessagesClickPrevent752'](event) {
+                    return this.removeMessage(this.index)
+                },
+                ['mountainITHyvaChildHyvaMessagesHtml751']() {
+                    return this.message.text
+                },
+                ['mountainITHyvaChildHyvaMessagesIf748']() {
+                    return !this.isEmpty()
+                },
+                ['mountainITHyvaChildHyvaMessagesUiId750']() {
+                    return 'message-' + this.message.type
+                },
+            }
+        )
+    }
+    window.addEventListener('alpine:init', () => Alpine.data('mountainITHyvaChildHyvaMessages', mountainITHyvaChildHyvaMessages), {
+        once: true
+    });
 </script>
 <?php $hyvaCsp->registerInlineScript() ?>

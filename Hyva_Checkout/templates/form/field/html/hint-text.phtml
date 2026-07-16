@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Hyvä Themes - https://hyva.io
  * Copyright © Hyvä Themes 2022-present. All rights reserved.
@@ -25,8 +26,7 @@ $formFieldViewModel = $viewModels->require(FormFieldViewModel::class);
 $element = $block->getData('element');
 ?>
 <?php if ($element->hasTooltip() && $formFieldViewModel->designConfig()->showTooltipAsHintText()): ?>
-    <p class="form-hint-text mt-2.5 w-full font-normal text-base text-teakea-gray font-garamond">
+    <p class="form-hint-text mt-2.5 w-full font-normal text-base text-techtic-gray font-garamond">
         <?= $escaper->escapeHtml(__($element->getTooltip())) ?>
     </p>
 <?php endif ?>
-

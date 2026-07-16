@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 use Hyva\Theme\Model\ViewModelRegistry;
@@ -8,23 +9,51 @@ $hyvaCsp = $viewModels->require(\Hyva\Theme\ViewModel\HyvaCsp::class);
 ?>
 <script>
     <?php /** Generated with hyva-csp-helper.php */ ?>
-    function mountainITTeakeaHyvaCheckoutTermsConditionsList() {
-        return Object.assign(
-            { open: false, hasError: false }
-            ,{
-                ['mountainITTeakeaHyvaCheckoutTermsConditionsListClass235']() {return { 'text-red-600': this.hasError, 'text-black': ! this.hasError }},
-                ['mountainITTeakeaHyvaCheckoutTermsConditionsListClick238'](event) {return this.open = false},
-                ['mountainITTeakeaHyvaCheckoutTermsConditionsListClick241'](event) {return this.open = false},
-                ['mountainITTeakeaHyvaCheckoutTermsConditionsListClick242'](event) {return this.open = false},
-                ['mountainITTeakeaHyvaCheckoutTermsConditionsListClickOutsideAway239'](event) {return this.open = false},
-                ['mountainITTeakeaHyvaCheckoutTermsConditionsListClickPrevent236'](event) {return this.$dispatch('term-dialog:open', { target: `${this.$el.dataset.hyvacsp2}` })},
-                ['mountainITTeakeaHyvaCheckoutTermsConditionsListErrorWindow233'](event) {return this.hasError = ('terms' in this.$event.detail) && this.$event.detail.terms.includes(this.$el.dataset.hyvacsp1)},
-                ['mountainITTeakeaHyvaCheckoutTermsConditionsListInput234'](event) {return this.hasError = this.hasError && ! this.$event.target.checked},
-                ['mountainITTeakeaHyvaCheckoutTermsConditionsListOpenWindow237'](event) {if (this.$event.detail.target === `${this.$el.dataset.hyvacsp3}`) this.open = true},
-                ['mountainITTeakeaHyvaCheckoutTermsConditionsListOpenWindow240'](event) {if (this.$event.detail.target === `${this.$el.dataset.hyvacsp4}`) this.open = true},
-            }
-        )
+
+    function TechticHyvaChildHyvaCheckoutTermsConditionsList() {
+        return Object.assign({
+            open: false,
+            hasError: false
+        }, {
+            ['TechticHyvaChildHyvaCheckoutTermsConditionsListClass235']() {
+                return {
+                    'text-red-600': this.hasError,
+                    'text-black': !this.hasError
+                }
+            },
+            ['TechticHyvaChildHyvaCheckoutTermsConditionsListClick238'](event) {
+                return this.open = false
+            },
+            ['TechticHyvaChildHyvaCheckoutTermsConditionsListClick241'](event) {
+                return this.open = false
+            },
+            ['TechticHyvaChildHyvaCheckoutTermsConditionsListClick242'](event) {
+                return this.open = false
+            },
+            ['TechticHyvaChildHyvaCheckoutTermsConditionsListClickOutsideAway239'](event) {
+                return this.open = false
+            },
+            ['TechticHyvaChildHyvaCheckoutTermsConditionsListClickPrevent236'](event) {
+                return this.$dispatch('term-dialog:open', {
+                    target: `${this.$el.dataset.hyvacsp2}`
+                })
+            },
+            ['TechticHyvaChildHyvaCheckoutTermsConditionsListErrorWindow233'](event) {
+                return this.hasError = ('terms' in this.$event.detail) && this.$event.detail.terms.includes(this.$el.dataset.hyvacsp1)
+            },
+            ['TechticHyvaChildHyvaCheckoutTermsConditionsListInput234'](event) {
+                return this.hasError = this.hasError && !this.$event.target.checked
+            },
+            ['TechticHyvaChildHyvaCheckoutTermsConditionsListOpenWindow237'](event) {
+                if (this.$event.detail.target === `${this.$el.dataset.hyvacsp3}`) this.open = true
+            },
+            ['TechticHyvaChildHyvaCheckoutTermsConditionsListOpenWindow240'](event) {
+                if (this.$event.detail.target === `${this.$el.dataset.hyvacsp4}`) this.open = true
+            },
+        })
     }
-    window.addEventListener('alpine:init', () => Alpine.data('mountainITTeakeaHyvaCheckoutTermsConditionsList', mountainITTeakeaHyvaCheckoutTermsConditionsList), {once: true});
+    window.addEventListener('alpine:init', () => Alpine.data('TechticHyvaChildHyvaCheckoutTermsConditionsList', TechticHyvaChildHyvaCheckoutTermsConditionsList), {
+        once: true
+    });
 </script>
 <?php $hyvaCsp->registerInlineScript() ?>

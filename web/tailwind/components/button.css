@@ -38,10 +38,10 @@
     }
 
     .btn-secondary {
-        @apply bg-white border border-secondary text-teakea-black shadow-none;
+        @apply bg-white border border-secondary text-techtic-black shadow-none;
 
         &:hover {
-            @apply bg-white border border-secondary text-teakea-black shadow-none;
+            @apply bg-white border border-secondary text-techtic-black shadow-none;
         }
 
         &:focus {

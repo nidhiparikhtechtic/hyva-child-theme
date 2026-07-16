@@ -207,15 +207,15 @@ if ($msrpPrice = iterator_to_array($product->getPriceInfo()->getPrices())[MsrpPr
         <div class="flex gap-x-1.5 items-center">
             <?php if ($finalPrice < $regularPrice): ?>
                 <div class="old-price flex items-center gap-x-1">
-                    <span class="price price-wrapper title-font font-normal text-sm sm:text-base line-through text-teakea-gray"><?= $escaper->escapeHtml(__('Van')) ?></span>
-                    <span class="price-wrapper title-font font-normal text-sm sm:text-base line-through text-teakea-gray">
+                    <span class="price price-wrapper title-font font-normal text-sm sm:text-base line-through text-techtic-gray"><?= $escaper->escapeHtml(__('Van')) ?></span>
+                    <span class="price-wrapper title-font font-normal text-sm sm:text-base line-through text-techtic-gray">
                         <span class="price" x-html="hyva.formatPrice(<?= (float)$regularPrice ?>)"><?= (float)$regularPrice ?></span>
                     </span>
                 </div>
                 <?php if ($productPriceViewModel->displayPriceInclAndExclTax()): ?>
                     <div class="old-price-excl-tax">
-                        <span class="price price-wrapper title-font font-normal text-sm sm:text-base line-through text-teakea-gray"><?= $escaper->escapeHtml(__('Van')) ?></span>
-                        <span class="font-regular font-normal text-sm sm:text-base line-through text-teakea-gray">
+                        <span class="price price-wrapper title-font font-normal text-sm sm:text-base line-through text-techtic-gray"><?= $escaper->escapeHtml(__('Van')) ?></span>
+                        <span class="font-regular font-normal text-sm sm:text-base line-through text-techtic-gray">
                             <span><?= $escaper->escapeHtml(__('Excl. Tax')) ?>:</span>
                             <span class="price" x-html="hyva.formatPrice(<?= (float)$regularPriceExclTax ?>)"><?= (float)$regularPriceExclTax ?></span>
                         </span>
@@ -224,9 +224,9 @@ if ($msrpPrice = iterator_to_array($product->getPriceInfo()->getPrices())[MsrpPr
             <?php endif; ?>
 
             <div class="final-price flex gap-x-1 min-h-7 lg:min-h-8" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
-                <span class="price price-wrapper title-font items-center font-extrabold hidden md:flex md:text-xl lg:text-2xl text-teakea-terracotta"><?= $escaper->escapeHtml(__('Voor')) ?></span>
+                <span class="price price-wrapper title-font items-center font-extrabold hidden md:flex md:text-xl lg:text-2xl text-techtic-terracotta"><?= $escaper->escapeHtml(__('Voor')) ?></span>
                 <span id="product-price-<?= (int)$product->getId() ?>"
-                    class="price-wrapper title-font flex items-center font-extrabold text-xl lg:text-2xl text-teakea-terracotta">
+                    class="price-wrapper title-font flex items-center font-extrabold text-xl lg:text-2xl text-techtic-terracotta">
                     <span class="price" x-html="getFormattedFinalPrice()"><?= (float)$finalPrice ?></span>
                 </span>
                 <meta itemprop="price" content="<?= $escaper->escapeHtmlAttr($finalPrice) ?>">
@@ -235,8 +235,8 @@ if ($msrpPrice = iterator_to_array($product->getPriceInfo()->getPrices())[MsrpPr
 
             <?php if ($productPriceViewModel->displayPriceInclAndExclTax()): ?>
                 <div class="final-price-excl-tax">
-                    <span class="price price-wrapper title-font hidden md:flex items-center font-extrabold md:text-xl lg:text-2xl text-teakea-terracotta"><?= $escaper->escapeHtml(__('Voor')) ?></span>
-                    <span class="font-extrabold text-xl lg:text-2xl text-teakea-terracotta">
+                    <span class="price price-wrapper title-font hidden md:flex items-center font-extrabold md:text-xl lg:text-2xl text-techtic-terracotta"><?= $escaper->escapeHtml(__('Voor')) ?></span>
+                    <span class="font-extrabold text-xl lg:text-2xl text-techtic-terracotta">
                         <span><?= $escaper->escapeHtml(__('Excl. Tax')) ?>:</span>
                         <span class="price" x-html="getFormattedBasePrice()"><?= (float)$finalPriceExclTax ?></span>
                     </span>
@@ -247,7 +247,7 @@ if ($msrpPrice = iterator_to_array($product->getPriceInfo()->getPrices())[MsrpPr
                 <?php
                 $discountPercent = round((($regularPrice - $finalPrice) / $regularPrice) * 100);
                 ?>
-                <div class="flex items-center px-2 sm:px-2.5 h-6 bg-teakea-terracotta text-white text-xs sm:text-sm rounded-lg">
+                <div class="flex items-center px-2 sm:px-2.5 h-6 bg-techtic-terracotta text-white text-xs sm:text-sm rounded-lg">
                     <?= $escaper->escapeHtml(__('-%1% Korting', $discountPercent)) ?>
                 </div>
 
@@ -265,7 +265,7 @@ if ($msrpPrice = iterator_to_array($product->getPriceInfo()->getPrices())[MsrpPr
 
         ?>
             <div class="flex gap-x-1.5 items-center text-left">
-                <div class="flex flex-row text-sm text-teakea-gray capitalize">
+                <div class="flex flex-row text-sm text-techtic-gray capitalize">
                     <?= $escaper->escapeHtml(__('Promotional price valid until %1', $dateLocalized)) ?>
                 </div>
             </div>

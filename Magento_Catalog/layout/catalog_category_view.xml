@@ -51,7 +51,7 @@
         <referenceContainer name="content">
             <block class="Magento\Cms\Block\Block" name="teak-tiles">
                 <arguments>
-                    <argument name="block_id" xsi:type="string">product-page-usp-bottom-teakea</argument>
+                    <argument name="block_id" xsi:type="string">product-page-usp-bottom-techtic</argument>
                 </arguments>
             </block>
         </referenceContainer>

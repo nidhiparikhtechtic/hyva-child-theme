@@ -308,13 +308,13 @@ $miniCartOptionQtySaveAuto = $miniCartOptionQtyStyle === "incrementor" || $miniC
         <div class="grow grid place-items-center">
             <div class="text-center">
                 <div class="max-w-full max-h-full aspect-square w-44 h-44 inline-flex items-center justify-center rounded-full
-                    bg-teakea-red text-white outline-2 outline-dashed outline-teakea-red  outline-offset-8">
+                    bg-techtic-red text-white outline-2 outline-dashed outline-techtic-red  outline-offset-8">
                     <?= $heroIconsSolid->shoppingCartHtml('', 120, 120, ['aria-hidden' => 'true']); ?>
                 </div>
                 <p class="mt-10 text-xl">
                     <strong><?= $escaper->escapeHtml(__('Your cart is empty')) ?></strong>
                 </p>
-                <p class="text-teakea-black">
+                <p class="text-techtic-black">
                     <?= $escaper->escapeHtml(__("Looks like you haven't made your choice yet.")) ?>
                 </p>
             </div>
@@ -446,7 +446,7 @@ $miniCartOptionQtySaveAuto = $miniCartOptionQtyStyle === "incrementor" || $miniC
                                     <?php if (!$miniCartOptionQtySaveAuto): ?>
                                         <button
                                             type="submit"
-                                            class="justify-center rounded-lg p-2.5 text-base bg-teakea-red text-white disabled:shadow-none transition
+                                            class="justify-center rounded-lg p-2.5 text-base bg-techtic-red text-white disabled:shadow-none transition
                                                disabled:bg-slate-600 disabled:text-slate-50 disabled:opacity-70 disabled:invisible"
                                             :disabled="itemQty === initQty || itemQty === null"
                                             :aria-label="hyva.str(
@@ -462,7 +462,7 @@ $miniCartOptionQtySaveAuto = $miniCartOptionQtyStyle === "incrementor" || $miniC
                                 <a
                                     :href="item.configure_url"
                                     x-show="item.product_type !== 'grouped'"
-                                    class="hidden justify-center py-2.5 sm:py-2.5 px-2.5 text-base bg-teakea-lighter-gray rounded-lg disabled:bg-slate-50 disabled:text-slate-600 disabled:opacity-70"
+                                    class="hidden justify-center py-2.5 sm:py-2.5 px-2.5 text-base bg-techtic-lighter-gray rounded-lg disabled:bg-slate-50 disabled:text-slate-600 disabled:opacity-70"
                                     :aria-label="hyva.str(
                                         '<?= $escaper->escapeJs(__('Edit product "%1"')) ?>',
                                         item.product_name
@@ -473,7 +473,7 @@ $miniCartOptionQtySaveAuto = $miniCartOptionQtyStyle === "incrementor" || $miniC
                                 </a>
                                 <button
                                     type="button"
-                                    class="flex items-center gap-1 text-xs justify-center py-1.5 px-2 text-teak-muted hover:text-teakea-red disabled:bg-white disabled:border-slate-200 disabled:text-slate-600 disabled:opacity-70"
+                                    class="flex items-center gap-1 text-xs justify-center py-1.5 px-2 text-teak-muted hover:text-techtic-red disabled:bg-white disabled:border-slate-200 disabled:text-slate-600 disabled:opacity-70"
                                     @click="deleteItemFromCart(item.item_id)"
                                     :aria-label="hyva.str(
                                         '<?= $escaper->escapeJs(__('Remove product "%1" from cart')) ?>',
@@ -537,7 +537,7 @@ $miniCartOptionQtySaveAuto = $miniCartOptionQtyStyle === "incrementor" || $miniC
         <div class="flex flex-col px-4 pt-4 pb-6 bg-teak-stone-light border border-t-0.5 border-[#1e4d2b14]">
             <a href="<?= $escaper->escapeUrl($block->getUrl('best-verkopers')) ?>"
                 @click="closeCartDrawer"
-                class="flex gap-2 justify-center items-center rounded py-3 px-6 text-base border border-teakea-red hover:bg-teakea-red text-teakea-red hover:text-white disabled:opacity-70">
+                class="flex gap-2 justify-center items-center rounded py-3 px-6 text-base border border-techtic-red hover:bg-techtic-red text-techtic-red hover:text-white disabled:opacity-70">
 
                 <?= $escaper->escapeHtml(__('Discover our bestsellers')) ?>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">

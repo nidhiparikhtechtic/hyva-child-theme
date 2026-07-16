@@ -48,7 +48,7 @@
     pointer-events: none;
 }
 .catalog-category-view .category-description p{
-    @apply text-teakea-neutral text-base;
+    @apply text-techtic-neutral text-base;
 }
 .scrollbar-thin{
     scrollbar-width: thin;

@@ -3,7 +3,7 @@ html {
 }
 
 body {
-    @apply bg-teakea overflow-x-hidden;
+    @apply bg-techtic overflow-x-hidden;
 }
 
 .cms-index-index .columns{
@@ -96,15 +96,15 @@ body {
 }
 
 
-.fill-teakea {
+.fill-techtic {
     fill: #d1ad65;
 }
 
-.stroke-teakea {
+.stroke-techtic {
     stroke: #d1ad65;
 }
 
-.decoration-teakea {
+.decoration-techtic {
     text-decoration-color: #d1ad65;
 }
 
@@ -481,7 +481,7 @@ h4{
 }
 
 .product-item .price-container .price{
-    @apply font-bold text-base text-teakea-neutral-dark;
+    @apply font-bold text-base text-techtic-neutral-dark;
 }
 
 /*end */
@@ -669,7 +669,7 @@ table#shopping-cart-table {
 }
 
 #maincontent .old-price .price {
-    @apply line-through text-teakea-gray font-normal text-base;
+    @apply line-through text-techtic-gray font-normal text-base;
 }
 
 #maincontent nav[aria-expanded="true"]:first-child{
@@ -742,7 +742,7 @@ form#search_mini_form button {
 }
 
 .container.py-8.bg-right-bottom.bg-no-repeat {
-    background-image: url("https://www.teakea.nl/media/wysiwyg/Vector(1).png");
+    background-image: url("#");
 }
 
 #search_mobile::-webkit-search-cancel-button {

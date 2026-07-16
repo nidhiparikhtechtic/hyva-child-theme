@@ -373,7 +373,7 @@ if ($showCustomImageInThumbnail && $imagesConfig["modelThumbnail"] != '') {
                         <img
                             width="<?= /* @noEscape */ $mediumWidth ?>"
                             height="<?= /* @noEscape */ $mediumHeight ?>"
-                            class="max-h-full mx-auto object-contain w-[550px] h-[400px] xl:h-[570px] border rounded-lg border-teakea-light-gray"
+                            class="max-h-full mx-auto object-contain w-[550px] h-[400px] xl:h-[570px] border rounded-lg border-techtic-light-gray"
                             :class="{ 'w-auto': fullscreen }"
                             :src="fullscreen ? image.full : image.img"
                             :alt="image.caption || '<?= $escaper->escapeJs($productName) ?>'"
@@ -590,11 +590,11 @@ if ($showCustomImageInThumbnail && $imagesConfig["modelThumbnail"] != '') {
                     <template x-for="(image, index) in images" :key="index">
                         <button
                             type="button"
-                            class="relative shrink-0 border-2 border-teakea-light-gray rounded-lg w-16 h-16 lg:w-24 lg:h-24"
+                            class="relative shrink-0 border-2 border-techtic-light-gray rounded-lg w-16 h-16 lg:w-24 lg:h-24"
                             tabindex="-1"
                             :class="{
                                 'border-primary': activeItem === index,
-                                'border-teakea-light-gray !border': activeItem !== index
+                                'border-techtic-light-gray !border': activeItem !== index
                             }"
                             :aria-label="hyva.str('View %1', image.caption) || '<?= $escaper->escapeJs("View %1", $productName) ?>'"
                             :aria-current="activeItem === index"

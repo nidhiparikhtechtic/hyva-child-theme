@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Hyvä Themes - https://hyva.io
  * Copyright © Hyvä Themes 2020-present. All rights reserved.
@@ -64,7 +65,7 @@ foreach ($orderCollection as $order) {
 ?>
 
 <div class="grid grid-cols-2 gap-2.5 mb-2.5">
-    <div class="border border-teakea-light-gray rounded-lg p-3">
+    <div class="border border-techtic-light-gray rounded-lg p-3">
         <div class="uppercase text-xs tracking-wider text-teak-muted font-medium mb-2">
             <?= $escaper->escapeHtml(__('Bestellingen')) ?>
         </div>
@@ -73,7 +74,7 @@ foreach ($orderCollection as $order) {
         </div>
     </div>
 
-    <div class="border border-teakea-light-gray rounded-lg p-3">
+    <div class="border border-techtic-light-gray rounded-lg p-3">
         <div class="uppercase text-xs tracking-wider text-teak-muted font-medium mb-2">
             <?= $escaper->escapeHtml(__('Totaal Besteed')) ?>
         </div>
@@ -83,8 +84,8 @@ foreach ($orderCollection as $order) {
     </div>
 </div>
 
-<div class="border border-teakea-light-gray rounded-lg p-3 mb-10">
-    <div class="text-teakea-terracotta text-sm mb-1">
+<div class="border border-techtic-light-gray rounded-lg p-3 mb-10">
+    <div class="text-techtic-terracotta text-sm mb-1">
         <valued-widget layout="rating" size="small" align="left" star-color="yellow" theme="dark"></valued-widget>
     </div>
 </div>
@@ -92,22 +93,19 @@ foreach ($orderCollection as $order) {
 
 <div
     class="block block-dashboard-orders card mt-4 p-0"
-    x-data="{ tabIndex: -1 }"
->
+    x-data="{ tabIndex: -1 }">
     <div class="block-title order my-4 flex justify-between items-center">
         <h2
             id="recentOrders"
             class="text-base font-bold block uppercase"
             @focus="tabIndex = 0;"
             @blur="tabIndex = -1"
-            :tabindex="tabIndex"
-        ><?= $escaper->escapeHtml(__('Recent Orders')) ?></h2>
+            :tabindex="tabIndex"><?= $escaper->escapeHtml(__('Recent Orders')) ?></h2>
         <?php if ($count > 0): ?>
             <a
                 class="action view inline-block text-sm underline"
                 href="<?= $escaper->escapeUrl($block->getUrl('sales/order/history')) ?>"
-                aria-label="<?= $escaper->escapeHtmlAttr(__('View all orders')) ?>"
-            ><?= $escaper->escapeHtml(__('View All')) ?></a>
+                aria-label="<?= $escaper->escapeHtmlAttr(__('View all orders')) ?>"><?= $escaper->escapeHtml(__('View All')) ?></a>
         <?php endif; ?>
     </div>
     <div class="overflow-x-auto">
@@ -134,12 +132,12 @@ foreach ($orderCollection as $order) {
                     }
                     ?>
 
-                    <div class="border border-teakea-light-gray rounded-lg overflow-hidden">
+                    <div class="border border-techtic-light-gray rounded-lg overflow-hidden">
 
                         <!-- Header -->
-                        <div class="flex items-start justify-between p-3 border-b border-teakea-light-gray">
+                        <div class="flex items-start justify-between p-3 border-b border-techtic-light-gray">
                             <div>
-                                <h3 class="text-base font-extrabold text-teakea-deep-green">
+                                <h3 class="text-base font-extrabold text-techtic-deep-green">
                                     <?= $escaper->escapeHtml(__('Order #%1', $order->getRealOrderId())) ?>
                                 </h3>
                                 <div class="text-sm text-teak-muted mt-1">
@@ -149,21 +147,21 @@ foreach ($orderCollection as $order) {
 
                             <?php
                             $statusKey = strtolower(str_replace(' ', '_', $order->getStatus()));
-                            $statusClasses = match($statusKey) {
+                            $statusClasses = match ($statusKey) {
                                 'pending', 'pending_payment'
-                                    => 'bg-teakea-lighter-yellow text-teakea-yellow border border-teakea-yellow',
+                                => 'bg-techtic-lighter-yellow text-techtic-yellow border border-techtic-yellow',
                                 'processing'
-                                    => 'bg-[#e8f4fd] text-[#1565C0] border border-[#1565C0]',
+                                => 'bg-[#e8f4fd] text-[#1565C0] border border-[#1565C0]',
                                 'complete', 'closed'
-                                    => 'bg-[#E8F5E9] text-teakea-deep-green border border-teakea-light-green',
+                                => 'bg-[#E8F5E9] text-techtic-deep-green border border-techtic-light-green',
                                 'holded'
-                                    => 'bg-teakea-warm-white text-teakea-dark-brown border border-teakea-yellow',
+                                => 'bg-techtic-warm-white text-techtic-dark-brown border border-techtic-yellow',
                                 'canceled'
-                                    => 'bg-[#fdecea] text-teakea-red border border-teakea-red',
+                                => 'bg-[#fdecea] text-techtic-red border border-techtic-red',
                                 'fraud', 'payment_review'
-                                    => 'bg-teakea-lighter-yellow text-teakea-terracotta border border-teakea-terracotta',
+                                => 'bg-techtic-lighter-yellow text-techtic-terracotta border border-techtic-terracotta',
                                 default
-                                    => 'bg-teakea-lighter-gray text-teakea-gray border border-teakea-light-gray',
+                                => 'bg-techtic-lighter-gray text-techtic-gray border border-techtic-light-gray',
                             };
                             ?>
                             <div class="px-3 py-1 rounded-full text-xs font-semibold <?= $escaper->escapeHtmlAttr($statusClasses) ?>">
@@ -174,22 +172,21 @@ foreach ($orderCollection as $order) {
                         <!-- Product -->
                         <div class="p-4">
                             <?php
-                                $product = $firstItem->getProduct();
-                                $imageUrl = null;
+                            $product = $firstItem->getProduct();
+                            $imageUrl = null;
 
-                                if ($product && $product->getSmallImage() && $product->getSmallImage() !== 'no_selection') {
-                                    $imageUrl = $block->getUrl('media') . 'catalog/product' . $product->getSmallImage();
-                                }
+                            if ($product && $product->getSmallImage() && $product->getSmallImage() !== 'no_selection') {
+                                $imageUrl = $block->getUrl('media') . 'catalog/product' . $product->getSmallImage();
+                            }
                             ?>
 
                             <div class="flex items-center gap-4">
-                                <div class="w-14 h-14 rounded-lg overflow-hidden border border-teakea-light-gray shrink-0">
+                                <div class="w-14 h-14 rounded-lg overflow-hidden border border-techtic-light-gray shrink-0">
                                     <?php if ($imageUrl): ?>
                                         <img
                                             src="<?= $escaper->escapeUrl($imageUrl) ?>"
                                             alt="<?= $escaper->escapeHtmlAttr($productName) ?>"
-                                            class="w-14 h-14 object-cover rounded-lg"
-                                        />
+                                            class="w-14 h-14 object-cover rounded-lg" />
                                     <?php else: ?>
                                         <div class="w-full h-full bg-gray-100 flex items-center justify-center">
                                             <span class="text-gray-400 text-xs"></span>
@@ -211,43 +208,45 @@ foreach ($orderCollection as $order) {
                             <?php
                             $comment = null;
                             foreach ($order->getStatusHistories() as $history) {
-                                if ($history->getIsCustomerComment()) { $comment = $history->getComment(); }
+                                if ($history->getIsCustomerComment()) {
+                                    $comment = $history->getComment();
+                                }
                             }
                             ?>
                             <?php if ($comment != null): ?>
-                                <div class="mt-4 bg-teakea-warm-white border-l-4 border-teakea-deep-green px-4 py-3 rounded-r-lg text-sm">
-                                    <b><?=$escaper->escapeHtml(__('Your note')) ?></b>: 
+                                <div class="mt-4 bg-techtic-warm-white border-l-4 border-techtic-deep-green px-4 py-3 rounded-r-lg text-sm">
+                                    <b><?= $escaper->escapeHtml(__('Your note')) ?></b>:
                                     <?= $escaper->escapeHtml(__($comment)); ?>
                                 </div>
                             <?php endif; ?>
 
                             <div class="sm:grid grid-cols-2 gap-3 mt-4">
                                 <a href="<?= $escaper->escapeUrl($block->getViewUrl($order)) ?>"
-                                    class="flex items-center justify-center mb-2 sm:mb-0 p-1.5 md:p-2.5 border border-teakea-deep-green text-teakea-deep-green font-bold rounded-lg hover:-translate-y-[1px]">
-                                    <?=$escaper->escapeHtml(__('View')) ?>
+                                    class="flex items-center justify-center mb-2 sm:mb-0 p-1.5 md:p-2.5 border border-techtic-deep-green text-techtic-deep-green font-bold rounded-lg hover:-translate-y-[1px]">
+                                    <?= $escaper->escapeHtml(__('View')) ?>
                                 </a>
 
                                 <?php
-                                    $canReorder = $this->helper(Reorder::class)->canReorder($order->getEntityId());
-                                    $formData = json_decode(
-                                        $this->helper(PostHelper::class)->getPostData(
-                                            $block->getReorderUrl($order)
-                                        ),
-                                        true
-                                    )
+                                $canReorder = $this->helper(Reorder::class)->canReorder($order->getEntityId());
+                                $formData = json_decode(
+                                    $this->helper(PostHelper::class)->getPostData(
+                                        $block->getReorderUrl($order)
+                                    ),
+                                    true
+                                )
                                 ?>
                                 <form action="<?= $escaper->escapeUrl($formData['action']) ?>" method="post">
-                                        
+
                                     <?php if ($canReorder): ?>
                                         <?= $block->getBlockHtml('formkey'); ?>
                                         <input type="hidden" name="data" value='<?= /* @noEscape */ json_encode($formData['data']) ?>'>
                                     <?php endif ?>
 
-                                    <button type="submit" class="w-full p-2 md:p-3 bg-teakea-terracotta text-white font-semibold rounded-lg flex justify-center items-center gap-2 hover:-translate-y-[1px]
+                                    <button type="submit" class="w-full p-2 md:p-3 bg-techtic-terracotta text-white font-semibold rounded-lg flex justify-center items-center gap-2 hover:-translate-y-[1px]
                                         <?= !$canReorder ? 'opacity-75' : '' ?>"
                                         <?= !$canReorder ? 'disabled' : '' ?>>
-                                            <?= $heroicons->refreshHtml('text-gray-300', 20, 20, ['aria-hidden' => 'true']) ?>
-                                            <?=$escaper->escapeHtml(__('Reorder')) ?>
+                                        <?= $heroicons->refreshHtml('text-gray-300', 20, 20, ['aria-hidden' => 'true']) ?>
+                                        <?= $escaper->escapeHtml(__('Reorder')) ?>
                                     </button>
                                 </form>
                             </div>
