@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Social Login Base for Magento 2
+ */-->
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="customer_form_login">
+            <container name="login_form_bottom" as="login_form_bottom"/>
+        </referenceBlock>
+
+        <move
+                element="customer.login.am-social-below_login"
+                destination="login_form_bottom"
+                after="-"
+        />
+    </body>
+</page>

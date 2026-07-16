@@ -1,0 +1,32 @@
+<?php
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+
+/** @var ViewModelRegistry $viewModels */
+/** @var Escaper $escaper */
+
+$hyvaCsp = $viewModels->require(\Hyva\Theme\ViewModel\HyvaCsp::class);
+?>
+    <script>
+        window.addEventListener('checkout:step:loaded', () => {
+            const checked = document.querySelector('#shipping-method-list input[name="shipping-method-option"]:checked');
+            if (!checked) return;
+
+            window.dispatchEvent(new CustomEvent('checkout:shipping:method-activate', {
+                detail: { method: checked.value }
+            }));
+        }, { once: true });
+
+        function mountainITTeakeaHyvaCheckoutShippingMethodList() {
+            return {
+                disabled: (this.$el.dataset.hyvacsp1 === 'true')
+            };
+        }
+
+        window.addEventListener('alpine:init', () => {
+            Alpine.data('mountainITTeakeaHyvaCheckoutShippingMethodList', mountainITTeakeaHyvaCheckoutShippingMethodList);
+        }, { once: true });
+    </script>
+<?php $hyvaCsp->registerInlineScript(); ?>

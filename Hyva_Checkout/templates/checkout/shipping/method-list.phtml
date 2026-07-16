@@ -1,0 +1,135 @@
+<?php
+
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Checkout\Model\ShippingMethodMetaData;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Checkout\ViewModel\Checkout\Formatter as FormatterViewModel;
+use Hyva\Checkout\ViewModel\Checkout\Shipping\MethodList as ViewModel;
+use Hyva\Checkout\Magewire\Checkout\Shipping\MethodList as Magewire;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Magento\Quote\Api\Data\ShippingMethodInterface;
+use Magento\Tax\Helper\Data as TaxHelper;
+use Hyva\Theme\ViewModel\Store;
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundHelper
+
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var ViewModel $viewModel */
+/** @var ShippingMethodInterface $method */
+/** @var Magewire $magewire */
+/** @var Escaper $escaper */
+/** @var TaxHelper $taxHelper */
+/** @var Store $storeViewModel */
+
+$viewModel = $viewModels->require(ViewModel::class);
+$formatterViewModel = $viewModels->require(FormatterViewModel::class);
+$taxHelper = $this->helper(TaxHelper::class);
+$storeViewModel = $viewModels->require(Store::class);
+$storeId = $storeViewModel->getStoreId();
+$methods = $viewModel->getList();
+?>
+<div id="shipping-methods" class="border-b border-[#E5E7EB] pb-5 pt-1">
+    <?php if ($methods): ?>
+        <div id="shipping-method-list" class="flex flex-row items-center gap-5">
+            <?php foreach ($methods as $method): ?>
+                <?php if ($method->getAvailable()): ?>
+                    <?php $methodCode = $escaper->escapeHtml($method->getMethodCode()) ?>
+                    <?php $methodCodeAttr = $escaper->escapeHtmlAttr($method->getMethodCode()) ?>
+                    <?php $methodCarrierCode = $escaper->escapeHtmlAttr($method->getCarrierCode()) ?>
+                    <?php $methodTitle = $escaper->escapeHtml($method->getMethodTitle() ?: __('Unknown')) ?>
+                    <?php /** @var ShippingMethodMetaData $methodMetaData */ ?>
+                    <?php $methodMetaData = $viewModel->getMethodMetaData($block, $method) ?>
+
+                    <div
+                        id="shipping-method-option-<?= /* @noEscape */ $methodCode ?>"
+                        class="rounded-lg px-4 py-2 text-sm <?= $magewire->method === $methodCarrierCode . '_' . $methodCodeAttr ? 'active bg-teakea-red bg-opacity-10 border-teakea-red border' : 'inactive bg-teakea-lighter-gray' ?>"
+                        wire:key="<?= /* @noEscape */ $methodCodeAttr ?>"
+                        x-data="mountainITTeakeaHyvaCheckoutShippingMethodList" data-hyvacsp1="<?= ! $method->getErrorMessage() ? 'false' : 'true' ?>">
+                        <label class="flex items-center gap-x-2 cursor-pointer text-teakea-gray text-sm font-normal rounded-lg <?php $magewire->method === $methodCarrierCode . '_' . $methodCodeAttr ? 'active bg-teakea-red bg-opacity-10' : 'inactive bg-teakea-lighter-gray' ?>">
+                            <input type="radio"
+                                class="form-radio border-[#C7C7C7] bg-teakea-lighter-gray"
+                                id="shipping-method-<?= /* @noEscape */ $methodCodeAttr ?>"
+                                name="shipping-method-option"
+                                value="<?= $escaper->escapeHtmlAttr($methodCarrierCode . '_' . $methodCodeAttr) ?>"
+                                wire:model="method"
+                                x-bind:disabled="disabled" />
+                            <span
+                                class="flex flex-1 flex-wrap justify-between cursor-pointer gap-x-4 gap-y-2"
+                                for="shipping-method-<?= /* @noEscape */ $methodCodeAttr ?>">
+                                <span class="font-normal hyphens-auto break-words leading-relaxed <?= $magewire->method === $methodCarrierCode . '_' . $methodCodeAttr ? 'teakea-neutral' : 'teakea-gray' ?>">
+                                    <?=
+                                    /** @noEscape */
+                                    $methodTitle ?>
+                                </span>
+
+                                <?php if ($methodMetaData->canRenderIcon() && $iconHtml = $methodMetaData->renderIcon()): ?>
+                                    <div class="shrink-0">
+                                        <?= /* @noEscape */ $iconHtml; ?>
+                                    </div>
+                                <?php endif ?>
+                                <?php if ($method->getPriceInclTax()): ?>
+                                    <div class="product-price w-full">
+                                        <?php if ($taxHelper->displayShippingPriceIncludingTax() || $taxHelper->displayShippingBothPrices()): ?>
+                                            <span class="price-including-tax" data-label="<?= $escaper->escapeHtmlAttr(__('Incl. Tax')) ?>">
+                                                <?= /* @noEscape */ $formatterViewModel->currency($method->getPriceInclTax()) ?>
+                                            </span>
+                                        <?php endif ?>
+
+                                        <?php if (($taxHelper->displayShippingPriceExcludingTax() || $taxHelper->displayShippingBothPrices() || $taxHelper->getShippingTaxClass($storeId) === 0)): ?>
+                                            <span class="price-excluding-tax" data-label="<?= $escaper->escapeHtmlAttr(__('Excl. Tax')) ?>">
+                                                <?= /* @noEscape */ $formatterViewModel->currency($method->getPriceExclTax()) ?>
+                                            </span>
+                                        <?php endif ?>
+                                    </div>
+                                <?php endif ?>
+                            </span>
+                        </label>
+                        <?php if (($method->getErrorMessage()) || ($viewModel->isCurrentShippingMethod($method, $magewire->method))): ?>
+                            <div class="flex-1 space-y-2">
+                                <?php if ($method->getErrorMessage()): ?>
+                                    <div class="p-4 pt-0">
+                                        <div role="alert" class="messages w-full">
+                                            <p class="message error mb-0">
+                                                <?= $escaper->escapeHtml(__($method->getErrorMessage())) ?>
+                                            </p>
+                                        </div>
+                                    </div>
+                                <?php endif ?>
+
+                                <?php if ($viewModel->isCurrentShippingMethod($method, $magewire->method)): ?>
+                                    <?php if ($viewModel->hasAdditionalView($block, $method)): ?>
+                                        <?php $html = $viewModel->getAdditionalViewBlock($block, $method)->toHtml() ?>
+                                        <?php if (! empty($html)): ?>
+                                            <div class="p-4 pt-0">
+                                                <div id="<?= /* @noEscape */ 'shipping-method-view-' . $methodCodeAttr ?>"
+                                                    class="w-full mt-4">
+                                                    <?= /* @noEscape */ $html ?>
+                                                </div>
+                                            </div>
+                                        <?php endif ?>
+                                    <?php endif ?>
+                                <?php endif ?>
+                            </div>
+                        <?php endif ?>
+                    </div>
+                <?php endif ?>
+            <?php endforeach ?>
+        </div>
+
+
+        <div class="my-2.5 text-sm font-medium text-teakea-gray">
+            <?= __('Gratis bezorgd in NL & BE vanaf €300,-') ?>
+        </div>
+
+    <?php endif ?>
+</div>

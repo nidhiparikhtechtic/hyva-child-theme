@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="2columns-left"
+    xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="catalog_list_item" />
+    <body>
+        <referenceContainer name="columns" htmlClass="columns py-7 lg:py-12" />
+
+        <referenceContainer name="category.view.container" htmlId="category-view-container"
+            htmlClass="category-view" />
+
+        <referenceBlock name="page.main.title" remove="true" />
+
+        <referenceContainer name="content">
+            <block class="Magento\Cms\Block\Block" name="usp">
+                <arguments>
+                    <argument name="block_id" xsi:type="string">topheader-usp</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+
+        <referenceBlock name="category.image" remove="true" />
+
+        <move element="slider" destination="category.view.container" before="category.description" />
+        <move element="category.description" destination="content" before="teak-tiles" />
+
+        <referenceContainer name="content">
+            <block name="slider" template="Magento_Theme::elements/categorie-slider.phtml" />
+            <block class="Magento\Cms\Block\Block" name="usp">
+                <arguments>
+                    <argument name="block_id" xsi:type="string">cat-usp</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+
+        <!-- <referenceContainer name="content">
+            <block class="Magento\Cms\Block\Block" name="usp-banner">
+                <arguments>
+                    <argument name="block_id" xsi:type="string">usp_banner_product_detail_page</argument>
+                </arguments>
+            </block>
+        </referenceContainer> -->
+
+        <referenceContainer name="content">
+            <block class="Magento\Cms\Block\Block" name="teak-tiles">
+                <arguments>
+                    <argument name="block_id" xsi:type="string">product-page-usp-bottom-teakea</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+
+        <!-- Add sale banner to category page -->
+        <referenceContainer name="content">
+            <block class="Magento\Catalog\Block\Category\View"
+                name="category.sale.banner"
+                template="Magento_Catalog::category/sale-banner.phtml" />
+        </referenceContainer>
+        <move element="category.sale.banner" destination="category.view.container" before="slider" />
+
+        <referenceBlock name="breadcrumbs" remove="true" />
+        <!-- <container name="filter.container" htmlTag="div" htmlClass="filter-tool"
+            before="category.view.container" />
+        <container name="filter.inner.container" htmlTag="div"
+            htmlClass="filter-inner-container container" before="category.view.container" />
+        <container name="filter.inner" htmlTag="div" htmlClass="filter-inner"
+            before="category.view.container" />
+
+        <move element="filter.container" destination="content" before="category.products" />
+        <move element="filter.inner.container" destination="filter.container" before="-" />
+        <move element="filter.inner" destination="filter.inner.container" before="-" />
+        <move element="product_list_toolbar" destination="filter.inner" after="catalog.leftnav" /> -->
+        <!-- <move element="usp-banner" destination="category.view.container" before="slider" /> -->
+    </body>
+</page>

@@ -1,0 +1,62 @@
+<?php
+
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes. All rights reserved.
+ * See COPYING.txt for license details.
+ *
+ * Customer account sidebar nav links — redesigned with emoji icons,
+ * active left-accent bar, and clean item rows matching the new sidebar design.
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\Customer\Block\Account\Navigation;
+
+/** @var Navigation $block */
+/** @var Escaper $escaper */
+
+$links = $block->getLinks();
+?>
+
+<ul class="nav items">
+    <?php foreach ($links as $link): ?>
+        <?php
+        $isCurrent  = false;
+        if (method_exists($link, 'isCurrent')) {
+            $isCurrent = $link->isCurrent();
+        } elseif (method_exists($link, 'getIsHighlighted')) {
+            $isCurrent = (bool) $link->getIsHighlighted();
+        }
+
+        $isLogout = strpos((string)$link->getHref(), 'customer/account/logout') !== false;
+        $linkClasses = $isLogout ? 'text-teakea-terracotta' : 'text-teak-ink';
+        ?>
+        <?php if ($isCurrent): ?>
+            <li class="nav item current border-l-4 border-teakea-deep-green">
+                <a class="flex px-4 py-2 hover:bg-teakea-lighter-gray font-bold text-teak-green bg-teak-light-green" href="<?= $escaper->escapeUrl($link->getHref()) ?>"
+                    <?php if ($link->getTitle()): ?>
+                    title="<?= $escaper->escapeHtmlAttr($link->getTitle()) ?>"
+                    <?php endif; ?>>
+
+                    <?= $escaper->escapeHtml($link->getLabel()) ?>
+                </a>
+            </li>
+        <?php else: ?>
+            <?php if ($link->getHref()): ?>
+                <li class="nav item">
+                    <a class="flex px-4 py-2 hover:bg-teakea-lighter-gray <?= $escaper->escapeHtmlAttr($linkClasses) ?>" href="<?= $escaper->escapeUrl($link->getHref()) ?>"
+                        <?php if ($link->getTitle()): ?>
+                        title="<?= $escaper->escapeHtmlAttr($link->getTitle()) ?>"
+                        <?php endif; ?>>
+
+                        <?= $escaper->escapeHtml($link->getLabel()) ?>
+                    </a>
+                </li>
+            <?php else: ?>
+                <span class="delimiter block border-b border-gray-300 w-full my-2"></span>
+            <?php endif; ?>
+        <?php endif; ?>
+    <?php endforeach; ?>
+</ul>

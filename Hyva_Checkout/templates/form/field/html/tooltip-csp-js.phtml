@@ -1,0 +1,25 @@
+<?php
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+
+/** @var ViewModelRegistry $viewModels */
+$hyvaCsp = $viewModels->require(\Hyva\Theme\ViewModel\HyvaCsp::class);
+?>
+<script>
+    <?php /** Generated with hyva-csp-helper.php */ ?>
+    function mountainITTeakeaHyvaFormFieldHtmlTooltip() {
+        return Object.assign(
+            { tooltipVisible: false }
+            ,{
+                ['mountainITTeakeaHyvaFormFieldHtmlTooltipClick245'](event) {return this.tooltipVisible = !this.tooltipVisible},
+                ['mountainITTeakeaHyvaFormFieldHtmlTooltipClickOutside247'](event) {return this.tooltipVisible = false},
+                ['mountainITTeakeaHyvaFormFieldHtmlTooltipMouseenterSelf243'](event) {return this.tooltipVisible = true},
+                ['mountainITTeakeaHyvaFormFieldHtmlTooltipMouseleaveSelf244'](event) {return this.tooltipVisible = false},
+                ['mountainITTeakeaHyvaFormFieldHtmlTooltipTouchstartPrevent246'](event) {return this.tooltipVisible = true},
+            }
+        )
+    }
+    window.addEventListener('alpine:init', () => Alpine.data('mountainITTeakeaHyvaFormFieldHtmlTooltip', mountainITTeakeaHyvaFormFieldHtmlTooltip), {once: true});
+</script>
+<?php $hyvaCsp->registerInlineScript() ?>

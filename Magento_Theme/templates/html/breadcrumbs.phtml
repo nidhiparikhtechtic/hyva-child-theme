@@ -1,0 +1,75 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Magento\Theme\Block\Html\Breadcrumbs;
+use Magento\Framework\Escaper;
+
+/** @var Escaper $escaper */
+/** @var Breadcrumbs $block */
+/** @var array[] $crumbs */
+
+?>
+<?php if ($crumbs && is_array($crumbs)): ?>
+    <?php
+    $crumbsCopy = $crumbs;
+    $currentCrumb = array_pop($crumbsCopy);
+    $previousCrumb = end($crumbsCopy);
+    reset($crumbsCopy);
+    ?>
+    <nav class="breadcrumbs mt-2 shadow-sm md:shadow-none md:order-1" aria-label="Breadcrumb">
+        <div class="container">
+
+            <div class="breadcrumb-desktop hidden md:block">
+                <?php $index = 0; ?>
+                <ol class="items list-reset py-4 rounded flex flex-wrap text-grey text-sm">
+                    <?php foreach ($crumbs as $crumbInfo): ?>
+                        <li class="item flex text-sm <?= $escaper->escapeHtmlAttr($crumbInfo['label']) ?>">
+                            <?php if ($index !== 0): ?>
+                                <span aria-hidden="true" class="separator text-primary-lighter px-2 self-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" width="12" height="12" fill="currentColor" aria-hidden="true">
+                                        <path d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"/>
+                                    </svg>
+                                </span>
+                            <?php endif; ?>
+                            <?php if ($crumbInfo['link']): ?>
+                                <a href="<?= $escaper->escapeUrl($crumbInfo['link']) ?>"
+                                   class="no-underline text-sm text-[#00000080] font-semibold"
+                                   title="<?= $escaper->escapeHtmlAttr($crumbInfo['title']) ?>">
+                                    <?= $escaper->escapeHtml($crumbInfo['label']) ?>
+                                </a>
+                            <?php else: ?>
+                                <?= $escaper->escapeHtml($crumbInfo['label']) ?>
+                            <?php endif; ?>
+                        </li>
+                        <?php $index++;?>
+                    <?php endforeach; ?>
+                </ol>
+            </div>
+
+            <?php if ($previousCrumb): ?>
+                <div class="breadcrumb-mobile md:hidden block">
+                    <ol class="items list-reset py-4 rounded flex flex-wrap text-sm">
+                        <li class="item flex">
+                            <a href="<?= $escaper->escapeUrl($previousCrumb['link']) ?>"
+                               class="no-underline flex items-center text-sm text-black font-semibold"
+                               title="<?= $escaper->escapeHtmlAttr($previousCrumb['title']) ?>">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="mr-2" width="16" height="16" viewBox="0 0 320 512" fill="currentColor" aria-hidden="true">
+                                    <path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"/>
+                                </svg>
+                                <?= $escaper->escapeHtml($previousCrumb['label']) ?>
+                            </a>
+                        </li>
+                    </ol>
+                </div>
+            <?php endif; ?>
+
+        </div>
+    </nav>
+<?php endif; ?>

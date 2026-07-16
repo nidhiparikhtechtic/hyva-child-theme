@@ -1,0 +1,130 @@
+<?php
+
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes. All rights reserved.
+ * See COPYING.txt for license details.
+ *
+ * This file includes sections of software developed by Magento, Inc.
+ * (https://github.com/magento/magento2) and distributed under the AFL v3.0.
+ */
+
+use Magento\Customer\Block\Widget\Name;
+use Magento\Framework\Escaper;
+
+/** @var Name $block */
+/** @var Escaper $escaper */
+
+$prefix = $block->showPrefix();
+$middle = $block->showMiddlename();
+$suffix = $block->showSuffix();
+
+$inputClasses = 'w-full border border-teakea-light-gray rounded-lg px-4 py-3 text-sm placeholder-gray-400 '
+    . 'focus:outline-none focus:ring-2 focus:ring-[#163A20]/30 focus:border-[#163A20]';
+$selectClasses = 'w-full border border-teakea-light-gray rounded-lg px-4 py-3 text-sm'
+    . 'focus:outline-none focus:ring-2 focus:ring-[#163A20]/30 focus:border-[#163A20]';
+$labelClasses = 'block text-sm font-semibold text-teak-ink mb-1.5';
+?>
+<?php if ($prefix): ?>
+    <div class="mb-5">
+        <label class="<?= $escaper->escapeHtmlAttr($labelClasses) ?>" for="<?= $escaper->escapeHtmlAttr($block->getFieldId('prefix')) ?>">
+            <?= $escaper->escapeHtml($block->getStoreLabel('prefix')) ?>
+        </label>
+        <?php if ($block->getPrefixOptions() === false): ?>
+            <input type="text" id="<?= $escaper->escapeHtmlAttr($block->getFieldId('prefix')) ?>"
+                name="<?= $escaper->escapeHtmlAttr($block->getFieldName('prefix')) ?>"
+                <?= $block->isPrefixRequired() ? ' required' : '' ?>
+                value="<?= $escaper->escapeHtmlAttr($block->getObject()->getPrefix()) ?>"
+                title="<?= $escaper->escapeHtmlAttr($block->getStoreLabel('prefix')) ?>"
+                class="<?= $escaper->escapeHtmlAttr($inputClasses) ?> <?= $escaper->escapeHtmlAttr($block->getAttributeValidationClass('prefix')) ?>">
+        <?php else: ?>
+            <select id="<?= $escaper->escapeHtmlAttr($block->getFieldId('prefix')) ?>"
+                name="<?= $escaper->escapeHtmlAttr($block->getFieldName('prefix')) ?>"
+                <?= $block->isPrefixRequired() ? ' required' : '' ?>
+                title="<?= $escaper->escapeHtmlAttr($block->getStoreLabel('prefix')) ?>"
+                class="<?= $escaper->escapeHtmlAttr($selectClasses) ?> <?= $escaper->escapeHtmlAttr($block->getAttributeValidationClass('prefix')) ?>">
+                <?php foreach ($block->getPrefixOptions() as $option): ?>
+                    <option value="<?= $escaper->escapeHtmlAttr($option) ?>"
+                        <?php if ($block->getObject()->getPrefix() == $option): ?>selected="selected" <?php endif; ?>>
+                        <?= $escaper->escapeHtml(__($option)) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        <?php endif; ?>
+    </div>
+<?php endif; ?>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+    <div>
+        <label class="<?= $escaper->escapeHtmlAttr($labelClasses) ?>" for="<?= $escaper->escapeHtmlAttr($block->getFieldId('firstname')) ?>">
+            <?= $escaper->escapeHtml($block->getStoreLabel('firstname')) ?>
+        </label>
+        <input type="text" id="<?= $escaper->escapeHtmlAttr($block->getFieldId('firstname')) ?>"
+            name="<?= $escaper->escapeHtmlAttr($block->getFieldName('firstname')) ?>"
+            value="<?= $escaper->escapeHtmlAttr($block->getObject()->getFirstname()) ?>"
+            required
+            title="<?= $escaper->escapeHtmlAttr($block->getStoreLabel('firstname')) ?>"
+            class="<?= $escaper->escapeHtmlAttr($inputClasses) ?> <?= $escaper->escapeHtmlAttr($block->getAttributeValidationClass('firstname')) ?>"
+            @input.debounce="onChange"
+            <?= ($block->getAttributeValidationClass('firstname') == 'required-entry') ? ' required' : '' ?>>
+    </div>
+
+    <div>
+        <label class="<?= $escaper->escapeHtmlAttr($labelClasses) ?>" for="<?= $escaper->escapeHtmlAttr($block->getFieldId('lastname')) ?>">
+            <?= $escaper->escapeHtml($block->getStoreLabel('lastname')) ?>
+        </label>
+        <input type="text" id="<?= $escaper->escapeHtmlAttr($block->getFieldId('lastname')) ?>"
+            name="<?= $escaper->escapeHtmlAttr($block->getFieldName('lastname')) ?>"
+            required
+            value="<?= $escaper->escapeHtmlAttr($block->getObject()->getLastname()) ?>"
+            title="<?= $escaper->escapeHtmlAttr($block->getStoreLabel('lastname')) ?>"
+            class="<?= $escaper->escapeHtmlAttr($inputClasses) ?> <?= $escaper->escapeHtmlAttr($block->getAttributeValidationClass('lastname')) ?>"
+            @input.debounce="onChange"
+            <?= ($block->getAttributeValidationClass('lastname') == 'required-entry') ? ' required' : '' ?>>
+    </div>
+</div>
+
+<?php if ($middle): ?>
+    <?php $isMiddlenameRequired = $block->isMiddlenameRequired(); ?>
+    <div class="mb-5">
+        <label class="<?= $escaper->escapeHtmlAttr($labelClasses) ?>" for="<?= $escaper->escapeHtmlAttr($block->getFieldId('middlename')) ?>">
+            <?= $escaper->escapeHtml($block->getStoreLabel('middlename')) ?>
+        </label>
+        <input type="text" id="<?= $escaper->escapeHtmlAttr($block->getFieldId('middlename')) ?>"
+            name="<?= $escaper->escapeHtmlAttr($block->getFieldName('middlename')) ?>"
+            value="<?= $escaper->escapeHtmlAttr($block->getObject()->getMiddlename()) ?>"
+            title="<?= $escaper->escapeHtmlAttr($block->getStoreLabel('middlename')) ?>"
+            class="<?= $escaper->escapeHtmlAttr($inputClasses) ?> <?= $escaper->escapeHtmlAttr($block->getAttributeValidationClass('middlename')) ?>"
+            @input.debounce="onChange"
+            <?= $isMiddlenameRequired ? ' required' : '' ?>>
+    </div>
+<?php endif; ?>
+
+<?php if ($suffix): ?>
+    <div class="mb-5">
+        <label class="<?= $escaper->escapeHtmlAttr($labelClasses) ?>" for="<?= $escaper->escapeHtmlAttr($block->getFieldId('suffix')) ?>">
+            <?= $escaper->escapeHtml($block->getStoreLabel('suffix')) ?>
+        </label>
+        <?php if ($block->getSuffixOptions() === false): ?>
+            <input type="text" id="<?= $escaper->escapeHtmlAttr($block->getFieldId('suffix')) ?>"
+                name="<?= $escaper->escapeHtmlAttr($block->getFieldName('suffix')) ?>"
+                value="<?= $escaper->escapeHtmlAttr($block->getObject()->getSuffix()) ?>"
+                title="<?= $escaper->escapeHtmlAttr($block->getStoreLabel('suffix')) ?>"
+                class="<?= $escaper->escapeHtmlAttr($inputClasses) ?> <?= $escaper->escapeHtmlAttr($block->getAttributeValidationClass('suffix')) ?>"
+                <?= $block->isSuffixRequired() ? ' required' : '' ?>>
+        <?php else: ?>
+            <select id="<?= $escaper->escapeHtmlAttr($block->getFieldId('suffix')) ?>"
+                name="<?= $escaper->escapeHtmlAttr($block->getFieldName('suffix')) ?>"
+                title="<?= $escaper->escapeHtmlAttr($block->getStoreLabel('suffix')) ?>"
+                class="<?= $escaper->escapeHtmlAttr($selectClasses) ?> <?= $escaper->escapeHtmlAttr($block->getAttributeValidationClass('suffix')) ?>"
+                <?= $block->isSuffixRequired() ? ' required' : '' ?>>
+                <?php foreach ($block->getSuffixOptions() as $option): ?>
+                    <option value="<?= $escaper->escapeHtmlAttr($option) ?>"
+                        <?php if ($block->getObject()->getSuffix() == $option): ?>selected="selected" <?php endif; ?>>
+                        <?= $escaper->escapeHtml(__($option)) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        <?php endif; ?>
+    </div>
+<?php endif; ?>

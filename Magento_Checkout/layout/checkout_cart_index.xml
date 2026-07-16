@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+
+      <body>
+            <referenceContainer name="page.wrapper"
+                  htmlClass="page-wrapper min-h-screen bg-teak-stone-light flex flex-col" />
+            <referenceBlock
+                  name="checkout.cart.shipping" remove="true" />
+            <referenceContainer
+                  name="main.content" htmlClass="page-main bg-teak-stone-light flex-grow" />
+            <move
+                  element="checkout.cart.methods"
+                  destination="cart.summary"
+                  after="cart.totals" />
+            <move element="cart.discount"
+                  destination="cart.summary"
+                  after="checkout.cart.totals.container" />
+      </body>
+</page>

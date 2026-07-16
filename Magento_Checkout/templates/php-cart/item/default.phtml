@@ -1,0 +1,350 @@
+<?php
+
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+// phpcs:disable Magento2.Files.LineLength.MaxExceeded
+
+use Magento\Checkout\Block\Cart\Item\Renderer;
+use Magento\Framework\Escaper;
+use Magento\Framework\App\ObjectManager;
+use Magento\Catalog\Api\ProductRepositoryInterface;
+
+/** @var Renderer $block */
+/** @var Escaper $escaper */
+
+$item = $block->getItem();
+$product = $item->getProduct();
+$isVisibleProduct = $product->isVisibleInSiteVisibility();
+$sku = $product->getSku();
+
+$productRepository = ObjectManager::getInstance()
+    ->get(ProductRepositoryInterface::class);
+
+$product = $productRepository->getById(
+    (int) $item->getProduct()->getId(),
+    false,
+    (int) $item->getStoreId(),
+    true
+);
+
+$isFscCertified = (int) $product->getData('is_fsc_certified');
+
+
+$deliveryTime = (string) $product->getAttributeText('levertijd');
+$deliveryType = (string) $product->getAttributeText('delivery_type');
+
+$stockItem = \Magento\Framework\App\ObjectManager::getInstance()
+    ->get(\Magento\CatalogInventory\Api\StockRegistryInterface::class)
+    ->getStockItem($product->getId());
+/** @var \Techtic\DeliveryDate\ViewModel\ProductDelivery $deliveryViewModel */
+$deliveryViewModel = $viewModels->require(
+    \Techtic\DeliveryDate\ViewModel\ProductDelivery::class
+);
+
+
+$qty = (int) $stockItem->getQty();
+$isInStock = (bool) $stockItem->getIsInStock();
+
+$oneDayOptions = ['1_werkdag', '1 werkdag'];
+$onetothreeDayOptions = ['1_3_werkdagen', '1 tot 3 werkdagen'];
+$twelveWeekOptions = ['12_weken', '12 weken'];
+
+$isOneDayDelivery = in_array($deliveryTime, $oneDayOptions, true);
+$isOnetothreeDayDelivery = in_array($deliveryTime, $onetothreeDayOptions, true);
+$isTwelveWeeks = in_array($deliveryTime, $twelveWeekOptions, true);
+
+$deliveryDate = $deliveryViewModel->getFormattedDeliveryDate();
+
+?>
+<div class="cart item cart-tr">
+    <div class="item-info text-left lg:text-right flex flex-col gap-2.5">
+
+        <div class="flex flex-row w-full gap-x-4">
+            <div data-th="<?= $escaper->escapeHtml(__('Item')) ?>" class="item flex text-left w-full">
+
+                <div class="flex sm:flex-row gap-x-2 md:gap-x-4 gap-y-4 w-full" x-cloak>
+                    <div class="flex flex-row gap-x-2 w-fit">
+                        <?php if ($block->hasProductUrl()): ?>
+                            <a href="<?= $escaper->escapeUrl($block->getProductUrl()) ?>"
+                                title="<?= $escaper->escapeHtmlAttr($block->getProductName()) ?>"
+                                tabindex="-1"
+                                class="product-item-photo shrink-0 flex w-fit justify-center bg-white">
+                            <?php else: ?>
+                                <span class="product-item-photo shrink-0">
+                                <?php endif; ?>
+                                <?= $block->getImage($block->getProductForThumbnail(), 'cart_page_product_thumbnail')
+                                    ->setTemplate('Magento_Catalog::product/image.phtml')
+                                    ->toHtml() ?>
+                                <?php if ($block->hasProductUrl()): ?>
+                            </a>
+                        <?php else: ?>
+                            </span>
+                        <?php endif; ?>
+                    </div>
+                    <div class="flex flex-col gap-y-2 justify-between w-full">
+                        <div class="product-item-details sm:flex gap-2.5 justify-between">
+                            <strong class="product-item-name break-all flex">
+                                <?php if ($block->hasProductUrl()): ?>
+                                    <a class="text-base text-teak-ink line-clamp-2 font-medium leading-snug hover:text-teak-green"
+                                        href="<?= $escaper->escapeUrl($block->getProductUrl()) ?>"><?= $escaper->escapeHtml($block->getProductName()) ?></a>
+                                <?php else: ?>
+                                    <?= $escaper->escapeHtml($block->getProductName()) ?>
+                                <?php endif; ?>
+                            </strong>
+
+                            <?php if ($messages = $block->getMessages()): ?>
+                                <?php foreach ($messages as $message): ?>
+                                    <div class="cart item message <?= $escaper->escapeHtmlAttr($message['type']) ?>">
+                                        <div><?= $escaper->escapeHtml($message['text']) ?></div>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                            <?php $addInfoBlock = $block->getProductAdditionalInformationBlock(); ?>
+                            <?php if ($addInfoBlock): ?>
+                                <?= $addInfoBlock->setItem($item)->toHtml() ?>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="flex flex-wrap gap-2 items-start text-sm">
+                            <?php if ($isFscCertified): ?>
+                                <div class="flex items-center gap-x-1 text-teak-green font-medium">
+                                    <svg class="w-4 h-4"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 128 128"
+                                        fill="currentColor"
+                                        aria-hidden="true"
+                                        role="img">
+                                        <path d="M84.5 37.89s-10.95 2.89-26.19 25.75c-11.77 17.65-12.95 31.48-22.8 40.75c-5.01 4.71-13.09 7.94-13.09 7.94s-6.47-.15-6.91.15c-.44.29-1.73 3.53.69 7.51c2 3.29 5.05 4.12 6.08 4.26c1.03.15 2.94-4.27 3.68-4.86c.74-.59 9.43-3.93 15.6-10.74c12.65-13.98 12.45-26.11 21.63-42.08c10.15-17.65 22.66-26.19 22.66-26.19l-1.35-2.49z" />
+                                        <path d="M122.69 3.39c-.39-.43-25.34-.05-38.15 11.52c-15.22 13.74-11.1 32.76-11.1 32.76s17.77 4.21 31.18-7.93c15.64-14.15 18.46-35.92 18.07-36.35z" />
+                                        <path d="M72.4 70.49c.82.64 2 1.39 3.69 2.23c9.56 4.78 21.5 2.16 27.35-.16c8.13-3.23 20.21-12.95 20.21-13.69c0-.74-5.5-3.38-13.32-5.71s-18.27-2.44-26.21.95c-7.28 3.11-10.67 8.58-12.54 11.86c0 0-2.9.46-5 .82c-3.7.63-6.55 1.9-6.55 1.9l-2.85 5.92s5.81-2.64 8.77-3.28s6.45-.84 6.45-.84z" />
+                                        <path d="M54.31 8.73c-.93.19-5.33 7.06-8.03 13.63c-2.13 5.17-4.26 18.38-.45 26.52s8.22 9.68 8.22 9.68s.54 2.37.48 5.55c-.03 1.8-.21 6.76-.21 6.76l4.35-1.89s.29-4.16.27-6.18c-.03-2.13-.29-4.82-.29-4.82s7.19-6.73 7.72-17.18c.42-8.24-.46-15.89-5-24.14c-3.56-6.43-6.53-8.03-7.06-7.93z" />
+                                        <path d="M5.8 24.95c-1.08 1.23 1.37 4.33 1.59 11.31c.17 5.71 1.16 25.05 6.87 34.98s13.63 12.37 16.17 13.21c2.54.85 8.03.95 8.03.95s2.33 2.01 3.17 4.86c.85 2.85 1.69 7.08 1.69 7.08l4.02-5.92s-1.16-4.65-2.33-6.76c-1.16-2.11-1.59-2.85-1.59-2.85s2.57-15.99-1.8-29.17C36.45 37 27.57 31.08 19.33 27.59S6.54 24.11 5.8 24.95z" />
+                                        <path d="M50.3 93.01s1.89-1.15 5.27-1.23c3.11-.07 5.04.51 5.04.51s5.81-6.67 12.31-8.58c6.13-1.8 14.22-3.41 28.47 2.5c14.27 5.92 22.47 11.66 22.37 13.46c-.11 1.8-14.13 8.22-19.94 10.22c-5.81 2.01-19.14 6.23-31.64 1.4c-9.93-3.84-12.15-13-12.15-13s-2.3-1.27-4.94-1.12c-4.83.26-8.9 3.87-8.9 3.87l4.11-8.03z" />
+                                        <path fill="#8dc02c" d="M77.97 38.72c1.57.97 5.5-8.88 9.3-13.42s10.89-9.19 10.15-11.2s-9.09.85-14.8 8.24c-5.7 7.4-6.02 15.54-4.65 16.38z" />
+                                        <path fill="#8dc02c" d="M79.04 63.53c1.14 1.57 6.37-2.17 11.63-3.38c5.41-1.25 11.2.51 10.99-2.43c-.2-2.78-7.93-3.06-13-1.69s-10.99 5.59-9.62 7.5z" />
+                                        <path fill="#8dc02c" d="M50.51 48.58c1.93-.08 1.27-6.02 1.37-11.63s1.06-14.06-1.06-14.16c-2.11-.11-3.89 5.47-4.02 12.15c-.1 5.5 1.17 13.74 3.71 13.64z" />
+                                    </svg>
+                                    <span>
+                                        <span><?= __('FSC®-C220387') ?></span>
+                                    </span>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if ($sku): ?>
+                                <div class="text-teak-muted">
+                                    <span class="uppercase"><?= __('Sku: ') ?></span>
+                                    <span><?= $escaper->escapeHtml($sku) ?></span>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-col gap-2">
+
+                            <!-- STOCK STATUS -->
+                            <?php if ($isInStock): ?>
+                                <?php if ($qty > 0 && $qty < 5 && $deliveryType !== 'Indonesia_En_Route'): ?>
+                                    <div class="text-teakea-highlight-red font-normal text-xs">
+                                        <?= __('Order quickly, only %1 left in stock', $qty) ?>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="flex items-center gap-1 text-xs font-semibold text-teak-green">
+                                        <svg class="w-1.5 h-1.5 text-teak-green"
+                                            viewBox="0 0 6 7"
+                                            fill="currentColor"
+                                            aria-hidden="true">
+                                            <rect y="0.5" width="6" height="6" rx="3" />
+                                        </svg>
+                                        <?= __('In stock') ?>
+                                    </div>
+                                <?php endif; ?>
+
+                            <?php else: ?>
+                                <div class="flex items-center gap-1 text-xs font-semibold text-teakea-tomato-red">
+                                    <svg class="w-1.5 h-1.5 text-teakea-tomato-red"
+                                        viewBox="0 0 6 7"
+                                        fill="currentColor"
+                                        aria-hidden="true">
+                                        <rect y="0.5" width="6" height="6" rx="3" />
+                                    </svg>
+                                    <?= __('Out of stock') ?>
+                                </div>
+                            <?php endif; ?>
+
+
+                            <!-- DELIVERY STATUS -->
+
+                            <?php if ($isInStock): ?>
+
+                                <?php if ($deliveryType === 'Handmade_Production'): ?>
+                                    <div class="text-xs text-teakea-dark-gray">
+                                        <?= __('Production starts immediately') ?>
+                                    </div>
+                                <?php elseif ($deliveryType === 'Indonesia_Workshop'): ?>
+                                    <div class="text-xs text-teakea-dark-gray">
+                                        <?= __('Production begins immediately after order placement') ?>
+                                    </div>
+                                <?php elseif ($deliveryType === 'Indonesia_En_Route'): ?>
+                                    <div class="text-xs text-teakea-dark-gray">
+                                        <?= __('Already manufactured — on its way from our own factory in Indonesia.') ?>
+                                    </div>
+                                <?php elseif ($deliveryType === 'Stock_Direct'): ?>
+
+                                    <?php if ($isOneDayDelivery): ?>
+
+                                        <div class="text-xs text-teakea-dark-gray">
+                                            <?= __('Ordered before 15:00 is delivered the next working day.') ?>
+                                        </div>
+
+                                    <?php elseif ($isOnetothreeDayDelivery): ?>
+
+                                        <div class="text-xs text-teakea-dark-gray">
+                                            <?= __('Expected delivery: %1', $escaper->escapeHtml($deliveryDate)) ?>
+                                        </div>
+
+                                    <?php elseif ($isTwelveWeeks): ?>
+
+                                        <div class="text-xs text-teakea-dark-gray">
+                                            <?= __('Delivery time: 12 weeks') ?>
+                                        </div>
+
+                                    <?php elseif (!empty($deliveryTime)): ?>
+
+                                        <div class="text-xs text-teakea-dark-gray">
+                                            <?= __('Expected shipment:') ?>
+                                            <?= $escaper->escapeHtml($deliveryTime) ?>
+                                        </div>
+
+                                    <?php endif; ?>
+
+                                <?php endif; ?>
+
+                            <?php endif; ?>
+                        </div>
+
+                        <?php if ($options = $block->getOptionList()): ?>
+                            <ul class="mt-1 space-y-1 text-xs bg-teak-stone-light border border-[#F0F0F0] rounded-lg p-2.5 max-w-max">
+                                <?php foreach ($options as $option): ?>
+                                    <?php $formattedOptionValue = $block->getFormatedOptionValue($option); ?>
+                                    <li class="leading-tight">
+                                        <?php if (isset($formattedOptionValue['full_view'])): ?>
+                                            <span class="text-[#6B6B6B]">
+                                                <?= $escaper->escapeHtml($formattedOptionValue['full_view']) ?>
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="text-[#6B6B6B]">
+                                                <?= $escaper->escapeHtml($formattedOptionValue['value'], ['span', 'a']) ?>
+                                            </span>
+                                        <?php endif; ?>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php endif; ?>
+
+                        <div class="flex items-center flex-col md:flex-row gap-2.5 cart-card-prices text-lg md:text-xl text-teak-ink leading-none font-garamond">
+                            <?= $block->getRowTotalHtml($item) ?>
+                            <span x-cloak class="flex flex-row items-center unit-price">
+                                <span
+                                    class="flex items-center flex-col-reverse md:flex-row-reverse gap-1.5 text-base text-teak-muted font-normal"
+                                    x-data="{ qty: <?= (int)$block->getQty() ?> }"
+                                    x-show="qty > 1">
+                                    <?= $block->getUnitPriceHtml($item) ?> <?= $escaper->escapeHtml(__('Each')) ?>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-row gap-1 md:gap-2.5 justify-between px-2 md:px-4 items-center border-t border-hair pt-3 mt-1">
+
+
+            <div class="qty flex justify-center items-center text-center w-fit h-fit">
+                <div class="qty flex items-center justify-center gap-1 md:gap-x-1.5 mt-0 border border-teak-muted rounded-lg">
+
+                    <button type="button"
+                        x-cloak
+                        class="qty-btn decrease p-1 relative overflow-hidden transition ease-in-out duration-300 rounded-md group"
+                        aria-label="<?= $escaper->escapeHtmlAttr(__('Decrease Quantity')) ?>"
+                        onclick="updateQty('cart-<?= $escaper->escapeHtmlAttr($item->getId()) ?>-qty', -1)">
+
+                        <span
+                            class="absolute inset-0 md:scale-0 transition-transform md:duration-300"></span>
+
+                        <span class="relative text-teak-ink">
+                            <svg class="w-4 h-4" viewBox="0 0 24 25" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20 12.5H4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </span>
+                    </button>
+
+
+                    <div class="control qty">
+                        <label class="mb-0"
+                            for="cart-<?= $escaper->escapeHtmlAttr($item->getId()) ?>-qty">
+                            <span class="label sr-only"><?= $escaper->escapeHtml(__('Qty')) ?></span>
+                            <input id="cart-<?= $escaper->escapeHtmlAttr($item->getId()) ?>-qty"
+                                name="cart[<?= $escaper->escapeHtmlAttr($item->getId()) ?>][qty]"
+                                value="<?= $escaper->escapeHtmlAttr($block->getQty()) ?>"
+                                type="number"
+                                x-cloak
+                                size="4"
+                                step="1"
+                                title="<?= $escaper->escapeHtmlAttr(__('Qty')) ?>"
+                                class="qty no-spinner w-10 h-9 text-sm text-center text-teak-ink font-medium border-none shadow-none"
+                                required="required"
+                                min="0"
+                                data-role="cart-item-qty"
+                                x-on:change.debounce.100ms="$event.target.form && $event.target.form.dispatchEvent(new Event('submit', { cancelable: true }));" />
+                        </label>
+                    </div>
+
+
+                    <button type="button"
+                        x-cloak
+                        class="qty-btn increase p-1 relative overflow-hidden transition ease-in-out duration-300 rounded-md group"
+                        aria-label=" <?= $escaper->escapeHtmlAttr(__('Increase Quantity')) ?>"
+                        onclick="updateQty('cart-<?= $escaper->escapeHtmlAttr($item->getId()) ?>-qty', 1)">
+
+                        <span
+                            class="absolute inset-0 md:scale-0 transition-transform md:duration-300"></span>
+                        <span class="relative text-teak-ink">
+                            <svg class="w-4 h-4" viewBox="0 0 24 25" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 4.5V20.5M20 12.5L4 12.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </span>
+                    </button>
+                </div>
+            </div>
+            <div class="item-actions">
+                <div class="gap-y-3 flex flex-row justify-center gap-x-1.5 items-center"
+                    x-cloak><?= /* @noEscape */
+                            $block->getActions($item) ?></div>
+            </div>
+        </div>
+
+
+    </div>
+
+</div>
+
+<script>
+    function updateQty(inputId, delta) {
+        const input = document.getElementById(inputId);
+        if (input) {
+            let currentValue = parseFloat(input.value) || 0;
+            let newValue = Math.max(0, currentValue + delta); // Prevent negative quantities
+            input.value = newValue;
+
+            // Optionally trigger an event or form submission if needed
+            input.dispatchEvent(new Event('change'));
+        }
+    }
+</script>

@@ -1,0 +1,34 @@
+<?php
+
+/** @var Escaper $escaper */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\ProductPage;
+use Magento\Catalog\Model\Product;
+use Magento\Framework\Escaper;
+
+/** @var ViewModelRegistry $viewModels */
+$productViewModel = $viewModels->require(ProductPage::class);
+
+/** @var Product $product */
+$product = $productViewModel->getProduct();
+
+
+$collection = $product->getMediaGalleryImages();
+$productImg = $collection->getFirstItem();
+
+
+?>
+<div class="flex ml-auto md:ml-5">
+    <img
+        src="<?= $productImg['small_image_url'] ?>"
+        class="mr-4 hidden md:inline h-14"
+        height="56" width="56"
+        alt="<?= $product->getName(); ?>"
+        title="<?= $product->getName(); ?>" />
+
+    <div class="flex flex-col mr-4">
+        <span class="text-base"><?= $product->getName(); ?></span>
+        <?= $block->getBlockHtml("product.info.price-footer") ?>
+    </div>
+</div>

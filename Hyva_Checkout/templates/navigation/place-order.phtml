@@ -1,0 +1,92 @@
+<?php
+
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Checkout\ViewModel\Navigation;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Magento\Cms\Block\Block;
+
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var Escaper $escaper */
+/** @var Navigation $viewModel */
+
+$viewModel = $viewModels->require(Navigation::class);
+$navigator = $viewModel->getNavigator();
+$checkout  = $navigator->getActiveCheckout();
+$next      = $checkout->getStepAfter($navigator->getActiveStep())
+?>
+<?php if ($next === null): ?>
+    <div
+        x-data="mountainITTeakeaHyvaNavigationPlaceOrder"
+        x-init="mountainITTeakeaHyvaNavigationPlaceOrderInit248"
+        :class="mountainITTeakeaHyvaNavigationPlaceOrderClass249"
+        class="w-full">
+        <button type="button"
+            class="group flex items-center gap-2 text-center w-full justify-center py-3 px-6
+                    rounded-lg disabled:opacity-10 disabled:cursor-not-allowed 
+                    bg-[linear-gradient(180deg,_#1E4D2B_0%,_#163A20_100%)] text-white text-base font-semibold
+                    transition-all duration-200 ease-in-out
+                    shadow-[0_1px_0_rgba(0,0,0,0.04),0_2px_12px_-3px_rgba(30,77,43,0.35)]
+                    hover:shadow-[0_4px_18px_-4px_rgba(30,77,43,0.45)]
+                    hover:-translate-y-[1px]"
+            x-bind="mountainITTeakeaHyvaNavigationPlaceOrderBind250">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-3.75 11.25h16.5a1.5 1.5 0 0 0 1.5-1.5v-9a1.5 1.5 0 0 0-1.5-1.5H3.75a1.5 1.5 0 0 0-1.5 1.5v9a1.5 1.5 0 0 0 1.5 1.5Z"></path>
+            </svg>
+            <?= $escaper->escapeHtml(__('Place an order')) ?>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path>
+            </svg>
+        </button>
+        <div class="transition-all duration-300 ease-in-out w-full">
+            <?php
+            echo $block->getLayout()
+                ->createBlock(Block::class)
+                ->setBlockId('checkout-below-place-order')
+                ->toHtml();
+            ?>
+        </div>
+
+    </div>
+<?php endif ?>
+<script>
+    <?php /** Generated with hyva-csp-helper.php */ ?>
+
+    function mountainITTeakeaHyvaNavigationPlaceOrder() {
+        return Object.assign({
+            sticky: false
+        }, {
+            ['mountainITTeakeaHyvaNavigationPlaceOrderBind250']() {
+                return this.buttonPlaceOrder()
+            },
+            ['mountainITTeakeaHyvaNavigationPlaceOrderClass249']() {
+                return {
+                    'fixed bottom-0 left-0 bg-teakea-cream border-t border-gray-200 shadow-lg px-2.5 py-1 z-[100]': this.sticky
+                }
+            },
+            ['mountainITTeakeaHyvaNavigationPlaceOrderInit248']() {
+                (() => {
+                    if (window.innerWidth < 768) {
+                        window.addEventListener('scroll', () => {
+                            this.sticky = window.scrollY > 100;
+                        });
+                    }
+                })()
+            },
+        })
+    }
+    window.addEventListener('alpine:init', () => Alpine.data('mountainITTeakeaHyvaNavigationPlaceOrder', mountainITTeakeaHyvaNavigationPlaceOrder), {
+        once: true
+    });
+</script>
+<?php $hyvaCsp->registerInlineScript() ?>

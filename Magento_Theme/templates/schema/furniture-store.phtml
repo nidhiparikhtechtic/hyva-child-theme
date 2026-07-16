@@ -1,0 +1,76 @@
+<?php
+/**
+ * FurnitureStore Schema
+ *
+ * Only for: Homepage, Showroom, Contact — NL Store View only
+ */
+
+use Magento\Framework\App\ObjectManager;
+use Magento\Cms\Model\PageFactory;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Store\Model\ScopeInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+
+$objectManager = ObjectManager::getInstance();
+$store = $objectManager->get(StoreManagerInterface::class)->getStore();
+
+// Only NL Store View
+if ((int)$store->getId() !== 1) {
+    return;
+}
+
+// Only allowed pages: homepage, contact, or showroom CMS page
+$action = $block->getRequest()->getFullActionName();
+$pageId = $block->getRequest()->getParam('page_id');
+
+$isAllowed = in_array($action, ['cms_index_index', 'contact_index_index'], true)
+    || ($pageId && $objectManager->get(PageFactory::class)->create()->load($pageId)->getIdentifier() === 'showroom');
+
+if (!$isAllowed) {
+    return;
+}
+
+// Reusable config getter
+$config = $objectManager->get(ScopeConfigInterface::class);
+$cfg = static fn (string $path) => $config->getValue($path, ScopeInterface::SCOPE_STORE);
+
+$schema = [
+    '@context'       => 'https://schema.org',
+    '@type'          => 'FurnitureStore',
+    '@id'            => $store->getBaseUrl() . '#localbusiness',
+    'name'           => $cfg('general/store_information/name'),
+    'url'            => $store->getBaseUrl(),
+    'telephone'      => $cfg('general/store_information/phone'),
+    'email'          => $cfg('trans_email/ident_general/email'),
+    'foundingDate'   => '2002',
+    'priceRange'     => '€€',
+    'image'          => "https://www.teakea.nl/media/logo/default/teakea_logo512x128.png",
+    'parentOrganization' => ['@id' => $store->getBaseUrl() . '#organization'],
+    'address' => [
+        '@type'           => 'PostalAddress',
+        'streetAddress'   => $cfg('general/store_information/street_line1'),
+        'postalCode'      => $cfg('general/store_information/postcode'),
+        'addressLocality' => $cfg('general/store_information/city'),
+        'addressRegion'   => $cfg('general/store_information/region_id'),
+        'addressCountry'  => $cfg('general/store_information/country_id'),
+    ],
+    'geo' => [
+        '@type'     => 'GeoCoordinates',
+        'latitude'  => '53.169803462232515',
+        'longitude' => '6.360664539935331',
+    ],
+    'hasMap' => 'https://maps.app.goo.gl/sApkkhy6N8ZnH5U2A',
+    'openingHoursSpecification' => [],
+    'sameAs' => [
+        'https://www.facebook.com/TeakeaNL/',
+        'https://www.instagram.com/teakeahomeliving/',
+        'https://nl.pinterest.com/teakealiving/',
+        'https://www.youtube.com/@TeakeaFurniture',
+        'https://nl.linkedin.com/company/teakea',
+        'https://www.webwinkelkeur.nl/webshop/Teakea_1215009',
+    ],
+];
+?>
+<script type="application/ld+json">
+<?= /** @noEscape */ json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT); ?>
+</script>

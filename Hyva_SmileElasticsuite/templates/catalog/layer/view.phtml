@@ -1,0 +1,159 @@
+<?php
+
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\LayeredNavigation\Block\Navigation;
+
+// phpcs:disable Generic.Files.LineLength.TooLong
+
+/** @var Navigation $block */
+/** @var Escaper $escaper */
+?>
+<?php if ($block->canShowBlock()) : ?>
+
+    <div
+        role="region"
+        aria-label="<?= $escaper->escapeHtmlAttr(__('Product filters')) ?>"
+        class="block border border-container rounded-lg md:p-4 p-2.5 md:border-0 md:bg-transparent md:py-0 md:px-0 w-auto border-[#E8E8E8]"
+        x-data="initLayeredNavigation()"
+        x-init="checkIsMobileResolution()"
+
+        @resize.window.debounce="checkIsMobileResolution()"
+        @visibilitychange.window.debounce="checkIsMobileResolution()">
+
+        <h2 class="md:hidden">
+            <div
+                class="block-title h-10 flex items-center justify-between"
+                :class="{ 'cursor-pointer' : isMobile }"
+                :role="isMobile ? 'button' : 'presentation'"
+                :aria-expanded="isMobile ? blockOpen : undefined"
+                :aria-controls="isMobile ? 'filters-content' : undefined"
+                :tabindex="isMobile ? 0 : undefined"
+                @click="blockOpen = !blockOpen"
+                @keydown.enter="blockOpen = !blockOpen"
+                @keydown.space="blockOpen = !blockOpen">
+                <span class="md:text-3xl font-medium uppercase text-sm text-[#000000DD]">
+                    <?= $escaper->escapeHtml(__('Shop By')) ?>
+                </span>
+                <span class="py-1 px-1 bg-container-lighter rounded-xl border border-container-darker hidden border-[#E8E8E8]"
+                    :class="{ 'block' : isMobile, 'hidden': !isMobile }">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M6 9.00012L12 15.0001L18 9.00012" stroke="black" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </span>
+            </div>
+        </h2>
+        <div class="md:flex gap-2">
+            <div
+                id="filters-content"
+                class="block-content filter-content md:flex block md:flex-wrap  gap-2 mt-4 md:mt-0"
+                x-show="isMobile && blockOpen || !isMobile"
+                x-cloak>
+                <?php $filterIndex = 0; ?>
+                <?php $activeFilters = json_decode($block->getActiveFilters()) ?>
+                <a
+                    href="#products-list"
+                    class="sr-only focus:not-sr-only bg-blue-600 text-white px-12 py-4 text-center block rounded-sm">
+                    <?= $escaper->escapeHtml(__('Skip to product list')) ?>
+                </a>
+                <?php foreach ($block->getFilters() as $filter): ?>
+                    <?php if ($filter->getItemsCount()): ?>
+                        <?php $showOpen = in_array($filterIndex, $activeFilters) ?>
+                        <div
+                            role="group"
+                            aria-labelledby="filter-option-<?= $filterIndex ?>-title"
+                            class="filter-option card md:p-0 py-2 px-0 rounded-lg mb-2.5 md:mb-0 bg-transparent"
+                            x-bind:class="{ 'open': activeFilterIndex === <?= $filterIndex ?> }">
+                            <h3
+                                id="filter-option-<?= $filterIndex ?>-title"
+                                class="filter-options-title">
+                                <button
+                                    class="flex justify-between bg-white items-center cursor-pointer hover:text-secondary-darker md:border-container w-full gap-[5px] h-10 md:border md:rounded-[50px] md:border-[#0000001A] px-4 uppercase rounded-lg"
+                                    :class="{ 'border-b': activeFilterIndex === <?= $filterIndex ?> }"
+                                    @click="activeFilterIndex = activeFilterIndex === <?= $filterIndex ?> ? null : <?= $filterIndex ?>"
+                                    aria-controls="filter-option-<?= $filterIndex ?>-content"
+                                    :aria-expanded="activeFilterIndex === <?= $filterIndex ?>">
+                                    <span class="title text-sm font-medium w-full text-left">
+                                        <?= $escaper->escapeHtml(__($filter->getName())) ?>
+                                        <span class="sr-only"><?= $escaper->escapeHtml(__(' filter')) ?></span>
+                                    </span>
+                                    <span class=" border-container">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                            <path d="M6 9L12 15L18 9" stroke="black" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </span>
+                                </button>
+                            </h3>
+                            <div
+                                id="filter-option-<?= $filterIndex ?>-content"
+                                class="filter-options-content pt-3 px-4 text-sm md:!w-[200px] bg-white pb-3"
+                                x-show="activeFilterIndex === <?= $filterIndex ?>"
+                                x-cloak  style="display: none;">
+                                <?= /* @noEscape */ $block->getChildBlock('renderer')->render($filter) ?>
+                            </div>
+                        </div>
+                        <?php $filterIndex++ ?>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+
+            </div>
+            <button @click="toggleExpand()" x-cloak x-show="ready && showToggle" class="text-black pt-2.5 text-sm underline md:flex hidden font-medium">
+                <span class="w-max" x-show="!expanded"><?= $escaper->escapeHtml(__('Show More')) ?></span>
+                <span class="w-max" x-show="expanded"><?= $escaper->escapeHtml(__('Show Less')) ?></span>
+            </button>
+        </div>
+
+        <?= $block->getChildHtml('state') ?>
+    </div>
+
+    <script>
+        function initLayeredNavigation() {
+            return {
+                isMobile: false,
+                blockOpen: false,
+                expanded: false,
+                ready: false,
+                showToggle: false,
+                activeFilterIndex: null,
+                checkIsMobileResolution: function() {
+                    this.isMobile = window.outerWidth < 768;
+                },
+                init() {
+                    this.checkIsMobileResolution();
+                    this.ready = true;
+
+                    if (!this.isMobile) {
+                        this.$nextTick(() => {
+                            const el = this.$root.querySelector('#filters-content');
+                            if (el) {
+                                const fullHeight = el.scrollHeight;
+                                const visibleHeight = el.clientHeight;
+
+                                // Show toggle only if scrollHeight > visible height
+                                this.showToggle = fullHeight > 40;
+                                el.style.maxHeight = this.expanded ? fullHeight + 'px' : '40px';
+                                el.style.overflow = 'hidden';
+                            }
+                        });
+                    }
+                },
+                toggleExpand() {
+                    const el = this.$root.querySelector('#filters-content');
+                    if (el) {
+                        this.expanded = !this.expanded;
+                        const fullHeight = el.scrollHeight;
+                        el.style.maxHeight = this.expanded ? fullHeight + 'px' : '40px';
+                    }
+                }
+            };
+        }
+    </script>
+<?php endif; ?>

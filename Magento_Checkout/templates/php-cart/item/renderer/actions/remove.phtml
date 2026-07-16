@@ -1,0 +1,58 @@
+<?php
+
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsSolid;
+use Magento\Checkout\Block\Cart\Item\Renderer\Actions\Remove;
+use Magento\Framework\Escaper;
+
+/** @var Remove $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var Escaper $escaper */
+
+/** @var HeroiconsSolid $heroicons */
+$heroicons = $viewModels->require(HeroiconsSolid::class);
+$item = $block->getItem();
+
+if ($item->getProductType() === 'configurable') {
+    $productOptions = $item->getProduct()->getTypeInstance()->getOrderOptions($item->getProduct());
+    $productName = $productOptions["simple_name"];
+} else {
+    $productName = $item->getName();
+}
+?>
+<button
+    class="flex items-center gap-1 text-xs action action-delete leading-4 text-teak-muted hover:text-teakea-red relative overflow-hidden transition ease-in-out md:duration-300 group"
+    x-data="{}"
+    @click.prevent='
+        hyva.postForm(<?= /* @noEscape */
+                        $block->getDeletePostJson() ?>);
+        $dispatch(
+            "cart-item-removed",
+            [{
+                "product_sku": "<?= $escaper->escapeJs($item->getSku()); ?>",
+                "product_name": "<?= $escaper->escapeJs($item->getName()); ?>",
+                "product_price_value": "<?= $escaper->escapeJs($item->getPrice()); ?>",
+                "quantity": "<?= $escaper->escapeJs($item->getQty()); ?>",
+            }]
+        );
+    '
+    aria-label="<?= $escaper->escapeHtmlAttr(__('Remove %1', $productName)) ?>"
+    type="button">
+    <svg class="w-3.5 h-3.5" stroke="currentColor" stroke-width="1.21154" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16.7103 4.82932C14.0207 4.56278 11.315 4.42548 8.61726 4.42548C7.01803 4.42548 5.4188 4.50625 3.81957 4.66778L2.17188 4.82932" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M6.61719 4.01414L6.79488 2.95606C6.92411 2.18876 7.02103 1.6153 8.38603 1.6153H10.5022C11.8672 1.6153 11.9722 2.22106 12.0933 2.96414L12.271 4.01414" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M14.9716 7.38281L14.4466 15.5163C14.3578 16.7843 14.2851 17.7697 12.0316 17.7697H6.84625C4.59279 17.7697 4.5201 16.7843 4.43125 15.5163L3.90625 7.38281" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M8.09375 13.3269H10.7834" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M7.42188 10.0961H11.4603" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+    <?= __('Remove') ?>
+</button>

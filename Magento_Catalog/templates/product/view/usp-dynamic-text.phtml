@@ -1,0 +1,151 @@
+<?php
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\CurrentProduct;
+use Magento\Catalog\Model\Product;
+use Hyva\Theme\ViewModel\ProductStockItem;
+
+/** @var \Magento\Framework\View\Element\Template $block */
+/** @var ViewModelRegistry $viewModels */
+
+$currentProduct = $viewModels->require(CurrentProduct::class);
+/** @var Product $product */
+$product = $block->getData('product') ?: $currentProduct->get();
+
+if (!$product || !$product->getId()) {
+    return;
+}
+
+$deliveryType = (string) $product->getAttributeText('delivery_type');
+
+$expectedDate = $product->getCjm_expecdate();
+
+// Stock Information
+/** @var ProductStockItem $stockItemViewModel */
+$stockItemViewModel = $viewModels->require(ProductStockItem::class);
+$qty = (int)$stockItemViewModel->getQty($product);
+$isInStock = $stockItemViewModel->isInStock($product);
+
+?>
+
+<!-- ========================================================= -->
+<!-- Dynamic USP – Final Copy (Clean & Calm)                   -->
+<!-- ========================================================= -->
+<?php if (!$expectedDate && $isInStock) : ?>
+
+    <div class="space-y-1.5 text-sm leading-relaxed text-[#2D5A27] mt-2.5">
+
+        <?php if ($deliveryType === 'Handmade_Production'): ?>
+
+            <div class="flex items-center gap-1.5">
+                <span class="w-5 h-5 bg-[#e0f3e8] rounded-full flex items-center justify-center">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 7.5L6 11.5L13.5 1" stroke="#009844" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </span>
+                <span class="text-sm text-[#2D5A27] font-medium normal-case">
+                    <?= __('Craftsmanship from our own furniture factory') ?>
+                </span>
+            </div>
+
+            <div class="flex items-center gap-1.5">
+                <span class="w-5 h-5 bg-[#e0f3e8] rounded-full flex items-center justify-center">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 7.5L6 11.5L13.5 1" stroke="#009844" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </span>
+                <span class="text-sm text-[#2D5A27] font-medium normal-case">
+                    <?= __('100% quality control by our craftsmen') ?>
+                </span>
+            </div>
+
+        <?php elseif ($deliveryType === 'Stock_Direct'): ?>
+
+            <div class="flex items-center gap-1.5">
+                <span class="w-5 h-5 bg-[#e0f3e8] rounded-full flex items-center justify-center">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 7.5L6 11.5L13.5 1" stroke="#009844" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </span>
+                <span class="text-sm text-[#2D5A27] font-medium normal-case">
+                    <?= __('Available immediately from stock') ?>
+                </span>
+            </div>
+
+            <div class="flex items-center gap-1.5">
+                <span class="w-5 h-5 bg-[#e0f3e8] rounded-full flex items-center justify-center">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 7.5L6 11.5L13.5 1" stroke="#009844" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </span>
+                <span class="text-sm text-[#2D5A27] font-medium normal-case">
+                    <?= __('30-day cooling-off period') ?>
+                </span>
+            </div>
+
+        <?php elseif ($deliveryType === 'Indonesia_Workshop'): ?>
+
+            <div class="flex items-center gap-1.5">
+                <span class="w-5 h-5 bg-[#e0f3e8] rounded-full flex items-center justify-center">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 7.5L6 11.5L13.5 1" stroke="#009844" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </span>
+                <span class="text-sm text-[#2D5A27] font-medium normal-case">
+                    <?= __('Craftsmanship from our own factory in Indonesia') ?>
+                </span>
+            </div>
+
+            <div class="flex items-center gap-1.5">
+                <span class="w-5 h-5 bg-[#e0f3e8] rounded-full flex items-center justify-center">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 7.5L6 11.5L13.5 1" stroke="#009844" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </span>
+                <span class="text-sm text-[#2D5A27] font-medium normal-case">
+                    <?= __('100% quality control before shipment') ?>
+                </span>
+            </div>
+
+            <div class="flex items-center gap-1.5">
+                <span class="w-5 h-5 bg-[#e0f3e8] rounded-full flex items-center justify-center">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 7.5L6 11.5L13.5 1" stroke="#009844" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </span>
+                <span class="text-sm text-[#2D5A27] font-medium normal-case">
+                    <?= __('Exclusively FSC® Premium Teak') ?>
+                </span>
+            </div>
+
+        <?php elseif ($deliveryType === 'Indonesia_En_Route'): ?>
+
+            <div class="flex items-center gap-1.5">
+                <span class="w-5 h-5 bg-[#e0f3e8] rounded-full flex items-center justify-center">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 7.5L6 11.5L13.5 1" stroke="#009844" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </span>
+                <span class="text-sm text-[#2D5A27] font-medium normal-case">
+                    <?= __('Craftsmanship from our own factory in Indonesia') ?>
+                </span>
+            </div>
+
+            <div class="flex items-center gap-1.5">
+                <span class="w-5 h-5 bg-[#e0f3e8] rounded-full flex items-center justify-center">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 7.5L6 11.5L13.5 1" stroke="#009844" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </span>
+                <span class="text-sm text-[#2D5A27] font-medium normal-case">
+                    <?= __('100% quality control before shipment') ?>
+                </span>
+            </div>
+
+        <?php endif; ?>
+
+    </div>
+
+<?php endif; ?>

@@ -1,0 +1,273 @@
+<?php
+
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Request a Quote Hyva Compatibility
+ */
+
+use Amasty\RequestQuote\Block\Cart\Quote\Details;
+use Amasty\RequestQuoteHyva\ViewModel\Quote;
+use Amasty\RequestQuoteHyva\ViewModel\QuoteIcons;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+
+/** @var Details $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+$quoteIcons = $viewModels->require(QuoteIcons::class);
+$quoteViewModel = $viewModels->require(Quote::class);
+$block->getChildBlock('checkout.cart.details.form.email')->setData('email_title', $block->getData('email_title'));
+?>
+<div id="quote-details" class="quote-details card mb-3 pt-3 p-2 border border-teakea-light-grey bg-teak-stone-light rounded-lg">
+    <div class="flex flex-col">
+        <h2 class="w-full text-lg xl:text-2xl font-medium title-font font-garamond text-center md:text-left font-base">
+            <?= $escaper->escapeHtml($block->getData('title')) ?>
+        </h2>
+    </div>
+    <?= $block->getChildHtml('cart.details.before-login-form') ?>
+    <form x-data="initAmQuoteDetailsForm"
+        x-ref="quoteDetailsForm"
+        @persist-field-values="persistFieldValues"
+        @private-content-loaded.window="initForm"
+        class="form form-login">
+        <template x-if="isCustomerNotLoggedIn">
+            <div class="flex flex-col lg:flex-row gap-2 mt-2">
+                <div class="field field-name-firstname required text-sm text-black font-medium">
+                    <label for="amquote-firstname">
+                        <span><?= $escaper->escapeHtml($block->getData('first_name_title')) ?></span>
+                    </label>
+                    <div class="control">
+                        <input @input.debounce.500ms="persistFieldValuesDispatch"
+                            type="text"
+                            name="firstname"
+                            id="amquote-firstname"
+                            class="form-input required-entry w-full border border-teakea-light-gray rounded-lg focus:outline-none focus:ring-0 shadow-none"
+                            title="<?= $escaper->escapeHtmlAttr($block->getData('first_name_title')) ?>"
+                            required />
+                    </div>
+                </div>
+                <div class="field field-name-lastname required text-sm text-black font-medium">
+                    <label for="amquote-lastname">
+                        <span><?= $escaper->escapeHtml($block->getData('last_name_title')) ?></span>
+                    </label>
+                    <div class="control">
+                        <input @input.debounce.500ms="persistFieldValuesDispatch"
+                            type="text"
+                            name="lastname"
+                            id="amquote-lastname"
+                            class="form-input required-entry w-full border border-teakea-light-gray rounded-lg focus:outline-none focus:ring-0 shadow-none"
+                            title="<?= $escaper->escapeHtmlAttr($block->getData('last_name_title')) ?>"
+                            required />
+                    </div>
+                </div>
+            </div>
+        </template>
+        <?= $block->getChildHtml('checkout.cart.details.form.email') ?>
+        <?= $block->getChildHtml('checkout.cart.details.form.attributes') ?>
+        <fieldset class="fieldset amquote-summary-details mt-2">
+            <div class="flex flex-col text-sm text-black font-medium">
+                <label class="label" for="quote-remark">
+                    <span><?= $escaper->escapeHtml($block->getData('remark_title')) ?></span>
+                    <span x-show="isRemarkProcessing" aria-hidden="true">
+                        <?= $quoteIcons->loadingIndicatorHtml('inline h-4 w-4', 16, 16) ?>
+                    </span>
+                </label>
+                <div class="control">
+                    <textarea x-ref="remark"
+                        @input.debounce.1000ms="inputUpdate"
+                        name="remarks"
+                        id="quote-remark"
+                        class="form-input w-full border border-teakea-light-gray rounded-lg focus:outline-none focus:ring-0 shadow-none"
+                        rows="3"
+                        cols="25"></textarea>
+                </div>
+            </div>
+
+        </fieldset>
+    </form>
+</div>
+
+<script>
+    function initAmQuoteDetailsForm() {
+        return Object.assign(
+            hyva.formValidation(this.$el), {
+                selectors: {
+                    visibleFields: ':is(input:not([type=hidden],[type=password],[type=file]), textarea:not([type=hidden]), select, input[data-quote-entity="file"])'
+                },
+                quoteId: <?= (int)$quoteViewModel->getQuote()->getId() ?>,
+                controller: new AbortController(),
+                isRemarkProcessing: false,
+
+                /**
+                 * @returns {void}
+                 */
+                initForm: function() {
+                    this.initFieldsValue();
+                },
+
+                /**
+                 * @returns {void}
+                 */
+                initFieldsValue: function() {
+                    const sectionData = JSON.parse(hyva.getBrowserStorage().getItem('mage-cache-storage'));
+                    const shippingAddressFromData = this.getShippingAddressFromData(sectionData);
+
+                    Array.from(this.$refs.quoteDetailsForm.querySelectorAll(this.selectors.visibleFields)).forEach((input) => {
+                        const persistedAttributeValue = shippingAddressFromData.amasty_quote_attributes['data.' + input.name];
+                        !!persistedAttributeValue && this.setPersistedValues(input, persistedAttributeValue);
+                    });
+                },
+
+                /**
+                 * @param {Object} sectionData
+                 * @returns {Object}
+                 */
+                getShippingAddressFromData: function(sectionData) {
+                    let shippingAddressFromData = sectionData?.['quotecart-data']?.shippingAddressFromData ?? {};
+
+                    shippingAddressFromData = {
+                        ...shippingAddressFromData,
+                        amasty_quote_attributes: this.getCurrentQuoteAttributesValues(shippingAddressFromData?.amasty_quote_attributes ?? {})
+                    }
+                    shippingAddressFromData.amasty_quote_attributes.quote_id = this.quoteId;
+
+                    return shippingAddressFromData;
+                },
+
+                /**
+                 *
+                 * @param {Object} amasty_quote_attributes
+                 * @returns {Object}
+                 */
+                getCurrentQuoteAttributesValues: function(amasty_quote_attributes) {
+                    return amasty_quote_attributes?.quote_id === this.quoteId ?
+                        amasty_quote_attributes : {};
+                },
+
+                /**
+                 * @param {Object} attributes
+                 * @returns {void}
+                 */
+                saveQuoteAttributes: function(attributes) {
+                    const sectionData = JSON.parse(hyva.getBrowserStorage().getItem('mage-cache-storage'));
+                    const checkoutData = sectionData['quotecart-data'] ?? {};
+                    checkoutData.shippingAddressFromData = {
+                        ...this.getShippingAddressFromData(sectionData)
+                    };
+                    checkoutData.shippingAddressFromData.amasty_quote_attributes = {
+                        quote_id: this.quoteId,
+                        ...attributes
+                    };
+                    sectionData['quotecart-data'] = {
+                        ...checkoutData
+                    };
+
+                    hyva.getBrowserStorage().setItem('mage-cache-storage', JSON.stringify(sectionData));
+                },
+
+                /**
+                 * @returns {void}
+                 */
+                persistFieldValues: function() {
+                    const fieldValues = {};
+
+                    Array.from(this.$refs.quoteDetailsForm.querySelectorAll(this.selectors.visibleFields)).forEach((input) => {
+                        !!input.value && (fieldValues['data.' + input.name] = this.getPersistFieldValues(input))
+                    });
+
+                    this.saveQuoteAttributes(fieldValues);
+                },
+
+                /**
+                 * @returns {void}
+                 */
+                updateRemark: function() {
+                    this.isRemarkProcessing = true;
+                    const remarkValue = this.$refs.remark.value;
+                    this.abortUpdateRemark();
+
+                    fetch(
+                        `${BASE_URL}rest/${CURRENT_STORE_CODE}/V1/amasty_quote/updateRemark/`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            signal: this.controller.signal,
+                            body: JSON.stringify({
+                                'remark': remarkValue
+                            })
+                        }
+                    ).finally(() => {
+                        this.isRemarkProcessing = false;
+                    });
+                },
+
+                /**
+                 * @returns {void}
+                 */
+                abortUpdateRemark: function() {
+                    this.controller.abort();
+                    this.controller = new AbortController();
+                },
+
+                /**
+                 * @param {Object} input
+                 * @param {string} persistedAttributeValue
+                 * @returns {void}
+                 */
+                setPersistedValues: function(input, persistedAttributeValue) {
+                    if (input.type === 'select-multiple') {
+                        Array.from(input.options).forEach((option) => {
+                            option.selected = persistedAttributeValue.includes(option.value);
+                        });
+                    } else {
+                        input.value = persistedAttributeValue;
+                    }
+                },
+
+                /**
+                 * @param {Object} input
+                 * @returns {string}
+                 */
+                getPersistFieldValues: function(input) {
+                    if (input.type === 'select-multiple') {
+                        const selectedOptions = [];
+                        Array.from(input.options).forEach((option) => {
+                            !!option.selected && selectedOptions.push(option.value);
+                        });
+
+                        return selectedOptions.join();
+                    } else {
+                        return input.value;
+                    }
+                },
+
+                isCustomerNotLoggedIn() {
+                    return !window.checkoutConfig.isCustomerLoggedIn
+                },
+
+                inputUpdate() {
+                    this.updateRemark();
+                    return this.persistFieldValuesDispatch();
+                },
+
+                persistFieldValuesDispatch(event) {
+                    return this.$dispatch('persist-field-values')
+                }
+            }
+        )
+    }
+
+    window.addEventListener(
+        'alpine:init',
+        () => Alpine.data(
+            'initAmQuoteDetailsForm',
+            initAmQuoteDetailsForm
+        ), {
+            once: true
+        }
+    );
+</script>
+<?php isset($hyvaCsp) && $hyvaCsp->registerInlineScript() ?>

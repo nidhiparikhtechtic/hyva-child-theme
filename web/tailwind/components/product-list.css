@@ -1,0 +1,35 @@
+
+.product-item {
+    .price-container {
+        @apply block;
+
+        .price {
+            @apply font-semibold text-lg;
+        }
+
+        .price-label {
+            @apply text-sm;
+        }
+    }
+
+    .special-price .price-container .price-label {
+        @apply sr-only;
+    }
+
+    .old-price .price-container {
+        @apply text-gray-500;
+
+        .price {
+            @apply font-normal text-base;
+        }
+    }
+}
+/* Hide scrollbar but keep swipe */
+.catalog-category-view .page-main #product-list .products-grid .scrollbar-hide {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.catalog-category-view .page-main #product-list .products-grid .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}

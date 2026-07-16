@@ -1,0 +1,38 @@
+<?php
+
+declare(strict_types=1);
+
+use Hyva\Theme\ViewModel\ProductPage;
+use Hyva\Theme\Model\ViewModelRegistry;
+
+/** @var ViewModelRegistry $viewModels */
+
+$productViewModel = $viewModels->require(ProductPage::class);
+/**
+ * IMPORTANT:
+ * - false → do NOT excerpt (PDP must show full content)
+ * - true  → strip unwanted tags safely
+ */
+//$shortDescription = trim(
+//    (string) $productViewModel->getShortDescription(true, false)
+//);
+
+// ✅ Get product properly
+$product = $productViewModel->getProduct();
+
+// ✅ Get ONLY short description (no fallback)
+$rawShortDesc = trim((string) $product->getShortDescription());
+
+// 🚫 If empty → stop rendering
+if (empty($rawShortDesc)) {
+    return;
+}
+
+// ✅ Optional: apply Hyvä filtering
+//$shortDescription = $productViewModel->getFilteredContent($rawShortDesc);
+
+?>
+
+<div class="prose max-w-none text-[#646464] text-base">
+    <?= /* @noEscape */ $rawShortDesc; ?>
+</div>

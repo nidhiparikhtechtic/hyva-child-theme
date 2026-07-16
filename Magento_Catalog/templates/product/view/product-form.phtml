@@ -1,0 +1,52 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Modal;
+use Magento\Catalog\Block\Product\View;
+use Magento\Catalog\Model\Product;
+use Magento\Framework\Escaper;
+
+/** @var View $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+/** @var Product $product */
+$product = $block->getProduct();
+
+/** @var Modal $modalViewModel */
+$modalViewModel = $viewModels->require(Modal::class);
+$modal = $modalViewModel->createModal();
+
+/**
+ * Add to cart url is set on 'product.info' block by
+ * @see \Magento\Checkout\Block\Cart\Item\Configure::_prepareLayout
+ */
+$productInfoBlock = $block->getLayout()->getBlock('product.info');
+$simpleProductCSS = $product->getTypeId() != 'configurable' ? '' : '';
+
+?>
+
+<?php if ($product->isSaleable()): ?>
+    <div x-data="{isOutView: null}" x-init="$watch('isOutView', value => $dispatch('isOutOfView', isOutView))" x-intersect:leave="isOutView = true" x-intersect:enter="isOutView = false">
+
+    <form method="post"
+          action="<?= $escaper->escapeUrl($productInfoBlock->getSubmitUrl($product)) ?>"
+          class="<?= $simpleProductCSS ?>"
+          id="product_addtocart_form"<?php if ($product->getOptions()): ?> enctype="multipart/form-data"<?php endif; ?>
+    >
+        <input type="hidden" name="product" value="<?= (int)$product->getId() ?>" />
+        <input type="hidden" name="selected_configurable_option" value=""  />
+        <input type="hidden" name="related_product" id="related-products-field" value="" />
+        <input type="hidden" name="item"  value="<?= (int)$block->getRequest()->getParam('id') ?>">
+        <?= $block->getBlockHtml('formkey') ?>
+        <?= $block->getChildHtml() ?>
+    </form>
+    </div>
+<?php endif; ?>

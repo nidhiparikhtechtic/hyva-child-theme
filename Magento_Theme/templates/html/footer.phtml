@@ -1,0 +1,33 @@
+<?php
+
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\Escaper;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+?>
+<div class="bg-teakea-red text-white body-font">
+    <div class="container pt-10 pb-3 md:pt-14 md:pb-7 mx-auto">
+        <div class="flex flex-wrap order-first gap-y-16">
+            <?php foreach ($block->getChildNames() as $childName): ?>
+                <?= $childName !== 'footer-copyright' ? $block->getBlockHtml($childName) : '' ?>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <div class="bg-white">
+        <div class="container mx-auto flex items-center sm:flex-row flex-col justify-between">
+            <p class="ml:flex ml:justify-between grid w-full items-center ml:gap-0 gap-[15px] py-2">
+                <?= $block->getChildHtml('copyright') ?>
+            </p>
+        </div>
+    </div>
+</div>

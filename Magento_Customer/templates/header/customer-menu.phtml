@@ -1,0 +1,130 @@
+<?php
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Hyva\Theme\ViewModel\CustomerRegistration;
+use Magento\Customer\Block\Account\Customer;
+use Magento\Customer\Model\Account\Redirect;
+use Magento\Framework\Escaper;
+
+/** @var Customer $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var HeroiconsOutline $heroicons */
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+
+/** @var CustomerRegistration $customerRegistration */
+$customerRegistration = $viewModels->require(CustomerRegistration::class);
+?>
+
+<div x-data="accountMenu()"
+    @private-content-loaded.window="receiveCustomerData($event.detail.data)"
+    @keydown.escape.window="isOpen = false"
+    @click.outside="isOpen = false"
+    class="relative flex"
+    :class="{
+            'bg-teakea-terracotta rounded-lg p-1': isOpen
+        }">
+
+    <!-- Toggle Button -->
+    <button type="button"
+        @click="isOpen = !isOpen"
+        aria-label="<?= $escaper->escapeHtmlAttr(__('Account')) ?>"
+        class="inline-flex cursor-pointer items-center rounded-md tracking-wide transition"
+        :aria-expanded="isOpen || openedWithKeyboard"
+        aria-haspopup="true">
+        <svg class="w-5 md:w-6 h-5 md:h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M12 14C8.13401 14 5 17.134 5 21H19C19 17.134 15.866 14 12 14Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+    </button>
+
+    <!-- Dropdown Menu -->
+    <div x-cloak
+        x-show="isOpen"
+        class="absolute bg-container top-10 lg:top-14 right-0 w-max sm:w-60 overflow-auto origin-top-right rounded-lg z-[100] drop-shadow-lg"
+        role="menu">
+        <?php if ($block->customerLoggedIn()): ?>
+
+            <div class="bg-[linear-gradient(180deg,_#1E4D2B_0%,_#163A20_100%)] p-2.5 sm:p-4">
+                <p class="text-xs text-[#bfe0c9] italic">Welcome back</p>
+                <b class="font-semibold text-base text-white" x-text="customer.fullname || (customer.firstname + ' ' + customer.lastname)"></b>
+            </div>
+            <a href="<?= $escaper->escapeUrl($block->getUrl('customer/account')) ?>"
+                class="block py-2 sm:py-2.5 px-2.5 sm:px-4 text-sm font-semibold border-t border-[#eee8da] hover:bg-teakea-white-beige"
+                role="menuitem"><?= $escaper->escapeHtml(__('My Account')) ?></a>
+            <a href="<?= $escaper->escapeUrl($block->getUrl('wishlist')) ?>"
+                class="block py-2 sm:py-2.5 px-2.5 sm:px-4 text-sm font-semibold border-t border-[#eee8da] hover:bg-teakea-white-beige"
+                role="menuitem"><?= $escaper->escapeHtml(__('My Wish List')) ?></a>
+            <a href="<?= $escaper->escapeUrl($block->getUrl('sales/order/history')) ?>"
+                class="block py-2 sm:py-2.5 px-2.5 sm:px-4 text-sm font-semibold border-t border-[#eee8da] hover:bg-teakea-white-beige"
+                role="menuitem"><?= $escaper->escapeHtml(__('My Orders')) ?></a>
+            <a href="<?= $escaper->escapeUrl($block->getUrl('customer/address')) ?>"
+                class="block py-2 sm:py-2.5 px-2.5 sm:px-4 text-sm font-semibold border-t border-[#eee8da] hover:bg-teakea-white-beige"
+                role="menuitem"><?= $escaper->escapeHtml(__('Address Book')) ?></a>
+            <a href="<?= $escaper->escapeUrl($block->getUrl('customer/account/logout')) ?>"
+                class="block py-2 sm:py-2.5 px-2.5 sm:px-4 text-sm font-semibold border-t border-[#eee8da] hover:bg-teakea-white-beige text-teakea-terracotta"
+                role="menuitem"><?= $escaper->escapeHtml(__('Sign Out')) ?></a>
+        <?php else: ?>
+
+            <!-- <a href="<?= $escaper->escapeUrl($block->getUrl('customer/account/index')) ?>"
+                class="block py-2 sm:py-2.5 px-2.5 sm:px-4 text-sm font-semibold hover:bg-teakea-white-beige"
+                role="menuitem"
+                onclick="hyva.setCookie && hyva.setCookie(
+                   '<? //= Redirect::LOGIN_REDIRECT_URL 
+                    ?>',
+                   window.location.href,
+                   1
+                   )"><? //= $escaper->escapeHtml(__('Sign In')) 
+                        ?>
+            </a> -->
+            <?php //if ($customerRegistration->isAllowed()): 
+            ?>
+            <!-- <a href="<? //= $escaper->escapeUrl($block->getUrl('customer/account/create')) 
+                            ?>"
+                    class="block py-2 sm:py-2.5 px-2.5 sm:px-4 text-sm font-semibold border-t border-[#eee8da] hover:bg-teakea-white-beige"
+                    role="menuitem"><? //= $escaper->escapeHtml(__('Create an Account')) 
+                                    ?>
+                </a> -->
+            <?php //endif; 
+            ?>
+
+            <a href="<?= $escaper->escapeUrl($block->getUrl('customer/account/index')) ?>"
+                class="block py-2 sm:py-2.5 px-2.5 sm:px-4 text-sm font-semibold hover:bg-teakea-white-beige"
+                role="menuitem"
+                @click.prevent="hyva.setCookie && 
+                                hyva.setCookie('<?= Redirect::LOGIN_REDIRECT_URL ?>',window.location.href,1);
+                                $store.authModal.show('login');
+                                isOpen = false">
+                <?= $escaper->escapeHtml(__('Sign In')) ?>
+            </a>
+            <?php if ($customerRegistration->isAllowed()): ?>
+                <a href="<?= $escaper->escapeUrl($block->getUrl('customer/account/create')) ?>"
+                    class="block py-2 sm:py-2.5 px-2.5 sm:px-4 text-sm font-semibold border-t border-[#eee8da] hover:bg-teakea-white-beige"
+                    role="menuitem"
+                    @click.prevent="$store.authModal.show('register'); isOpen = false"><?= $escaper->escapeHtml(__('Create an Account')) ?></a>
+            <?php endif; ?>
+        <?php endif; ?>
+    </div>
+</div>
+<script>
+    function accountMenu() {
+        return {
+            isOpen: false,
+            customer: false,
+
+            receiveCustomerData(data) {
+                console.log('Private Content:', data);
+
+                if (data.customer && data.customer.firstname) {
+                    this.customer = data.customer;
+                } else {
+                    this.customer = false;
+                }
+            }
+        }
+    }
+</script>

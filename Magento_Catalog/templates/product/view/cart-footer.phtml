@@ -1,0 +1,32 @@
+<?php
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\ProductPage;
+
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var ProductPage $productViewModel */
+
+
+?>
+
+<div x-data="{isOutView:false}"
+     x-init="
+     document.addEventListener('isOutOfView', event => {
+        isOutView = event.detail;
+    });
+"
+     id="pro-sticky-bar" x-cloak class="product-bottom-bar fixed bottom-0 w-full left-0 z-50 bg-white p-2 mt-1 border-t-4 border flex justify-center cart-sticky"
+     :class="isOutView ? 'opacity-1 h-24 transition-all duration-250 z-50' : 'opacity-0 h-0'">
+
+    <div class="cart-footer-items items-center flex w-full max-w-[1280px] justify-between overflow-hidden items-center">
+        <?= $block->getBlockHtml("cart.footer.img") ?>
+
+        <?= $block->getBlockHtml("product.info.quantity") ?>
+
+        <?= $block->getBlockHtml("product.info.addtocart") ?>
+    </div>
+
+</div>

@@ -1,0 +1,119 @@
+<?php
+
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Magento\Theme\Block\Html\Footer;
+use Magento\Framework\Escaper;
+use Magento\Store\Model\StoreManagerInterface;
+
+/** @var Footer $block */
+/** @var Escaper $escaper */
+
+/** @var StoreManagerInterface $storeManager */
+$storeManager = \Magento\Framework\App\ObjectManager::getInstance()->get(StoreManagerInterface::class);
+
+$storeCode = $storeManager->getStore()->getCode();
+$baseUrl   = $storeManager->getStore()->getBaseUrl();
+
+$storeLinks = [
+    'teakea' => [
+        'returns' => ['url' => 'herroeping-en-retour',         'label' => 'Retour & Herroepingsrecht'],
+        'privacy' => ['url' => 'privacy-beleid',               'label' => 'Privacybeleid'],
+    ],
+    'teakea_be' => [
+        'returns' => ['url' => 'herroeping-en-retour',         'label' => 'Retour & Herroepingsrecht'],
+        'privacy' => ['url' => 'privacy-beleid',               'label' => 'Privacybeleid'],
+    ],
+    'teakea_dk' => [
+        'returns' => ['url' => 'returpolitik',                 'label' => 'Returpolitik & Fortrydelsesret'],
+        'privacy' => ['url' => 'privatlivspolitik',            'label' => 'Privatlivspolitik'],
+    ],
+    'teakea_de' => [
+        'returns' => ['url' => 'widerrufsrecht-rueckgabe',     'label' => 'Widerruf & Rückgabe'],
+        'privacy' => ['url' => 'datenschutzrichtlinie',        'label' => 'Datenschutzrichtlinie'],
+    ],
+    'teak_en' => [
+        'returns' => ['url' => 'return-policy',                'label' => 'Return Policy & Withdrawal'],
+        'privacy' => ['url' => 'privacy-policy',               'label' => 'Privacy Policy'],
+    ],
+    'teakea_fr' => [
+        'returns' => ['url' => 'politique-de-retour',          'label' => 'Retour & Rétractation'],
+        'privacy' => ['url' => 'politique-de-confidentialite', 'label' => 'Politique de confidentialité'],
+    ],
+    'teakea_lu' => [
+        'returns' => ['url' => 'politique-de-retour',          'label' => 'Retour & Rétractation'],
+        'privacy' => ['url' => 'politique-de-confidentialite', 'label' => 'Politique de confidentialité'],
+    ],
+    'teakea_es' => [
+        'returns' => ['url' => 'politica-de-devolucion',       'label' => 'Devolución & Desistimiento'],
+        'privacy' => ['url' => 'politica-de-privacidad',       'label' => 'Política de privacidad'],
+    ],
+];
+
+// Fallback to Nederland if store code not matched
+$links = $storeLinks[$storeCode] ?? $storeLinks['teakea'];
+echo $storeCode;
+?>
+
+<small class="text-sm text-[#272525] xl:w-[36%] ml:w-auto w-full ml:text-left text-center md:col-span-12">
+    <span><?= $escaper->escapeHtml($block->getCopyright()) ?></span>
+</small>
+
+<span class="flex justify-center lg:justify-start items-center gap-4 md:col-span-12 xl:w-[35%]">
+    <a class="" href="https://www.facebook.com/TeakeaNL/?locale=nl_NL" aria-label="<?= $escaper->escapeHtmlAttr(__('See our facebook profile!')) ?>" target="_blank">
+        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">
+            <rect x="0.5" y="0.5" width="50" height="50" rx="17.5" fill="white" />
+            <rect x="0.5" y="0.5" width="50" height="50" rx="17.5" stroke="#F4F4F4" />
+            <path d="M13.4863 16.2899V19.6232H15.9863V25.4565H19.3197V19.6232H21.8197L22.653 16.2899H19.3197V14.6232C19.3197 14.4022 19.4075 14.1902 19.5637 14.034C19.72 13.8777 19.932 13.7899 20.153 13.7899H22.653V10.4565H20.153C19.0479 10.4565 17.9881 10.8955 17.2067 11.6769C16.4253 12.4583 15.9863 13.5181 15.9863 14.6232V16.2899H13.4863Z" stroke="#A01937" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+    </a>
+
+    <a class="" href="https://www.instagram.com/accounts/login/?next=https%3A%2F%2Fwww.instagram.com%2Fteakeahomeliving%2F" aria-label="<?= $escaper->escapeHtmlAttr(__('See our instagram profile!')) ?>" target="_blank">
+        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">
+            <rect x="0.5" y="0.5" width="50" height="50" rx="17.5" fill="white" />
+            <rect x="0.5" y="0.5" width="50" height="50" rx="17.5" stroke="#F4F4F4" />
+            <path d="M21.6035 10.5405C23.8586 10.5405 25.6863 12.3685 25.6865 14.6235V21.2905C25.6863 23.5455 23.8585 25.3735 21.6035 25.3735H14.9365C12.6817 25.3734 10.8538 23.5454 10.8535 21.2905V14.6235C10.8537 12.3686 12.6816 10.5407 14.9365 10.5405H21.6035ZM14.9365 12.0405C13.51 12.0407 12.3537 13.1971 12.3535 14.6235V21.2905C12.3538 22.7169 13.5101 23.8734 14.9365 23.8735H21.6035C23.0301 23.8735 24.1863 22.717 24.1865 21.2905V14.6235C24.1863 13.1969 23.0301 12.0405 21.6035 12.0405H14.9365ZM18.2705 14.7065C20.0652 14.7067 21.5204 16.1618 21.5205 17.9565C21.5205 19.7514 20.0653 21.2064 18.2705 21.2065C16.4756 21.2065 15.0205 19.7515 15.0205 17.9565C15.0206 16.1617 16.4757 14.7065 18.2705 14.7065ZM18.2705 16.2065C17.3041 16.2065 16.5206 16.9902 16.5205 17.9565C16.5205 18.923 17.304 19.7065 18.2705 19.7065C19.2369 19.7064 20.0205 18.923 20.0205 17.9565C20.0204 16.9902 19.2368 16.2067 18.2705 16.2065ZM22.0205 13.4565C22.4344 13.4568 22.7703 13.7927 22.7705 14.2065V14.2075C22.7705 14.6216 22.4345 14.9573 22.0205 14.9575C21.6063 14.9575 21.2705 14.6217 21.2705 14.2075V14.2065C21.2707 13.7925 21.6064 13.4565 22.0205 13.4565Z" fill="#A01937" />
+        </svg>
+    </a>
+
+    <a class="" href="https://nl.pinterest.com/teakealiving/" aria-label="<?= $escaper->escapeHtmlAttr(__('See our pinterest profile!')) ?>" target="_blank">
+        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">
+            <rect x="0.5" y="0.5" width="50" height="50" rx="17.5" fill="white" />
+            <rect x="0.5" y="0.5" width="50" height="50" rx="17.5" stroke="#F4F4F4" />
+            <path d="M18.4254 9.25C14.8254 9.25 11.2754 11.65 11.2754 15.525C11.2754 17.9875 12.6629 19.4 13.5004 19.4C13.8504 19.4 14.0504 18.4375 14.0504 18.1625C14.0504 17.8375 13.2254 17.1375 13.2254 15.7875C13.2254 12.9625 15.3754 10.975 18.1504 10.975C20.5379 10.975 22.3004 12.3375 22.3004 14.825C22.3004 16.6875 21.5504 20.175 19.1379 20.175C18.2629 20.175 17.5129 19.55 17.5129 18.6375C17.5129 17.3125 18.4379 16.025 18.4379 14.6625C18.4379 12.3375 15.1504 12.7625 15.1504 15.5625C15.1504 16.15 15.2254 16.8 15.4879 17.3375C15.0004 19.425 14.0129 22.525 14.0129 24.675C14.0129 25.3375 14.1129 25.9875 14.1754 26.65C14.3004 26.7875 14.2379 26.775 14.4129 26.7C16.1754 24.275 16.1129 23.8125 16.9129 20.6375C17.3504 21.4625 18.4629 21.9 19.3379 21.9C23.0629 21.9 24.7379 18.275 24.7379 15C24.7379 11.5125 21.7254 9.25 18.4254 9.25Z" fill="#A01937" />
+        </svg>
+    </a>
+
+    <a class="" href="https://www.youtube.com/@TeakeaFurniture" aria-label="<?= $escaper->escapeHtmlAttr(__('See our youtube profile!')) ?>" target="_blank">
+        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">
+            <rect x="0.5" y="0.5" width="50" height="50" rx="17.5" fill="white" />
+            <rect x="0.5" y="0.5" width="50" height="50" rx="17.5" stroke="#F4F4F4" />
+            <path d="M18.0003 11.3335C18.7128 11.3335 19.4437 11.3518 20.152 11.3818L20.9887 11.4218L21.7895 11.4693L22.5395 11.5202L23.2245 11.5735C23.968 11.6301 24.6677 11.9472 25.2003 12.469C25.7329 12.9908 26.0643 13.6838 26.1362 14.426L26.1695 14.7802L26.232 15.5385C26.2903 16.3243 26.3337 17.181 26.3337 18.0002C26.3337 18.8193 26.2903 19.676 26.232 20.4618L26.1695 21.2202L26.1362 21.5743C26.0643 22.3166 25.7328 23.0098 25.2 23.5316C24.6672 24.0534 23.9673 24.3704 23.2237 24.4268L22.5403 24.4793L21.7903 24.531L20.9887 24.5785L20.152 24.6185C19.4352 24.6495 18.7178 24.6657 18.0003 24.6668C17.2828 24.6657 16.5655 24.6495 15.8487 24.6185L15.012 24.5785L14.2112 24.531L13.4612 24.4793L12.7762 24.4268C12.0327 24.3703 11.333 24.0531 10.8004 23.5313C10.2677 23.0095 9.93632 22.3165 9.86449 21.5743L9.83116 21.2202L9.76866 20.4618C9.70519 19.6428 9.67128 18.8217 9.66699 18.0002C9.66699 17.181 9.71033 16.3243 9.76866 15.5385L9.83116 14.7802L9.86449 14.426C9.93629 13.684 10.2676 12.991 10.8 12.4693C11.3325 11.9475 12.032 11.6303 12.7753 11.5735L13.4595 11.5202L14.2095 11.4693L15.0112 11.4218L15.8478 11.3818C16.5649 11.3508 17.2826 11.3347 18.0003 11.3335ZM18.0003 13.0002C17.3128 13.0002 16.6053 13.0185 15.917 13.0468L15.102 13.086L14.3195 13.1318L13.5845 13.1818L12.9112 13.2343C12.5572 13.2591 12.2234 13.4086 11.9692 13.6562C11.715 13.9039 11.5569 14.2336 11.5228 14.5868C11.4253 15.5943 11.3337 16.8485 11.3337 18.0002C11.3337 19.1518 11.4253 20.406 11.5228 21.4135C11.5937 22.1402 12.1703 22.7052 12.9112 22.766L13.5845 22.8177L14.3195 22.8677L15.102 22.9143L15.917 22.9535C16.6053 22.9818 17.3128 23.0002 18.0003 23.0002C18.6878 23.0002 19.3953 22.9818 20.0837 22.9535L20.8987 22.9143L21.6812 22.8685L22.4162 22.8185L23.0895 22.766C23.4435 22.7412 23.7773 22.5917 24.0314 22.3441C24.2856 22.0965 24.4438 21.7667 24.4778 21.4135C24.5753 20.406 24.667 19.1518 24.667 18.0002C24.667 16.8485 24.5753 15.5943 24.4778 14.5868C24.4438 14.2336 24.2856 13.9039 24.0314 13.6562C23.7773 13.4086 23.4435 13.2591 23.0895 13.2343L22.4162 13.1827L21.6812 13.1327L20.8987 13.086L20.0837 13.0468C19.3896 13.017 18.695 13.0015 18.0003 13.0002ZM16.3337 15.9793C16.3336 15.8979 16.3534 15.8177 16.3915 15.7456C16.4295 15.6736 16.4845 15.6119 16.5518 15.566C16.6191 15.5201 16.6965 15.4913 16.7775 15.4822C16.8584 15.473 16.9403 15.4838 17.0162 15.5135L17.0837 15.5468L20.5837 17.5668C20.6534 17.607 20.7123 17.6635 20.7555 17.7314C20.7988 17.7992 20.825 17.8765 20.8319 17.9567C20.8389 18.0369 20.8264 18.1175 20.7955 18.1918C20.7646 18.2661 20.7162 18.3319 20.6545 18.3835L20.5837 18.4335L17.0837 20.4543C17.0131 20.4952 16.9337 20.5182 16.8522 20.5213C16.7708 20.5244 16.6898 20.5076 16.6164 20.4722C16.5429 20.4369 16.4792 20.3842 16.4308 20.3186C16.3824 20.253 16.3508 20.1766 16.3387 20.096L16.3337 20.021V15.9793Z" fill="#A01937" />
+        </svg>
+    </a>
+
+    <a class="" href="https://nl.linkedin.com/company/teakea" aria-label="<?= $escaper->escapeHtmlAttr(__('See our linkedin profile!')) ?>" target="_blank">
+        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">
+            <rect x="0.5" y="0.5" width="50" height="50" rx="17.5" fill="white" />
+            <rect x="0.5" y="0.5" width="50" height="50" rx="17.5" stroke="#F4F4F4" />
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M18.4242 15.33V16.7442C18.7203 16.2931 19.1285 15.9266 19.6088 15.6806C20.0891 15.4346 20.625 15.3175 21.1642 15.3408C24.0433 15.3408 24.6658 17.1408 24.6658 19.4825V24.25H21.9992V20.0233C21.9992 19.015 21.7958 17.7183 20.2258 17.7183C18.7033 17.7183 18.4433 18.8158 18.4433 19.9483V24.25H15.785V15.33H18.4242ZM13.9992 13.0883C13.9988 13.3525 13.9205 13.6107 13.7741 13.8305C13.6276 14.0504 13.4195 14.2221 13.1758 14.3242C12.9323 14.4254 12.6641 14.4519 12.4054 14.4002C12.1468 14.3486 11.9093 14.2212 11.7233 14.0342C11.537 13.847 11.4101 13.609 11.3587 13.35C11.3072 13.0909 11.3335 12.8225 11.4343 12.5784C11.535 12.3342 11.7056 12.1253 11.9248 11.9779C12.1439 11.8306 12.4017 11.7513 12.6658 11.75C12.8413 11.75 13.0151 11.7847 13.1772 11.852C13.3393 11.9193 13.4865 12.0179 13.6104 12.1423C13.7343 12.2666 13.8324 12.4142 13.8991 12.5766C13.9658 12.7389 13.9998 12.9128 13.9992 13.0883Z" fill="#A01937" />
+            <path d="M13.9997 15.3408H11.333V24.25H13.9997V15.3408Z" fill="#A01937" />
+        </svg>
+    </a>
+</span>
+
+<span class="flex justify-center lg:justify-between gap-4 items-center sm:gap-3.5 gap-2 md:col-span-12">
+    <a href="<?= $escaper->escapeUrl($baseUrl . $links['returns']['url']) ?>" class="text-sm underline text-black">
+        <?= $escaper->escapeHtml(__($links['returns']['label'])) ?>
+    </a>
+    <a href="<?= $escaper->escapeUrl($baseUrl . $links['privacy']['url']) ?>" class="text-sm underline text-black">
+        <?= $escaper->escapeHtml(__($links['privacy']['label'])) ?>
+    </a>
+</span>

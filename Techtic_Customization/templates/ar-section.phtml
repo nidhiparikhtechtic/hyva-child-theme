@@ -1,0 +1,84 @@
+<?php
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\ProductList;
+use Hyva\Theme\ViewModel\Slider;
+use Hyva\Theme\ViewModel\Store;
+use Magento\Catalog\Model\Product\Visibility as ProductVisibility;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var Slider $sliderViewModel */
+/** @var ProductList $productListViewModel */
+/** @var Store $storeViewModel */
+
+$sliderViewModel      = $viewModels->require(Slider::class);
+$productListViewModel = $viewModels->require(ProductList::class);
+$storeViewModel       = $viewModels->require(Store::class);
+
+
+$productsViewModel = $viewModels->require(\Techtic\Customization\ViewModel\ArProducts::class);
+$products = $productsViewModel->getProducts();
+
+if (!empty($products)):
+
+    $sliderName        = str_replace('.', '_', $block->getNameInLayout());
+    $pageSize          = $block->getData('page_size') ?: 1;
+    $title             = $block->getData('title') ?: '';
+    $headingTag        = $block->getData('heading_tag') ?: 'h3';
+    $type              = $block->getData('type');
+    $itemTemplate      = $block->getData('item_template') ?? 'Magento_Catalog::product/list/home-page-item.phtml';
+    $containerTemplate = $block->getData('container_template')
+    ?? 'Magento_Catalog::product/slider/homepage-product-slider-container.phtml';
+
+    // Passed to the product slider container
+    $slideItemClasses  = 'mr-2 w-full';
+
+?>
+
+<div class="grid grid-cols-2 lg:grid-cols-3 gap-y-2">
+
+    <?php 
+    $index = 0;
+
+    foreach ($products as $product):
+        $index++;
+        $skusFilter = [$product];
+
+        // In case $type is not set on the block, it will default the block class name, which is not what we need in this template.
+        $type = is_string($type) && strpos($type, '\\') === false  ? $type : 'generic';
+
+        if ($skusFilter) {
+            $productListViewModel->addFilter('sku', array_map('trim', $skusFilter), 'in');
+        }
+
+        $productListViewModel->setPageSize($pageSize);
+        $productListViewModel->addFilter('website_id', $storeViewModel->getWebsiteId());
+        $productListViewModel->addFilter('visibility', [
+            ProductVisibility::VISIBILITY_IN_CATALOG,
+            ProductVisibility::VISIBILITY_BOTH,
+        ], 'in');
+
+        $items = $productListViewModel->getItems();
+
+        $sliderHtml = $sliderViewModel->getSliderForItems($itemTemplate, $items, $containerTemplate)
+            ->setData('name', $sliderName)
+            ->setData('title', $title)
+            ->setData('item_relation_type', $type)
+            ->setData('heading_tag', $headingTag)
+            ->setData('maybe_purged_tailwind_slide_item_classes', $slideItemClasses)
+            ->toHtml();
+
+        if (empty($sliderHtml)) {
+            return '';
+        }
+    ?>
+    <div class="relative group w-full overflow-hidden <?= $index == 4 ? 'lg:hidden' : '' ?>">
+        <?= /* @noEscape */ $sliderHtml ?>
+    </div>
+    <?php endforeach; ?>
+</div>
+
+<?php endif; ?>

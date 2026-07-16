@@ -1,0 +1,64 @@
+<?php
+
+/**
+ * Techtic_QualityInfographic Template (Hyvä Theme)
+ * Displays quality infographic on PDP if attribute is set
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ * @var \Hyva\Theme\Model\ViewModelRegistry $viewModels
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\CurrentProduct;
+use Magento\Catalog\Model\Product;
+use Magento\Framework\Escaper;
+
+/** @var ViewModelRegistry $viewModels */
+/** @var Escaper $escaper */
+
+// Get current product
+$product = $viewModels->require(CurrentProduct::class)->get();
+
+if (!$product || !$product->getId()) {
+    return;
+}
+
+// Get the quality infographic image attribute
+$infographicImage = $product->getData('pdp_quality_infographic');
+
+/**
+ * IMPORTANT:
+ * When no image is selected, Magento can return:
+ * - NULL (actual null)
+ * - Empty string ''
+ * - String 'no_selection'
+ */
+if (
+    $infographicImage === null ||
+    $infographicImage === '' ||
+    $infographicImage === 'no_selection' ||
+    trim((string)$infographicImage) === ''
+) {
+    return;
+}
+
+// Build media URL safely
+$mediaUrl = $block->getUrl('', ['_direct' => 'media/catalog/product' . $infographicImage]);
+$productName = $escaper->escapeHtml($product->getName());
+?>
+
+<!-- Quality Infographic Block -->
+<div class="py-4 border-b border-[#D8D8D8]" data-role="quality-infographic">
+    <div class="w-full max-w-full overflow-hidden">
+        <img src="<?= $escaper->escapeUrl($mediaUrl) ?>"
+            alt="<?= $escaper->escapeHtmlAttr(__('Quality Standards for %1', $productName)) ?>"
+            title="<?= $escaper->escapeHtmlAttr(__('Quality Standards')) ?>"
+            class="w-full h-auto block rounded-lg"
+            loading="lazy"
+            width="1200"
+            height="auto" />
+    </div>
+</div>

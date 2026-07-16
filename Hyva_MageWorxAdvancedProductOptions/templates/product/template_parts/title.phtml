@@ -1,0 +1,31 @@
+<?php
+
+declare(strict_types=1);
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See https://www.mageworx.com/terms-and-conditions for license details.
+ */
+?>
+
+<?php
+
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\Escaper;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+
+?>
+
+<div class="flex flex-wrap items-center gap-x-4 gap-y-2 mb-2.5">
+    <p class="text-lg font-semibold text-black capitalize text-center md:text-left">
+        <?= $escaper->escapeHtml(__('Configurable options')); ?>
+    </p>
+    <template x-if="isLoading">
+        <div class="h-full flex gap-x-4 items-center justify-center">
+            <div style="border-top-color:transparent"
+                class="w-6 h-6 border-4 border-primary border-solid rounded-full animate-spin">
+            </div>
+        </div>
+    </template>
+</div>

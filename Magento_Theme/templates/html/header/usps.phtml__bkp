@@ -1,0 +1,36 @@
+<div class="notification-bar bg-teakea-red text-white py-2">
+    <div class="container flex items-center justify-between lg:flex-wrap whitespace-nowrap overflow-x-auto lg:overflow-x-hidden gap-5 pb-0 scrollbar-custom">
+    <div class="notification-left flex items-center gap-5 lg:flex-wrap">
+        <div class="notification-item flex items-center gap-[5px]">
+            <div class="notification-icon">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7.5 10L9.16667 11.6667L12.5 8.33333M10 2.5L11.5917 4.05956L13.75 3.50481L14.3487 5.65129L16.4952 6.25L15.9404 8.40826L17.5 10L15.9404 11.5917L16.4952 13.75L14.3487 14.3487L13.75 16.4952L11.5917 15.9404L10 17.5L8.40826 15.9404L6.25 16.4952L5.65129 14.3487L3.50481 13.75L4.05956 11.5917L2.5 10L4.05956 8.40826L3.50481 6.25L5.65129 5.65129L6.25 3.50481L8.40826 4.05956L10 2.5Z" stroke="white" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+            </div>
+            <span class="font-normal text-sm not-italic leading-4">Kwaliteitsgarantie</span>
+        </div>
+        <div class="notification-item flex items-center gap-[5px]">
+            <div class="notification-icon">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7.5 10L9.16667 11.6667L12.5 8.33333M10 2.5L11.5917 4.05956L13.75 3.50481L14.3487 5.65129L16.4952 6.25L15.9404 8.40826L17.5 10L15.9404 11.5917L16.4952 13.75L14.3487 14.3487L13.75 16.4952L11.5917 15.9404L10 17.5L8.40826 15.9404L6.25 16.4952L5.65129 14.3487L3.50481 13.75L4.05956 11.5917L2.5 10L4.05956 8.40826L3.50481 6.25L5.65129 5.65129L6.25 3.50481L8.40826 4.05956L10 2.5Z" stroke="white" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+            </div>
+            <span class="font-normal text-sm not-italic leading-4">Veilige dienstverlening</span>
+        </div>
+    </div>
+
+    <div class="notification-center font-medium text-sm not-italic leading-4">Gratis bezorging vanaf € 150</div>
+
+    <div class="notification-right flex items-center gap-5 lg:flex-wrap">
+        <div class="dropdown">
+            <span class="font-normal text-sm not-italic leading-4">Klantenservice is geopend</span>
+            <div class="dropdown-arrow"></div>
+        </div>
+        <div class="dropdown">
+            <span class="font-normal text-sm not-italic leading-4">Bezoek onze winkels</span>
+            <div class="dropdown-arrow"></div>
+        </div>
+    </div>
+
+    </div>
+</div>

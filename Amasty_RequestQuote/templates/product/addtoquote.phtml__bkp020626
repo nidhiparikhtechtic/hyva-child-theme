@@ -1,0 +1,113 @@
+<?php
+
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Request a Quote Hyva Compatibility
+ *
+ * MODIFIED:
+ * - Mobile (<768px): always icon only, no text, no scroll behavior
+ * - Desktop (>=768px): icon-only on load, expands to icon + text on scroll > 100px
+ */
+
+use Amasty\RequestQuote\Block\Product\Action;
+use Amasty\RequestQuoteHyva\ViewModel\QuoteIcons;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+
+/** @var Action $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var Escaper $escaper */
+$quoteIcons = $viewModels->require(QuoteIcons::class);
+
+$buttonClasses  = 'inline-flex items-center justify-center btn btn-secondary text-sm w-auto mr-auto uppercase';
+$buttonClasses .= ' transition-all duration-300 ease-in-out overflow-hidden';
+$buttonClasses .= $block->isProductListing() ? ' mt-3' : '';
+$buttonClasses .= $block->getLoggedIn()      ? '' : ' amasty-quote-login';
+?>
+
+<?php if ($block->isProductListing()): ?>
+    <div class="w-full h-0"></div>
+<?php endif; ?>
+
+<div
+    x-data="{
+        scrolled: false,
+        isMobile: window.innerWidth < 768,
+        init() {
+            window.addEventListener('scroll', () => {
+                if (!this.isMobile) {
+                    this.scrolled = window.scrollY > 100;
+                }
+            });
+            window.addEventListener('resize', () => {
+                this.isMobile = window.innerWidth < 768;
+                if (this.isMobile) {
+                    this.scrolled = false;
+                }
+            });
+        },
+        get showLabel() {
+            return !this.isMobile && this.scrolled;
+        }
+    }">
+
+    <button
+        x-data="initAmQuoteButton(
+            '<?= $escaper->escapeUrl($block->getAddUrl()); ?>',
+            <?=
+            /** @noEscape */
+            var_export((bool)$block->isProductListing(), true) ?>,
+            <?=
+            /** @noEscape */
+            var_export((bool)$block->getLoggedIn(), true) ?>
+        )"
+        x-init="initButton($el)"
+        @click.prevent="
+                submitQuote($el).then((response) => {
+                    if (response && response.success) {
+
+                        GTMTracking.push('add_to_cart', {
+                            ecommerce: {
+                                currency: 'EUR',
+                                value: response.total || 0,
+                                items: [{
+                                    item_name: '<?= $escaper->escapeJs($block->getProduct()->getName()) ?>',
+                                    item_id: '<?= $block->getProduct()->getId() ?>',
+                                    price: response.price || 0,
+                                    quantity: response.qty || 1
+                                }]
+                            }
+                        });
+
+                    }
+                }); "
+        <?php if (!$block->isProductListing()): ?>
+        form="product_addtocart_form"
+        <?php endif; ?>
+        type="button"
+        title="<?= $escaper->escapeHtmlAttr($block->getButtonText()) ?>"
+        aria-label="<?= $escaper->escapeHtmlAttr($block->getButtonText()) ?>"
+        class="amquote-addto-button <?=
+                                    /** @noEscape */
+                                    $buttonClasses ?>">
+
+        <!-- Icon: always visible on all devices -->
+        <?= $quoteIcons->quoteHtml('h-5 w-5 shrink-0', 25, 25, ['aria-hidden' => 'true']) ?>
+
+        <!-- Label: hidden on mobile always, desktop shows on scroll -->
+        <span
+            x-show="showLabel"
+            x-transition:enter="transition-all duration-300 ease-in-out"
+            x-transition:enter-start="opacity-0 w-0 ml-0"
+            x-transition:enter-end="opacity-100 w-auto ml-2"
+            x-transition:leave="transition-all duration-300 ease-in-out"
+            x-transition:leave-start="opacity-100 w-auto ml-2"
+            x-transition:leave-end="opacity-0 w-0 ml-0"
+            class="amquote-addto-button-text whitespace-nowrap overflow-hidden"
+            style="display: none;">
+            <?= $escaper->escapeHtml($block->getButtonText()) ?>
+        </span>
+
+    </button>
+</div>

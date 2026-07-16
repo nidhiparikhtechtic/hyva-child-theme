@@ -1,0 +1,152 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Product Labels compatibility with Hyva Theme
+ */
+
+use Amasty\Label\Api\Data\LabelFrontendSettingsInterface;
+use Amasty\Label\Api\Data\LabelInterface;
+use Amasty\Label\Api\Data\RenderSettingsInterface;
+use Amasty\Label\Block\Label;
+use Amasty\Label\ViewModel\Label\TextProcessor;
+use Amasty\ProductLabelsHyva\ViewModel\Label as LabelViewModel;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+
+/** @var Label $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var Escaper $escaper */
+
+/** @var LabelInterface $label */
+$label = $block->getLabel();
+/** @var RenderSettingsInterface $renderSettings */
+$renderSettings = $label->getExtensionAttributes()->getRenderSettings();
+
+/** @var TextProcessor $textProcessor */
+$textProcessor = $block->getData('text_processor');
+/** @var LabelFrontendSettingsInterface $frontendSettings */
+$frontendSettings = $label->getExtensionAttributes()->getFrontendSettings()[0] ?? null;
+if ($frontendSettings === null) {
+    return;
+}
+$labelViewModel = $viewModels->require(LabelViewModel::class);
+$labelViewModel->setConfigFromBlock($block);
+
+$productId = $renderSettings->getProduct()->getId();
+$mode = $labelViewModel->getMode();
+$positionClassPostfix = $labelViewModel->getPosition() . "-$productId-$mode";
+$key = $label->getLabelId() . '-' . $productId . '-' . $mode;
+$text = $textProcessor->renderLabelText($frontendSettings->getLabelText(), $label);
+$imageSrc = $block->getImageSrc();
+$altTag = $textProcessor->renderLabelAltTag($frontendSettings->getAltTag(), $label);
+$uniqueId = uniqid('_', false);
+?>
+
+<?php if ($renderSettings->isLabelVisible()): ?>
+    <div class="amlabel-position-wrapper absolute max-w-full h-fit-content w-fit-content m-auto flex gap-amlabel-margin z-[1]
+         amlabel-position-<?= $escaper->escapeHtmlAttr($positionClassPostfix) ?>
+         <?= $labelViewModel->getAlignment() ? 'flex-row' : 'flex-col' ?>"
+         :class="{
+            'top-0': config.position.includes('top'),
+            'top-0 bottom-0': config.position.includes('middle'),
+            'bottom-0': config.position.includes('bottom'),
+            'left-0': config.position.includes('left'),
+            'left-0 right-0': config.position.includes('center'),
+            'right-0': config.position.includes('right')
+         }"
+         x-data="{
+             ...initAmlabel<?= /** @noEscape */ $uniqueId ?>(),
+             parentContainerProcessor: initParentContainerProcessor(),
+             labelItemProcessor: initLabelItemProcessor()
+         }"
+         x-init="initLabel($el)"
+         x-amintersect="render()">
+        <div x-ref="amLabel"
+             x-cloak
+             x-show="initialized"
+             x-transition:enter="transition ease-out duration-250"
+             x-transition:enter-start="opacity-0 transform scale-90"
+             x-transition:enter-end="opacity-100 transform scale-100"
+             @resize.window.debounce="resize()"
+             @click="labelItemProcessor.openLink($event, config.redirect_url)"
+             class="group ml-2.5 mt-2.5 relative amasty-label-container amasty-label-container-<?= $escaper->escapeHtmlAttr($key) ?>
+                amasty-label-for-<?= $escaper->escapeHtmlAttr($productId) ?>"
+             data-amlabel-order="<?= $escaper->escapeHtmlAttr($block->getPriority()) ?>"
+            <?php if ($labelViewModel->isShowTooltip()): ?>
+                aria-describedby="label-tooltip-<?= $escaper->escapeHtmlAttr($label->getLabelId()) ?>"
+                @mouseenter="labelItemProcessor.placeTooltip($event, $refs.tooltip)"
+            <?php endif; ?>>
+            <?php if ($labelViewModel->isShowTooltip()): ?>
+                <div id="label-tooltip-<?= $escaper->escapeHtmlAttr($label->getLabelId()) ?>"
+                     x-ref="tooltip"
+                     class="fixed invisible opacity-0 transition-opacity -translate-x-1/2 text-center rounded z-[-1]
+                        w-max max-w-[200px] mb-3 group-hover:z-30 shadow-md px-5 py-2 group-hover:visible group-hover:opacity-100 after:absolute
+                        after:border-color-inherit after:top-[calc(100%-theme(space.1))] after:left-1/2 after:-translate-x-1/2
+                        after:border-4 after:rotate-45"
+                     style="background-color: <?= $escaper->escapeHtmlAttr($labelViewModel->getTooltipBackground()) ?>;
+                             border-color: <?= $escaper->escapeHtmlAttr($labelViewModel->getTooltipBackground()) ?>"
+                     role="tooltip">
+                    <span style="color: <?= $escaper->escapeHtmlAttr($labelViewModel->getTooltipTextColor()) ?>">
+                        <?= $escaper->escapeHtml($labelViewModel->getTooltipContent(), ['br']) ?>
+                    </span>
+                </div>
+            <?php endif; ?>
+            <div style="<?= $escaper->escapeHtmlAttr($frontendSettings->getStyle()) ?>">
+                <div
+                    class="amlabel-text text-center whitespace-nowrap<?= ($imageSrc || $labelViewModel->isCenterPosition()) ? ' absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2' : '' ?>">
+                    <?= $escaper->escapeHtml($text, ['a', 'b', 'br']) ?>
+                </div>
+                <?php if ($imageSrc): ?>
+                    <img id="amasty-label-image-<?= $escaper->escapeHtml($key) ?>"
+                         class="amasty-label-image opacity-100 align-top w-full h-full"
+                         src="<?= $escaper->escapeUrl($imageSrc) ?>"
+                         title="<?= $escaper->escapeHtmlAttr($altTag) ?>"
+                         alt="<?= $escaper->escapeHtmlAttr($altTag) ?>">
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        'use strict';
+
+        function initAmlabel<?= /** @noEscape */ $uniqueId ?>() {
+            return {
+                element: null,
+                parent: null,
+                initialized: false,
+                wrapperClass: '',
+                labelContainer: null,
+                config: <?= /* @noEscape */ $block->getJsonConfig() ?>,
+                initLabel: function ($el) {
+                    this.element = $el;
+                    this.labelContainer = this.$refs.amLabel;
+                    this.parent = $el.parentElement;
+                    this.wrapperClass = `.amlabel-position-${this.config.position}-${this.config.product}-${this.config.mode}`;
+                },
+
+                /**
+                 * @return {void}
+                 */
+                render: function () {
+                    if (this.element.dataset.amlabelObserved) {
+                        return;
+                    }
+
+                    this.element.dataset.amlabelObserved = true;
+                    this.parentContainerProcessor.process(this);
+                    this.labelItemProcessor.process(this);
+                    this.initialized = true;
+                },
+
+                /**
+                 * @return {void}
+                 */
+                resize: function () {
+                    this.config.size && this.labelItemProcessor.setLabelSize(this);
+                }
+            }
+        }
+    </script>
+<?php endif; ?>

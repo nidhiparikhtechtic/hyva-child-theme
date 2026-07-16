@@ -1,0 +1,52 @@
+<?php
+
+declare(strict_types=1);
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See https://www.mageworx.com/terms-and-conditions for license details.
+ */
+?>
+
+<?php
+
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\Escaper;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+?>
+
+<template x-if="option.__typename === 'CustomizableFieldOption' && option.isShow">
+    <div class="flex flex-col sm:flex-row border-t border-gray-300 py-2 last:mb-6 last:border-b w-full items-center" :class="option.div_class">
+        <?= $block->getChildHtml('mageworx.apo.product.form.text_option.label') ?>
+        <div class="sm:ml-2 text-gray-900 text-left w-full sm:w-2/3 mw-apo-control">
+            <template x-if="!option.isDynamicOption">
+                <input x-model="option.value"
+                    :placeholder="(option.title.toLowerCase().includes('lengte') || option.title.toLowerCase().includes('length') || option.title.includes('Stap 2') || option.title.includes('Step 2')) ? 'e.g. 200' : 
+               ((option.title.toLowerCase().includes('diepte') || option.title.toLowerCase().includes('depth') || option.title.includes('Stap 1') || option.title.includes('Step 1')) ? 'e.g. 60' : option.title)"
+                    :readonly="isLoading"
+                    type="text" class="product-custom-option form-input w-full"
+                    x-on:input="if (['Lengte', 'Diepte', 'Length', 'Depth', 'Stap 1', 'Stap 2', 'Step 1', 'Step 2'].some(t => option.title.includes(t))) { 
+                        $el.value = $el.value.replace(/[^0-9]/g, ''); }"
+                    @input.debounce.300ms="onChangeNonDepField()"
+                    :id="'options_' + option.option_id + '_text'" :required="option.required"
+                    form="product_addtocart_form" :name="'options[' + option.option_id + ']'">
+            </template>
+            <template x-if="option.isDynamicOption">
+                <input x-model="option.value" :placeholder="option.title" :readonly="isLoading"
+                    type="number" class="product-custom-option form-input w-full" @change="onChangeDynamicField(option.option_id)"
+                    :id="'options_' + option.option_id + '_text'" :required="option.required"
+                    :min="option.dynamicOptionData.min" :max="option.dynamicOptionData.max || 'any'" :step="option.dynamicOptionData.step || 'any'"
+                    form="product_addtocart_form" :name="'options[' + option.option_id + ']'">
+            </template>
+            <template x-if="option.title && (option.title.toLowerCase().includes('lengte') || option.title.toLowerCase().includes('diepte'))">
+                <p class="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                    </svg>
+                    <span><?= $escaper->escapeHtml(__('Enter the size in cm (numbers only)')) ?></span>
+                </p>
+            </template>
+        </div>
+    </div>
+</template>

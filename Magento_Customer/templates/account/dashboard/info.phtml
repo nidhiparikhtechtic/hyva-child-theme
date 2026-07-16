@@ -1,0 +1,120 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Magento\Customer\Block\Account\Dashboard\Info;
+use Magento\Framework\Escaper;
+
+/** @var Info $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var HeroiconsOutline $heroicons */
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+?>
+<div class="mb-10">
+    <div class="pb-4 sm:pb-6">
+        <div class="text-sm italic text-teakea-deep-green">
+            <?= $escaper->escapeHtml(__('My account')) ?>
+        </div>
+
+        <div class="mt-1 text-2xl font-extrabold text-teak-ink">
+            <?= $escaper->escapeHtml(__("Welcome")) ?>, 
+            <?= $escaper->escapeHtml($block->getName()) ?>
+        </div>
+    </div>
+
+    <div>
+
+        <div class="block-title my-4">
+            <h2 class="text-base font-bold block uppercase">
+                <?= $escaper->escapeHtml(__('Account Information')) ?>
+            </h2>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 border border-teakea-light-gray rounded-lg">
+            <div class="p-3 lg:p-8">
+                <div class="flex items-start gap-3 md:gap-6">
+
+                    <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-teak-light-green text-teakea-deep-green">
+                        <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="13" cy="9" r="4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                            <path d="M4 22C4 17.5817 8.02944 14 13 14C17.9706 14 22 17.5817 22 22" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+
+                    <div class="flex-1">
+                            
+                        <h3 class="mb-2 text-base font-semibold text-teak-ink title-font">
+                            <span><?= $escaper->escapeHtml(__('Contact Information')) ?></span>
+                        </h3>
+                        
+                        <p class="text-sm"><?= $escaper->escapeHtml($block->getName()) ?></p>
+                        <p class="text-sm"><?= ''//$escaper->escapeHtml($block->getCustomer()->getCompany()) ?></p>
+                        <p class="text-sm"><?= $escaper->escapeHtml($block->getCustomer()->getEmail()) ?></p>
+
+                        <?= $block->getChildHtml('customer.account.dashboard.info.extra'); ?>
+                        <a class="inline-flex items-center w-full mt-3 md:text-sm text-teak-muted hover:underline hover:text-teak-ink"
+                            href="<?= $escaper->escapeUrl($block->getUrl('customer/account/edit')) ?>"
+                            aria-label="<?= $escaper->escapeHtml(__('Edit contact information')) ?>">
+                                <span><?= $escaper->escapeHtml(__('Edit')) ?></span>
+                                <?= $heroicons->arrowRightHtml('ml-1', 16, 16, ['aria-hidden' => 'true']); ?>
+                        </a>
+                        <a class="inline-flex items-center w-full md:text-sm text-teak-muted hover:underline hover:text-teak-ink"
+                            href="<?= $escaper->escapeUrl($block->getChangePasswordUrl()) ?>">
+                                <?= $escaper->escapeHtml(__('Change Password')) ?>
+                                <?= $heroicons->arrowRightHtml('ml-1', 16, 16, ['aria-hidden' => 'true']); ?>
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+
+            <?php if ($block->isNewsletterEnabled()): ?>
+                <div class="p-3 lg:p-8">
+                    <div class="flex items-start gap-3 md:gap-6">
+
+                        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-teak-light-green text-teakea-deep-green">
+                            <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="3" y="6" width="20" height="14" rx="2.5" stroke="currentColor" stroke-width="1.6"/>
+                                <path d="M3 9L11.7 14.56C12.5 15.08 13.5 15.08 14.3 14.56L23 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+
+                        <div class="flex-1">
+
+                            <h3 class="mb-2 text-base font-semibold text-teak-ink title-font">
+                                <?= $escaper->escapeHtml(__('Newsletters')) ?>
+                            </h3>
+                            <p class="text-sm">
+                                <?php if ($block->getIsSubscribed()): ?>
+                                    <?= $escaper->escapeHtml(__('You are subscribed to "General Subscription".')) ?>
+                                <?php else: ?>
+                                    <?= $escaper->escapeHtml(__('You aren\'t subscribed to our newsletter.')) ?>
+                                <?php endif; ?>
+                            </p>
+                            <a
+                                class="mt-3 w-full inline-flex items-center md:text-sm text-teak-muted hover:underline hover:text-teak-ink"
+                                href="<?= $escaper->escapeUrl($block->getUrl('newsletter/manage')) ?>"
+                                aria-label="<?= $escaper->escapeHtml(__('Edit newsletters')) ?>"
+                            >
+                                <span><?= $escaper->escapeHtml(__('Edit')) ?></span>
+                                <?= $heroicons->arrowRightHtml('ml-1', 16, 16, ['aria-hidden' => 'true']); ?>
+                            </a>
+
+                        </div>
+
+                    </div>
+                </div>
+            <?php endif; ?>
+
+        </div>
+        <?= $block->getChildHtml('additional_blocks'); ?>
+    </div>
+</div>

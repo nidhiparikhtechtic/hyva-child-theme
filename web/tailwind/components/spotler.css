@@ -1,0 +1,63 @@
+/*Search bar*/
+.spotlerSearchContainer .sqrOptions {
+    @apply !top-[120px] sm:!top-[139px] md:!top-[143px] lg:!top-[113px] xl:!top-[129px] 2xl:!top-[133px];
+}
+
+/*Spotler page container*/
+.spotlerSearchContainer {
+    @apply !px-2.5 md:!px-6 !mx-auto;
+}
+
+/*Spotler grid*/
+.spotlerSearchContainer .sqrResults {
+    @apply !gap-x-2.5 md:!gap-x-3;
+}
+
+
+/*Product cards*/
+.spotlerSearchContainer .sqrResultItem {
+    background: transparent !important;
+    @apply !rounded-none !p-0;
+}
+
+.spotlerSearchContainer .sqrResultItem .sqrCTA span {
+    @apply !py-2.5 !px-6 !rounded !bg-primary hover:!bg-tertiary !transition !duration-300 font-medium;
+}
+
+.spotlerSearchContainer .sqrResultItem .sqrImage img {
+    @apply !rounded-none;
+}
+
+.spotlerSearchContainer .sqrResultItem .sqrImage .sqrVariationsContainer {
+    @apply !hidden;
+}
+
+.spotlerSearchContainer .sqrResultItem h3 {
+    @apply !text-base !font-medium !line-clamp-2 !h-12 !mt-1.5 !mb-3;
+}
+
+.spotlerSearchContainer .sqrResultItem .sqrPrice {
+    @apply !text-[#639d05] !font-semibold !text-base sm:!text-lg;
+}
+
+.spotlerSearchContainer .sqrResultItem .sqrBeforePrice {
+    @apply !text-black !text-sm sm:!text-base;
+}
+
+.spotlerSearchContainer .sqrResultItem .sqrBeforePrice::before {
+    content: 'Advies prijs:' !important;
+    @apply !text-sm sm:!text-base;
+}
+
+.spotlerSearchContainer .sqrResultItem .sqrPriceContainer {
+    @apply !gap-x-1.5 !mb-3 !flex-col md:!flex-row lg:!flex-col xl:!flex-row !items-start !items-start md:!items-center lg:!items-start xl:!items-center;
+}
+
+.spotlerSearchContainer .sqrResultItem .sqrDiscountedPrice {
+    @apply !text-base sm:!text-lg;
+}
+
+.spotlerSearchContainer .sqrResultItem .sqrDiscountedPrice::before {
+    content: 'Voor:' !important;
+}
+

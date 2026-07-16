@@ -1,0 +1,183 @@
+<?php
+
+use Hyva\Theme\ViewModel\Slider;
+use Hyva\Theme\ViewModel\ProductCompare;
+use Hyva\Theme\ViewModel\ProductList;
+use Hyva\Theme\ViewModel\Store;
+use Hyva\Theme\ViewModel\Wishlist;
+use Magento\Catalog\Model\Product\Visibility as ProductVisibility;
+use Magento\Catalog\Model\CategoryRepository;
+use Magento\Framework\App\ObjectManager;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Slider $sliderViewModel */
+/** @var ProductList $productListViewModel */
+/** @var Wishlist $wishlistViewModel */
+/** @var ProductCompare $compareViewModel */
+/** @var Store $storeViewModel */
+/** @var \Magento\Framework\Escaper $escaper */
+
+$objectManager = ObjectManager::getInstance();
+
+$sliderViewModel      = $viewModels->require(Slider::class);
+$productListViewModel = $viewModels->require(ProductList::class);
+$wishlistViewModel    = $viewModels->require(Wishlist::class);
+$compareViewModel     = $viewModels->require(ProductCompare::class);
+$storeViewModel       = $viewModels->require(Store::class);
+$categoryRepository   = $objectManager->get(CategoryRepository::class);
+
+$categoryViewModel = $viewModels->require(\Techtic\Customization\ViewModel\ArProducts::class);
+$categoryId = (int) $categoryViewModel->getShopByLookCategory();
+
+$category = $categoryRepository->get($categoryId);
+
+if ($categoryId != null) {
+
+// echo $block->getLayout()
+//     ->createBlock(\Magento\Cms\Block\Widget\Block::class)
+//     ->setTemplate('Magento_Catalog::product/slider/product-slider.phtml')
+//     ->setData('sort_attribute', 'position')
+//     ->setData('sort_direction', 'ASC')
+//     ->setData('item_template', 'Magento_Catalog::product/list/home_page_item.phtml')
+//     ->setData('category_ids', $categoryId)
+//     ->toHtml();
+
+$sliderName        = str_replace('.', '_', $block->getNameInLayout());
+$itemTemplate = 'Magento_Catalog::product/list/home-page-item.phtml';
+$containerTemplate = 'Magento_Catalog::product/slider/homepage-product-slider-container.phtml';
+$sortAttribute     = 'position';
+$sortDirection     = 'ASC';
+$skusFilter        = [];
+$pageSize          = 8;
+$type              = 'generic';
+$headingTag        = 'h3';
+$maxVisibleSlides = $block->getData('max_visible');
+$slideSectionClasses = $block->getData('maybe_purged_tailwind_section_classes'); // default to null
+$slideItemClasses  = 'mr-2 w-1/2 sm:w-1/3 xl:w-1/4';
+
+if ($categoryId) {
+    $productListViewModel->addFilter('category_id', $categoryId, 'in');
+}
+
+if ($skusFilter) {
+    $productListViewModel->addFilter('sku', array_map('trim', $skusFilter), 'in');
+}
+
+$productListViewModel->setPageSize($pageSize);
+$productListViewModel->addFilter('website_id', $storeViewModel->getWebsiteId());
+$productListViewModel->addFilter('visibility', [
+    ProductVisibility::VISIBILITY_IN_CATALOG,
+    ProductVisibility::VISIBILITY_BOTH,
+], 'in');
+if ($sortAttribute) {
+    $sortDirection === 'ASC'
+        ? $productListViewModel->addAscendingSortOrder($sortAttribute)
+        : $productListViewModel->addDescendingSortOrder($sortAttribute);
+}
+
+$items = $productListViewModel->getItems();
+
+
+$sliderHtml = $sliderViewModel->getSliderForItems($itemTemplate, $items, $containerTemplate)
+    ->setData('name', $sliderName)
+    ->setData('title', '')
+    ->setData('item_relation_type', $type)
+    ->setData('heading_tag', $headingTag)
+    ->setData('max_visible', $maxVisibleSlides)
+    ->setData('maybe_purged_tailwind_section_classes', $slideSectionClasses)
+    ->setData('maybe_purged_tailwind_slide_item_classes', $slideItemClasses)
+    ->setData('left_nav_classes', 'sm:left-[47%] lg:left-[38%] xl:left-[30%]')
+    ->toHtml();
+
+
+if (empty($sliderHtml)) {
+    return '';
+}
+?>
+
+<a href="<?= $escaper->escapeUrl($category->getUrl()) ?>" class="hidden sm:inline-block border border-gray-800 text-sm px-6 py-2 mt-2 lg:mt-7
+    hover:bg-[#A01937] hover:text-white transition">
+    BEKIJK COLLECTIE
+</a>
+
+<div class="product-slider <?= $escaper->escapeHtmlAttr($type) ?>-product-slider mt-7">
+    <div>
+        <?= /* @noEscape */ $sliderHtml ?>
+    </div>
+    <script>
+        'use strict';
+        window.addEventListener('DOMContentLoaded', function() {
+            if (! window.productSliderEventHandlerInitialized) {
+                window.productSliderEventHandlerInitialized = true;
+
+                <?php if ($wishlistViewModel->isEnabled()): ?>
+                window.addEventListener('product-add-to-wishlist', (event) => {
+                    const formKey = hyva.getFormKey();
+                    const postUrl = BASE_URL + 'wishlist/index/add/';
+                    const productId = event.detail.productId;
+
+                    fetch(postUrl, {
+                        "headers": {
+                            "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+                        },
+                        "body": "form_key=" + formKey + "&product=" + productId + "&uenc=" + hyva.getUenc(),
+                        "method": "POST",
+                        "mode": "cors",
+                        "credentials": "include"
+                    }).then(function (response) {
+                        if (response.redirected) {
+                            window.location.href = response.url;
+                        } else if (response.ok) {
+                            return response.json();
+                        } else {
+                            typeof window.dispatchMessages !== "undefined" && window.dispatchMessages(
+                                [{
+                                    type: "warning",
+                                    text: "<?= $escaper->escapeHtml(__('Could not add item to wishlist.')) ?>"
+                                }], 5000
+                            );
+                        }
+                    }).then(function (result) {
+                        if (!result) {
+                            return
+                        }
+                        typeof window.dispatchMessages !== "undefined" && window.dispatchMessages(
+                            [{
+                                type: (result.success) ? "success" : "error",
+                                text: (result.success)
+                                    ? "<?=
+                                        $escaper->escapeHtml(
+                                            __("%1 has been added to your Wish List.", __("Product"))
+                                        )
+                                        ?>" : result.error_message
+                            }], 5000
+                        );
+                        window.dispatchEvent(new CustomEvent("reload-customer-section-data"));
+                    }).catch(function (error) {
+                        typeof window.dispatchMessages !== "undefined" && window.dispatchMessages(
+                            [{
+                                type: "error",
+                                text: error
+                            }], 5000
+                        );
+                    });
+                })
+                <?php endif; ?>
+
+                <?php if ($compareViewModel->showInProductList()): ?>
+                window.addEventListener('product-add-to-compare', (event) => {
+                    const productId = event.detail.productId;
+                    hyva.postForm({
+                        action: BASE_URL + 'catalog/product_compare/add/',
+                        data: {product: productId}
+                    })
+                })
+                <?php endif; ?>
+            }
+        });
+    </script>
+</div>
+
+
+<?php } ?>

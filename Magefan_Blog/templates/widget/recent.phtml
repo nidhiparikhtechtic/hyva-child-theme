@@ -1,0 +1,130 @@
+<?php
+
+/**
+ * Copyright © Magefan (support@magefan.com). All rights reserved.
+ * Please visit Magefan.com for license details (https://magefan.com/end-user-license-agreement).
+ *
+ * Glory to Ukraine! Glory to the heroes!
+ */
+?>
+<?php
+
+use Magento\Framework\Escaper;
+
+/**
+ * Blog recent posts widget
+ *
+ * @var $block \Magefan\Blog\Block\Widget\Recent
+ * @var Escaper $escaper
+ */
+
+?>
+
+<?php
+$width = (int)$block->getBackgroundImageWidth() ?: 700;
+$imageHelper = $this->helper(\Magefan\Blog\Helper\Image::class);
+?>
+
+<?php
+$_postCollection = $block->getPostCollection();
+?>
+<?php if ($_postCollection->count()) { ?>
+    <div class="container mx-auto py-8 lg:py-14 xl:!px-0">
+        <!-- Blog Header -->
+        <div class="text-center">
+            <h2 class="text-3xl md:text-4xl font-medium text-black mb-2.5">
+                <?= $block->escapeHtml($block->getTitle()) ?>
+            </h2>
+            <p class="text-black text-base">
+                <?= $escaper->escapeHtml(__('Discover our latest articles about interior, design and living trends')) ?>
+            </p>
+        </div>
+
+        <!-- Blog Grid -->
+        <div class="post-list-wrapper blog-widget-recent">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-5 py-10">
+                <!-- Post items will be generated here by Magefan Blog -->
+                <?php foreach ($_postCollection as $_post) : ?>
+                    <?php
+                    $_postUrl = $block->escapeUrl($_post->getPostUrl());
+                    $_postName = $block->escapeHtml($_post->getTitle());
+                    ?>
+                    <article class="flex flex-col gap-y-5 bg-white overflow-hidden blog-card-hover">
+
+                        <?php $featuredImage = $_post->getFeaturedListImg() ?: $_post->getFeaturedImg(); ?>
+                        <?php if ($featuredImage) : ?>
+                            <?php
+                            $featuredImage = $imageHelper->init($featuredImage)->resize($width, null, false);
+                            $featuredImgAlt = $_post->getData('featured_list_img_alt') ?: $_post->getData('featured_img_alt');
+                            if (!$featuredImgAlt) {
+                                $featuredImgAlt = $_postName;
+                            }
+                            ?>
+                            <a href="<?= /*@noEscape*/ $_postUrl ?>" title="<?= /*@noEscape*/ $_postName ?>">
+                                <img class="w-full rounded-lg max-h-60 min-h-[230px]" src="<?= $block->escapeHtml($featuredImage) ?>"
+                                    alt="<?= $block->escapeHtml($featuredImgAlt) ?>" loading="lazy" decoding="async" />
+                            </a>
+                        <?php endif; ?>
+
+                        <?php if ($_categoriesCount = $_post->getCategoriesCount()): ?>
+                            <div class="flex flex-wrap items-center gap-2 text-xs font-medium text-black">
+                                <div class="flex flex-wrap gap-2">
+                                    <?php foreach ($_post->getParentCategories() as $index => $ct): ?>
+                                        <a href="<?= $block->escapeUrl($ct->getCategoryUrl()) ?>"
+                                            title="<?= $block->escapeHtml($ct->getTitle()) ?>"
+                                            class="inline-flex items-center px-3 py-1 text-xs font-medium bg-[#E8E8E8] text-black rounded-[100px] uppercase">
+                                            <?= $block->escapeHtml($ct->getTitle()) ?>
+                                        </a>
+                                        <?php if ($index < $_categoriesCount - 1): ?>
+                                            <span class="text-black text-sm">,</span>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
+                        <div class="flex flex-col">
+                            <div class="flex items-center gap-x-2.5 text-black text-base mb-2.5">
+                                <svg class="w-5 h-5" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2.5 8.33333H17.5M5.83333 2.5V4.16667M14.1667 2.5V4.16667M5.16667 17.5H14.8333C15.7668 17.5 16.2335 17.5 16.59 17.3183C16.9036 17.1586 17.1586 16.9036 17.3183 16.59C17.5 16.2335 17.5 15.7668 17.5 14.8333V6.83333C17.5 5.89991 17.5 5.4332 17.3183 5.07668C17.1586 4.76308 16.9036 4.50811 16.59 4.34832C16.2335 4.16667 15.7668 4.16667 14.8333 4.16667H5.16667C4.23325 4.16667 3.76654 4.16667 3.41002 4.34832C3.09641 4.50811 2.84144 4.76308 2.68166 5.07668C2.5 5.4332 2.5 5.89991 2.5 6.83333V14.8333C2.5 15.7668 2.5 16.2335 2.68166 16.59C2.84144 16.9036 3.09641 17.1586 3.41002 17.3183C3.76654 17.5 4.23325 17.5 5.16667 17.5Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <?= $block->escapeHtml($_post->getPublishDate()) ?>
+                            </div>
+
+                            <h3 class="text-lg font-bold text-black line-clamp-3">
+                                <a href="<?= $_post->getPostUrl() ?>">
+                                    <?= $_post->getTitle() ?>
+                                </a>
+                            </h3>
+                        </div>
+
+
+                        <?php // Complete example with content + read more link 
+                        ?>
+                        <div class="flex post-excerpt">
+                            <a class="inline-flex items-center font-medium text-base text-black underline"
+                                href="<?= /*@noEscape*/ $_postUrl ?>"
+                                title="<?= /*@noEscape*/ $_postName ?>">
+                                <?= $block->escapeHtml(__('View description')) ?>
+                                <!-- <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg> -->
+                            </a>
+                        </div>
+
+                    </article>
+
+                <?php endforeach; ?>
+            </div>
+
+            <div class="text-center">
+                <a href="<?= $block->getUrl('blog') ?>" class="inline-block bg-teakea-terracotta h-[50px] px-11 rounded-lg">
+                    <span class="text-sm text-white uppercase font-semibold leading-[48px]">
+                        <?= $escaper->escapeHtml(__('View all')) ?>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </div>
+<?php } ?>

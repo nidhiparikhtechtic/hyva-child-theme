@@ -1,0 +1,129 @@
+<?php
+
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsSolid;
+use Hyva\Theme\ViewModel\Store;
+use Hyva\Theme\ViewModel\StoreSwitcher;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Magento\Store\ViewModel\SwitcherUrlProvider;
+use Siteation\HyvaIconsFlags\ViewModel\FlagsIcons;
+
+// phpcs:disable Generic.Files.LineLength.TooLong
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var HeroiconsSolid $heroiconsSolid */
+$heroiconsSolid = $viewModels->require(HeroiconsSolid::class);
+
+/** @var SwitcherUrlProvider $switcherUrlProvider */
+$switcherUrlProvider = $viewModels->require(SwitcherUrlProvider::class);
+
+/** @var Store $storeViewModel */
+$storeViewModel = $viewModels->require(Store::class);
+
+/** @var StoreSwitcher $storeSwitcherViewModel */
+$storeSwitcherViewModel = $viewModels->require(StoreSwitcher::class);
+
+$currentStore = $storeSwitcherViewModel->getStore();
+
+/** @var ViewModelRegistry $viewModels */
+
+/** @var FlagsIcons $flagsIcons */
+$flagsIcons = $viewModels->require(FlagsIcons::class);
+
+$storeName = $currentStore->getName();
+
+$storeShortNames = [
+    'Nederland' => 'NL',
+    'Denmark' => 'DK',
+    'België' => 'BE',
+    'Deutsch' => 'DE',
+    'France' => 'FR',
+    'Luxembourg' => 'LU',
+    'Spain' => 'ES',
+    'English' => 'EN',
+    'European Union ' => 'EU'
+];
+
+// Map store names to corresponding flag method suffixes
+// Add more store names and flag method suffixes as needed
+$storeFlagMethods = [
+    'Nederland' => 'nl',
+    'Denmark' => 'dk',
+    'België' => 'be',
+    'Deutsch' => 'de',
+    'France' => 'fr',
+    'Luxembourg' => 'lu',
+    'Spain' => 'es',
+    'English' => 'gb-ukm',
+    'European Union ' => 'eu'
+];
+
+$flagMethodSuffix = $storeFlagMethods[$storeName] ?? ''; // Default to empty string if no mapping is found
+$shortName = $storeShortNames[$storeName] ?? $storeName;
+?>
+<?php if (count($storeSwitcherViewModel->getStores()) > 1): ?>
+    <div x-data="{ isOpen: false}"
+        @keydown.esc.prevent="isOpen = false"
+        @click.outside="isOpen = false"
+        class="relative flex">
+
+        <!-- Toggle Button -->
+        <button type="button"
+            @click="isOpen = !isOpen"
+            aria-label="<?= $escaper->escapeHtmlAttr(__('Store Switcher')) ?>"
+            class="flex cursor-pointer items-center rounded-md tracking-wide transition"
+            :aria-expanded="isOpen"
+            aria-haspopup="true">
+            <div>
+                <?php
+                if (!empty($flagMethodSuffix)) {
+                    echo $flagsIcons->{$flagMethodSuffix . 'Html'}('', 20, 20, ["aria-label" => $storeName]);
+                } else {
+                    echo '<svg class="pt-1 lg:pt-0 h-5 w-5 lg:h-4 lg:w-4 mr-2" height="200px" width="200px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve" fill="#000000"><path d="M473.655,88.275H38.345C17.167,88.275,0,105.442,0,126.62V385.38c0,21.177,17.167,38.345,38.345,38.345h435.31c21.177,0,38.345-17.167,38.345-38.345V126.62C512,105.442,494.833,88.275,473.655,88.275z"></path></svg>';
+                }
+                ?>
+            </div>
+            <!-- Short name like NL -->
+            <!-- <div class="text-sm ml-1"> -->
+            <div class="text-sm ml-1 text-white">
+                <?= $escaper->escapeHtml($shortName) ?>
+            </div>
+
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- <path d="M6 9L12 15L18 9" stroke="black" stroke-linecap="round" stroke-linejoin="round" /> -->
+                <path d="M6 9L12 15L18 9" stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div x-cloak
+            x-show="isOpen"
+            class="absolute bg-container top-10 lg:top-[47px] right-0 w-max p-1 sm:p-2 overflow-auto origin-top-right rounded-lg z-[100] drop-shadow-lg"
+            role="menu">
+            <div class="my-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                <?php foreach ($storeSwitcherViewModel->getStores() as $lang): ?>
+                    <?php if ($lang->getId() != $storeViewModel->getStoreId()): ?>
+                        <a href="<?= $escaper->escapeUrl($switcherUrlProvider->getTargetStoreRedirectUrl($lang)) ?>"
+                            class="language rounded-md block py-1.5 sm:py-2 px-2.5 sm:px-5 hover:bg-gray-100"
+                            role="menuitem">
+                            <?= $escaper->escapeHtml($lang->getName()) ?>
+                        </a>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>

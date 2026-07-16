@@ -1,0 +1,8 @@
+.amasty_quote-cart-index .page-wrapper .page-main .title-page{
+    @apply container;
+}
+
+#quotecart-drawer .overflow-y-auto {
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}

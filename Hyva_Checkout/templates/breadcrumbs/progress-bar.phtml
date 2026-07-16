@@ -1,0 +1,117 @@
+<?php
+
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Checkout\ViewModel\Breadcrumbs;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Hyva\Theme\ViewModel\HeroiconsSolid;
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\Escaper;
+
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var Escaper $escaper */
+
+/** @var HeroiconsOutline $heroicons */
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+
+/** @var HeroiconsSolid $heroiconsSolid */
+$heroiconsSolid = $viewModels->require(HeroiconsSolid::class);
+
+/** @var Breadcrumbs $Breadcrumbs */
+$breadcrumbs = $viewModels->require(Breadcrumbs::class);
+
+$navigator = $breadcrumbs->getNavigator();
+$currentStep = $navigator->getActiveStep();
+$checkout = $navigator->getActiveCheckout();
+$settingShowWaypoints = $breadcrumbs->getSystemConfig()->showBreadcrumbsWaypoints();
+$settingShowBreadcrumbsCart = $breadcrumbs->getSystemConfig()->showBreadcrumbsCart();
+$stepCount = $checkout->countSteps();
+
+$lineHtml = '<span class="progress-bar-line hidden lg:block absolute top-[calc(theme(spacing.5)_/_2)] w-full h-1 text-slate-300"></span>';
+?>
+
+<style>
+    .progress-bar-line {
+        background-image: linear-gradient(to right,
+                var(--line-before-start, var(--line-before, currentcolor)),
+                var(--line-before-end, var(--line-before, currentcolor)) 50%,
+                var(--line-after-start, var(--line-after, currentcolor)) 50%,
+                var(--line-after-end, var(--line-after, currentcolor)));
+    }
+</style>
+
+<ul class="progress-bar flex">
+    
+    <?php foreach ($checkout->getAvailableSteps() as $step): ?>
+        <?php $isCurrent = ($step->getPosition() === $currentStep->getPosition()) ?>
+        <?php $isComplete = ($step->getPosition() < $currentStep->getPosition()); ?>
+        <?php $isPrevious = ($step->getPosition() === ($currentStep->getPosition() - 1)) ?>
+
+        <li class="relative lg:flex-1 lg:flex lg:flex-col items-center lg:bg-transparent lg:p-0 p-2 first:[--line-before:#0000] last:[--line-after:#0000]
+            <?= ($isPrevious) ? '' : 'hidden' ?>
+            <?= ($isCurrent) ? '[--line-before:theme(colors.background.teakea-red)]' : '' ?>
+            <?= ($isComplete) ? '[--line-before:theme(colors.background.teakea-red)] [--line-after:theme(colors.background.teakea-red)]' : '' ?>
+        ">
+            <?php if ($checkout->isStepBackwards($step, $currentStep) || $checkout->isComparison($step, $currentStep)): ?>
+                <button
+                    type="button"
+                    class="group inline-flex flex-col gap-2 items-center outline-offset-2 aria-[current=step]:font-bold"
+                    <?php if ($isCurrent): ?>
+                    aria-current="step"
+                    <?php endif; ?>
+                    onclick="hyvaCheckout.navigation.stepTo('<?= $escaper->escapeJs($step->getRoute()) ?>', false)">
+
+                    <div class="hidden lg:flex items-center justify-center w-6 h-6" aria-hidden="true">
+                        <?= /* @noEscape */ $lineHtml; ?>
+                        <?php if ($isCurrent): ?>
+                            <div class="border-2 border-teakea-red w-6 h-6 rounded-full bg-teakea-red z-[1]">
+                                <span class="flex justify-center font-garamond text-sm font-bold text-white"><?= (int) $step->getPosition() ?></span>
+                            </div>
+                        <?php elseif ($isComplete): ?>
+                            <div class="flex items-center justify-center w-6 h-6 rounded-full bg-teakea-red text-white z-[1]">
+                                <?= $heroiconsSolid->checkHtml('', 14, 14, ['aria-hidden' => 'true']) ?>
+                            </div>
+                        <?php else: ?>
+                            <div class="border-2 border-[#DFE3E8] w-6 h-6 rounded-full bg-[#DFE3E8] z-[1]">
+                                <span class="flex justify-center font-garamond text-sm font-bold text-[#637381]"><?= (int) $step->getPosition() ?></span>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                    <div class="flex items-center gap-2 text-sm font-extrabold <?= ($isComplete || $isCurrent) ? 'text-teakea-red' : 'text-teakea-gray' ?>">
+                        <?php if ($isPrevious): ?>
+                            <?= $heroiconsSolid->chevronLeftHtml(
+                                'group-hover:-translate-x-0.5 transition rtl:rotate-180 lg:hidden',
+                                16,
+                                16,
+                                ['aria-hidden' => 'true']
+                            ); ?>
+                        <?php endif; ?>
+                        <?= $escaper->escapeHtml(__($step->getLabel())) ?>
+                    </div>
+
+                </button>
+            <?php else: ?>
+                <div class="flex flex-col items-center gap-2">
+                    <div class="hidden lg:flex items-center justify-center w-6 h-6" aria-hidden="true">
+                        <?= /* @noEscape */ $lineHtml; ?>
+                        <div class="border-2 border-[#DFE3E8] w-6 h-6 rounded-full bg-[#DFE3E8] z-[1]">
+                            <span class="flex justify-center font-garamond text-sm font-bold text-[#637381]"><?= (int) $step->getPosition() ?></span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 text-teakea-gray text-sm font-normal">
+                        <?= $escaper->escapeHtml(__($step->getLabel())) ?>
+                    </div>
+                </div>
+            <?php endif ?>
+        </li>
+    <?php endforeach ?>
+</ul>

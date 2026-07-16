@@ -1,0 +1,295 @@
+<?php
+
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Hyva\Theme\ViewModel\ProductCompare;
+use Hyva\Theme\ViewModel\ProductPrice;
+use Hyva\Theme\ViewModel\Wishlist;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+// phpcs:disable Generic.Files.LineLength.TooLong
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var Wishlist $wishlistViewModel */
+$wishlistViewModel = $viewModels->require(Wishlist::class);
+
+/** @var ProductCompare $compareViewModel */
+$compareViewModel = $viewModels->require(ProductCompare::class);
+
+/** @var HeroiconsOutline $heroicons */
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+
+/** @var ProductPrice $productPrice */
+$productPrice = $viewModels->require(ProductPrice::class);
+
+$uniqueId = '_' . uniqid();
+$title = __('Recently Viewed Products');
+$name = 'recently-viewed-products';
+$widgetAttributesToShow = explode(',', (string) $block->getData('show_attributes'));
+$widgetButtonsToShow = explode(',', (string) $block->getData('show_buttons'));
+$sliderIndex = 1;
+$jsTemplate = 'Magento_Catalog::product/widget/viewed/js/recently-viewed-products.phtml';
+/* @noEscape */
+echo $block->assign(['uniqueId' => $uniqueId, 'title' => $title])
+    ->fetchView($block->getTemplateFile($jsTemplate));
+
+?>
+
+<script>
+    'use strict';
+
+    function initSliderComponents() {
+        return {
+            active: 0,
+            itemCount: 0,
+            getSlider() {
+                return this.$root.querySelector('.js_slides');
+            },
+            pageCount: 0,
+lastPageIndex: 0,
+
+            calcPageSize() {
+    const slider = this.getSlider();
+    if (slider) {
+        this.itemCount = slider.querySelectorAll('.js_slide').length;
+
+        // Compute size
+        this.pageSize = Math.round(
+            slider.clientWidth / slider.querySelector('.js_slide').clientWidth
+        );
+
+        // Fillers
+        this.pageFillers = (
+            this.pageSize * Math.ceil(this.itemCount / this.pageSize)
+        ) - this.itemCount;
+
+        // Compute pageCount & lastPageIndex
+        this.pageCount = Math.ceil(this.itemCount / this.pageSize);
+        this.lastPageIndex = (this.pageCount - 1) * this.pageSize;
+    }
+}
+,
+            calcActive() {
+                const slider = this.getSlider();
+                if (slider) {
+                    const sliderItems = this.itemCount + this.pageFillers;
+                    const calculatedActiveSlide = slider.scrollLeft / (slider.scrollWidth / sliderItems);
+                    this.active = Math.round(calculatedActiveSlide / this.pageSize) * this.pageSize;
+                }
+            },
+            scrollPrevious() {
+                this.scrollTo(this.active - this.pageSize);
+            },
+            scrollNext() {
+                this.scrollTo(this.active + this.pageSize);
+            },
+            scrollTo(idx) {
+                const slider = this.getSlider();
+                if (slider) {
+                    const slideWidth = slider.scrollWidth / (this.itemCount + this.pageFillers);
+                    slider.scrollLeft = Math.floor(slideWidth) * idx;
+                    this.active = idx;
+                }
+            },
+            skipCarouselToNavigation(navSelector) {
+                const element = document.getElementById(navSelector)
+                if (element) {
+                    element.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'end'
+                    });
+                    const button = element.querySelector('button:not([disabled])');
+                    this.$nextTick(() => button && button.focus({
+                        preventScroll: true
+                    }))
+                }
+            }
+        }
+    }
+</script>
+
+<section class="my-12 text-gray-700 body-font"
+    x-data="{
+    ...initRecentlyViewedProductsComponent<?= /** @noEscape */ $uniqueId ?>({isSlider: true}),
+    ...initSliderComponents()
+}"
+    x-defer="intersect"
+    x-init="getProducts(); calcPageSize()"
+    x-id="['slider-nav', 'slider-desc', 'slider-id']"
+    @resize.window.debounce="calcPageSize(); $nextTick( function() { calcActive() })"
+    role="group"
+    aria-roledescription="<?= $escaper->escapeHtmlAttr(__('Carousel')) ?>"
+    aria-label="<?= $escaper->escapeHtmlAttr(__('Carousel %1', $title)) ?>"
+    :aria-describedby="$id('slider-desc')"
+    x-defer="intersect"
+    :style="minHeight()">
+    <template x-if="products && products.length">
+        <div class="relative">
+            <div class="container flex flex-col gap-y-2 md:gap-y-0 items-center justify-between border-b border-gray-100 md:flex-row pb-5 mb-5 md:mb-10">
+                <h3 class="text-2xl font-semibold text-black capitalize">
+                    <?= $escaper->escapeHtml($title); ?>
+                </h3>
+                <div>
+                    <template x-if="itemCount > pageSize">
+                        <div
+                            class="flex items-center justify-center gap-x-2"
+                            :id="$id('slider-nav')">
+                            <button
+                                type="button"
+                                aria-label="<?= $escaper->escapeHtmlAttr(__('Previous slide')) ?>"
+                                :disabled="active === 0"
+                                class="text-black flex-none p-2 lg:p-3 rounded-3xl border border-[#EDEDED]"
+                                :class="{ 'opacity-25 pointer-events-none' : active === 0 }"
+                                @click="scrollPrevious">
+                                <svg class="w-6 h-6" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 12.0291H20M4 12.0291L8 8.02905M4 12.0291L8 16.0291" stroke="black" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </button>
+                            <button
+                                aria-label="<?= $escaper->escapeHtmlAttr(__('Next slide')) ?>"
+                                :disabled="active >= (Math.ceil(itemCount / pageSize) - 1) * pageSize"
+                                class="text-black flex-none p-2 lg:p-3 rounded-3xl border border-[#EDEDED]"
+                                :class="{ 'opacity-25 pointer-events-none' : active >= (Math.ceil(itemCount / pageSize) - 1) * pageSize }"
+                                @click="scrollNext">
+                                <svg class="w-6 h-6" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 12.0291H20M20 12.0291L16 8.02905M20 12.0291L16 16.0291" stroke="black" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </button>
+                        </div>
+                    </template>
+                </div>
+            </div>
+            <span
+                class="sr-only"
+                :id="$id('slider-desc')"
+                tabindex="-1">
+                <?= $escaper->escapeHtml(__('Navigating through the elements of the carousel is possible using the tab key. You can skip the carousel or go straight to carousel navigation using the skip links.')) ?>
+            </span>
+
+            <a
+                href="#<?= $escaper->escapeHtmlAttr($name) ?>-slider-end"
+                class="action skip sr-only focus:not-sr-only focus:absolute focus:z-30 focus:bg-white">
+                <?= $escaper->escapeHtml(__('Press to skip carousel')) ?>
+            </a>
+            <button
+                x-show="itemCount > pageSize"
+                type="button"
+                class="action skip sr-only focus:not-sr-only focus:absolute focus:z-30 focus:bg-white"
+                @click.prevent="skipCarouselToNavigation($id('slider-nav'))">
+                <?= $escaper->escapeHtml(__('Press to go to carousel navigation')) ?>
+            </button>
+            <div class="relative w-full overflow-x-hidden container !p-0">
+                <div class="relative flex flex-nowrap w-full overflow-auto js_slides snap"
+                    @scroll.debounce="calcActive">
+                    <template x-for="product in products">
+                        <div class="js_slide flex-none w-1/2 lg:w-1/3 xl:w-1/4 px-1.5">
+                            <div class="card card-interactive p-0">
+                                <?php if (in_array("image", $widgetAttributesToShow)): ?>
+                                    <a :href="'<?= $escaper->escapeJs($escaper->escapeUrl($block->getBaseUrl())) ?>' +
+                                            product.url_key + (product.url_suffix || '')"
+                                        class="relative flex items-center bg-white product photo product-item-photo"
+                                        style="padding-top:100%"
+                                        tabindex="-1">
+                                        <span class="absolute top-0 left-0 flex flex-wrap content-center w-full
+                                                         h-full p-2 overflow-hidden align-center hover:shadow-sm border rounded-lg border-teakea-light-gray">
+                                            <img class="self-center w-full h-auto"
+                                                :src="product.small_image.url"
+                                                :alt="product.small_image.label"
+                                                loading="lazy"
+                                                width="500"
+                                                height="500" />
+                                        </span>
+                                    </a>
+                                    <div class="product-info flex flex-col grow mt-5 gap-y-2.5">
+
+                                    
+                                <?php endif; ?>
+                                <?php if (in_array("name", $widgetAttributesToShow)): ?>
+                                    <p class="flex justify-start text-black">
+                                        <a class="truncate product-item-link"
+                                            :href="'<?= $escaper->escapeJs($escaper->escapeUrl($block->getBaseUrl())) ?>' +
+                                                    product.url_key + (product.url_suffix || '')">
+                                            <span class="flex text-sm sm:text-base line-clamp-1 overflow-hidden" x-html="product.name"></span>
+                                        </a>
+                                    </p>
+                                <?php endif; ?>
+                                <?php if (in_array("price", $widgetAttributesToShow)): ?>
+                                    <div class="flex items-center font-bold text-base text-teakea-neutral-dark">
+                                        <div class="final-price">
+                                            <span class="price-wrapper title-font">
+                                                <span class="price" x-html="hyva.formatPrice(product.price_range.minimum_price.final_price.value)"></span>
+                                            </span>
+                                        </div>
+                                        <?php if ($productPrice->displayPriceInclAndExclTax()): ?>
+                                            <template x-if="product.price_range.minimum_price.base_price">
+                                                <div class="final-price-excl-tax">
+                                                    <span class="font-regular text-gray-900">
+                                                        <span><?= $escaper->escapeHtml(__('Excl. Tax')) ?>:</span>
+                                                        <span class="price" x-html="hyva.formatPrice(product.price_range.minimum_price.base_price.value)"></span>
+                                                    </span>
+                                                </div>
+                                            </template>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endif; ?>
+                                </div>
+                                <p class="flex flex-wrap gap-2 p-3">
+                                    <?php if (in_array("learn_more", $widgetAttributesToShow)): ?>
+                                        <a class="justify-center w-auto mr-auto btn btn-primary"
+                                            :href="'<?= $escaper->escapeJs($escaper->escapeUrl($block->getBaseUrl())) ?>' +
+                                                    product.url_key + (product.url_suffix || '')">
+                                            <span class="inline"><?= $escaper->escapeHtml(__('View Product')) ?></span>
+                                        </a>
+                                    <?php endif; ?>
+                                    <span class="inline-flex gap-2">
+                                        <?php if (in_array("add_to_compare", $widgetButtonsToShow)): ?>
+                                            <?php if ($compareViewModel->showInProductList()): ?>
+                                                <button @click.prevent="addToCompare(product.id)"
+                                                    aria-label="<?= $escaper->escapeHtmlAttr(__('Add to Compare')) ?>"
+                                                    class="rounded-full w-10 h-10 bg-gray-200 p-0 border-0
+                                                            inline-flex items-center justify-center text-gray-500
+                                                            hover:text-yellow-500"
+                                                    data-addto="compare">
+                                                    <?= $heroicons->scaleHtml('', 20, 20, ['aria-hidden' => 'true']) ?>
+                                                </button>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                        <?php if (in_array("add_to_wishlist", $widgetButtonsToShow)): ?>
+                                            <?php if ($wishlistViewModel->isEnabled()): ?>
+                                                <button
+                                                    aria-label="<?= $escaper->escapeHtmlAttr(__('Add to Wish List')) ?>"
+                                                    @click.prevent="addToWishlist(product.id)"
+                                                    class="inline-flex items-center justify-center w-10 h-10 p-0 ml-auto
+                                                    text-gray-500 bg-gray-200 border-0 rounded-full hover:text-red-600"
+                                                    data-addto="wishlist">
+                                                    <?= $heroicons->heartHtml('', 20, 20, ['aria-hidden' => 'true']) ?>
+                                                </button>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </template>
+
+                </div>
+            </div>
+
+        </div>
+
+
+    </template>
+</section>

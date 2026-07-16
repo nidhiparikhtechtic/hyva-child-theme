@@ -1,0 +1,142 @@
+<?php
+
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\ProductStockItem;
+use Magento\Catalog\Block\Product\View;
+use Magento\Catalog\Model\Product;
+use Magento\Framework\Escaper;
+
+// phpcs:disable Generic.WhiteSpace.ScopeIndent.Incorrect
+
+/** @var View $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var Product $product */
+$product = $block->getProduct();
+
+/** @var ProductStockItem $stockItemViewModel */
+$stockItemViewModel = $viewModels->require(ProductStockItem::class);
+$minSalesQty = $stockItemViewModel->getMinSaleQty($product);
+$maxSalesQty = $stockItemViewModel->getMaxSaleQty($product);
+
+$maxSalesQtyLength = ($maxSalesQty ? strlen((string)$maxSalesQty) : 4)
+    + (/* add one if decimal for separator */
+        (int)$stockItemViewModel->isQtyDecimal($product));
+
+$step = $stockItemViewModel->getQtyIncrements($product)
+    ? $stockItemViewModel->getQtyIncrements($product)
+    : null;
+
+?>
+<?php if ($block->shouldRenderQuantity()): ?>
+    <script>
+        function initQtyField() {
+
+            function findPathParam(key) {
+                // get all path pairs after BASE_URL/front_name/action_path/action
+                const baseUrl = (BASE_URL.substr(0, 2) === '//' ? 'http:' : '') + BASE_URL;
+                const baseUrlParts = (new URL(baseUrl)).pathname.replace(/\/$/, '').split('/');
+                const pathParts = window.location.pathname.split('/').slice(baseUrlParts.length + 3);
+                for (let i = 0; i < pathParts.length; i += 2) {
+                    if (pathParts[i] === key && pathParts.length > i) {
+                        return pathParts[i + 1];
+                    }
+                }
+            }
+
+            return {
+                qty: <?= $block->getProductDefaultQty() * 1 ?>,
+                itemId: (new URLSearchParams(window.location.search)).get('id') || findPathParam('id'),
+                productId: '<?= (int)$product->getId() ?>',
+                <?php // populate the qty when editing a product from the cart
+                ?>
+                onGetCartData: function onGetCartData(data, $dispatch) {
+                    const cart = data && data.data && data.data.cart;
+                    if (this.itemId && cart && cart.items) {
+                        const cartItem = cart.items.find((item) => {
+                            return item.item_id === this.itemId && item.product_id === this.productId;
+                        });
+                        if (cartItem && cartItem.qty) {
+                            this.qty = cartItem.qty;
+                            $dispatch('update-qty-' + this.productId, this.qty);
+                        }
+                    }
+                },
+                eventListeners: {
+                    ['@update-qty-<?= (int)$product->getId() ?>.window'](event) {
+                        this.qty = event.detail;
+                        console.log('update-qty')
+                    }
+                }
+            };
+        }
+    </script>
+    <div x-data="initQtyField()"
+        x-bind="eventListeners"
+        class="flex align-center gap-x-2.5">
+        <?php if ($product->isSaleable()): ?>
+            <div class="flex items-center gap-x-2 lg:gap-x-2.5">
+
+                <label for="qty[<?= (int)$product->getId() ?>]" class="sr-only">
+                    <?= $escaper->escapeHtml(__('Quantity')) ?>
+                </label>
+
+                <button aria-label="<?= $escaper->escapeHtmlAttr(__('Decrease quantity')) ?>" class="p-2 md:p-3 text-teakea-dark-gray" @click="if(qty > 1){ qty--; $dispatch('update-qty-<?= (int)$product->getId() ?>', qty);}">
+                    <svg class="w-5 h-5" viewBox="0 0 24 25" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 12.5H4" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+
+                <input name="qty"
+                    @private-content-loaded.window="onGetCartData($event.detail, $dispatch)"
+                    id="qty[<?= (int)$product->getId() ?>]"
+                    form="product_addtocart_form"
+                    <?php if ($stockItemViewModel->isQtyDecimal($product)): ?>
+                    type="text"
+                    pattern="[0-9](\.[0-9])?{0,<?=
+                                                /** @noEscape */
+                                                $maxSalesQtyLength ?>}'"
+                    inputmode="decimal"
+                    <?php else: ?>
+                    type="number"
+                    pattern="[0-9]{0,<?=
+                                        /** @noEscape */
+                                        $maxSalesQtyLength ?>}"
+                    inputmode="numeric"
+                    <?php if ($minSalesQty): ?>min="<?=
+                                                    /** @noEscape */
+                                                    $minSalesQty ?>" <?php endif; ?>
+                    <?php if ($maxSalesQty): ?>max="<?=
+                                                    /** @noEscape */
+                                                    $maxSalesQty ?>" <?php endif; ?>
+                    <?php if ($step): ?>step="<?=
+                                                /** @noEscape */
+                                                $step ?>" <?php endif; ?>
+                    <?php endif; ?>
+                    :value="qty"
+                    class="form-input text-center border border-[#4F4F4F] font-semibold text-slate-800 no-spinner py-0 px-0 lg:py-2.5 lg:px-3.5 rounded-lg"
+                    x-model.number="qty"
+                    @change="$dispatch('update-qty-<?= (int)$product->getId() ?>', qty)" />
+
+                <button aria-label="<?= $escaper->escapeHtmlAttr(__('Increase quantity')) ?>" class="p-2 md:p-3 text-teakea-dark-gray" @click="qty++; $dispatch('update-qty-<?= (int)$product->getId() ?>', qty)">
+                    <svg class="w-5 h-5" viewBox="0 0 24 25" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 4.5V20.5M20 12.5L4 12.5" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+
+            <?php else : ?>
+            </div>
+        <?php endif; ?>
+    </div>
+
+<?php endif; ?>

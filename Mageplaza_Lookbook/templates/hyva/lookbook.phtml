@@ -1,0 +1,310 @@
+<?php global $item;
+
+/**
+ * Mageplaza
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Mageplaza.com license that is
+ * available through the world-wide-web at this URL:
+ * https://www.mageplaza.com/LICENSE.txt
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category    Mageplaza
+ * @package     Mageplaza_Lookbook
+ * @copyright   Copyright (c) Mageplaza (https://www.mageplaza.com/)
+ * @license     https://www.mageplaza.com/LICENSE.txt
+ */
+
+use Mageplaza\Lookbook\Model\Config\Source\LazyLoad;
+
+/** @var $block \Mageplaza\Lookbook\Block\Lookbook */
+$lookbook = $block->getLookbook();
+if ($lookbook && $lookbook->getStatus() === '1'): ?>
+    <?php
+    $imgUrl       = $block->getImageUrl($lookbook->getImage());
+    $lookbookName = $lookbook->getName();
+    $uniqid       = uniqid('-', false);
+    $lookbookId   = $lookbook->getId() . $uniqid;
+    $data         = $block->getMarkerData();
+    $width        = $lookbook->getWidth() ? 'width="' . $lookbook->getWidth() . '"' : '';
+    $height       = $lookbook->getLookbookHeight() ? 'height="' . $lookbook->getHeight() . '"' : '';
+    ?>
+    <div>
+        <div class="mplookbook-lookbook <?= !$block->isPopupType() ? 'mplookbook-marker-tooltip' : 'mplookbook-marker-popup' ?>">
+            <div style="max-width: max-content; margin: auto;" id="mplookbook-<?= /* @noEscape */
+                                                                                $lookbookId ?>">
+                <div class="easypin" style="width: 100%; height: 100%; position: relative;">
+                    <img class="img-responsive mplookbook-pin-<?= /* @noEscape */
+                                                                $lookbook->getId() ?>" <?= /* @noEscape */
+                                            $width ?> <?= /* @noEscape */
+                                $height ?>
+                        <?php if ($block->isLazyLoad() === LazyLoad::ONDEMAND) : ?>
+                        x-data="{ loaded: false }"
+                        :src="loaded ? '<?= $block->escapeUrl($imgUrl) ?>' : ''"
+                        x-init="
+                                    observer = new IntersectionObserver(([entry]) => {
+                                    if (entry.isIntersecting) {
+                                        loaded = true;
+                                        observer.disconnect();
+                                    }
+                                });
+                                observer.observe($el);
+                            "
+                        data-src="<?= $block->escapeUrl($imgUrl) ?>"
+                        <?php elseif ($block->isLazyLoad() === LazyLoad::PROGRESSIVE): ?>
+                        x-data="{ loaded: false }"
+                        :src="loaded ? '<?= $block->escapeUrl($imgUrl) ?>' : ''"
+                        x-init="
+                                    if ($el.getBoundingClientRect().top <= window.innerHeight) {
+                                        loaded = true;
+                                    }
+                                "
+                        data-src="<?= $block->escapeUrl($imgUrl) ?>"
+                        <?php else: ?>
+                        src="<?= $block->escapeUrl($imgUrl) ?>"
+                        <?php endif; ?>
+                        title="<?= $block->escapeHtml($lookbookName) ?>"
+                        alt="<?= $block->escapeHtml($lookbookName) ?>"
+                        easypin-id="<?= /* @noEscape */
+                                    $lookbookId ?>" />
+                    <?php if (is_array($data)) : ?>
+                        <?php
+                        $widthLookbook  = $data['canvas']['width'];
+                        $heightLookbook = $data['canvas']['height'];
+                        ?>
+                        <?php foreach ($data as $key => $lookbookItem) : ?>
+                            <?php if ($key !== 'canvas') : ?>
+                                <?php
+                                $left = (int)$lookbookItem['coords']['lat'] / (int)$widthLookbook * 100;
+                                $top  = (int)($lookbookItem['coords']['long'] - $block->getMarkerHeight()) / (int)$heightLookbook * 100;
+                                ?>
+                                <div style="<?= /* @noEscape */ $block->getMarkerStyle() ?>
+                                            left: <?= /* @noEscape */ $left ?>%; top: <?= /* @noEscape */ $top ?>%" class="easypin-marker">
+                                    <div class="exPopoverContainer mplookbook-exPopoverContainer easypin-popover mb-2.5 border border-[#f0f0f0] rounded-[5px] shadow-[0_2px_10px_0_rgba(209,209,209,0.5)]"
+                                        style="height: auto; background-color: #fff; color: #000;
+                                                font-size: 20px; position: absolute; display: none; bottom: <?= /* @noEscape */ $block->getMarkerHeight() . 'px' ?>; cursor: default;">
+                                        <?= /* @noEscape */ $lookbookItem['template'] ?>
+                                        <div class="mplookbook-tooltip-arrow absolute -bottom-[9px] right-auto left-[0] w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[10px] border-t-white drop-shadow-[0_2px_1px_rgba(0,0,0,0.1)]"></div>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php if ($block->isPopupType()): ?>
+        <link rel="stylesheet" type="text/css" href="<?= /* @noEscape */
+                                                        $block->getViewFileUrl('Mageplaza_Core::css/magnific-popup.css') ?>">
+        <style type="text/css">
+            .mfp-iframe-scaler iframe {
+                background: url(<?= /* @noEscape */ $block->getViewFileUrl('images/loader-1.gif') ?>) no-repeat scroll center center #fff;
+            }
+        </style>
+    <?php endif; ?>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            <?php if ($block->isPopupType()): ?>
+                var lookbookElement = document.getElementById('mplookbook-<?= /* @noEscape */ $lookbookId ?>');
+
+                if (lookbookElement) {
+                    var markers = lookbookElement.querySelectorAll('.easypin-marker');
+
+                    markers.forEach(marker => {
+                        marker.addEventListener('click', function() {
+                            var quickviewLink = this.querySelector('.mplookbook-quickview'),
+                                prodUrl = quickviewLink ? quickviewLink.getAttribute('data-quickview-url') : null;
+
+                            if (prodUrl && prodUrl.length) {
+                                openPopup({
+                                    src: prodUrl + '?mplookbook=1',
+                                    type: 'iframe',
+                                    mainClass: 'mfp-fade mfp-mplookbook-quickview-frame',
+                                });
+                            } else {
+                                var popoverContent = this.querySelector('.exPopoverContainer');
+                                if (popoverContent) {
+                                    openPopup({
+                                        src: popoverContent.innerHTML,
+                                        type: 'inline',
+                                        mainClass: 'mfp-fade',
+                                    });
+                                }
+                            }
+                        });
+                    });
+                }
+            <?php endif; ?>
+
+            function openPopup({
+                src,
+                type,
+                mainClass
+            }) {
+                var popupContainer = document.createElement('div');
+                popupContainer.className = `mfp-container ${mainClass} fixed inset-0 bg-[#000000CC] z-[10000] flex items-center justify-center`;
+
+                var closeButton = document.createElement('button');
+                closeButton.textContent = '×';
+                closeButton.className = 'close-popup-lookbook absolute top-4 right-4 text-2xl font-semibold bg-transparent border-0 text-black cursor-pointer opacity-70 hover:opacity-100';
+                closeButton.addEventListener('click', function() {
+                    document.body.removeChild(popupContainer);
+                });
+
+                var contentElement,
+                    iframeElement;
+
+                if (type === 'iframe') {
+                    contentElement = document.createElement('div');
+                    contentElement.className = 'popup-product relative';
+                    iframeElement = document.createElement('iframe');
+                    iframeElement.className = 'product-iframe w-[900px] h-[510px] border-0';
+                    iframeElement.src = src;
+                    contentElement.appendChild(closeButton);
+                    contentElement.appendChild(iframeElement);
+                } else if (type === 'inline') {
+                    contentElement = document.createElement('div');
+                    contentElement.className = 'popup-custom relative';
+                    contentElement.innerHTML = src;
+                    contentElement.appendChild(closeButton);
+
+                }
+
+                popupContainer.appendChild(contentElement);
+                document.body.appendChild(popupContainer);
+            }
+
+            document.addEventListener('click', function(event) {
+                var popupContainer = document.querySelector('.mfp-container'),
+                    popupProduct = document.querySelector('.popup-product'),
+                    popupCustom = document.querySelector('.popup-custom'),
+                    easypinMarker = event.target.closest('.easypin-marker');
+
+                if (easypinMarker) {
+                    return;
+                }
+
+                if (popupContainer && ((popupProduct && !popupProduct.contains(event.target)) || (popupCustom && !popupCustom.contains(event.target)))) {
+                    document.body.removeChild(popupContainer);
+                }
+            });
+            /* ── Tooltip type: smart collision detection ── */
+var markerHeight = <?= /* @noEscape */ (int)$block->getMarkerHeight() ?>;
+
+document.querySelectorAll('.mplookbook-marker-tooltip .easypin-marker').forEach(function(marker) {
+    marker.addEventListener('mouseenter', function() {
+        var popover = this.querySelector('.exPopoverContainer');
+        var arrow   = this.querySelector('.mplookbook-tooltip-arrow');
+        if (!popover) return;
+
+        popover.style.left   = '';
+        popover.style.right  = '';
+        popover.style.top    = '';
+        popover.style.bottom = markerHeight + 'px';
+
+        popover.style.visibility = 'hidden';
+        popover.style.display    = 'block';
+
+        var markerRect  = this.getBoundingClientRect();
+        var popoverRect = popover.getBoundingClientRect();
+        var viewportW   = window.innerWidth;
+
+        // Horizontal flip
+        if ((markerRect.left + popoverRect.width) > (viewportW - 20)) {
+            popover.style.left  = 'auto';
+            popover.style.right = '0';
+            if (arrow) { arrow.style.left = 'auto'; arrow.style.right = '0'; }
+        } else {
+            popover.style.left  = '0';
+            popover.style.right = 'auto';
+            if (arrow) { arrow.style.left = '0'; arrow.style.right = 'auto'; }
+        }
+
+        // Vertical flip
+        if (markerRect.top - popoverRect.height < 10) {
+            popover.style.bottom     = 'auto';
+            popover.style.top        = '100%';
+            if (arrow) {
+                arrow.style.bottom       = 'auto';
+                arrow.style.top          = '-9px';
+                arrow.style.borderTop    = 'none';
+                arrow.style.borderBottom = '10px solid white';
+            }
+        } else {
+            popover.style.top    = '';
+            popover.style.bottom = markerHeight + 'px';
+            if (arrow) {
+                arrow.style.top          = '';
+                arrow.style.bottom       = '-9px';
+                arrow.style.borderTop    = '10px solid white';
+                arrow.style.borderBottom = 'none';
+            }
+        }
+
+        popover.style.display    = 'none';
+        popover.style.visibility = '';
+    });
+});
+        });
+        
+    </script>
+<?php endif; ?>
+
+<style>
+    .white-popup {
+        position: relative;
+        background: #FFF;
+        padding: 20px;
+        width: 500px;
+        margin: 20px auto;
+        text-align: left;
+    }
+
+    .popup-product .close-popup-lookbook {
+        color: #fff;
+        top: -30px;
+        right: 0;
+        font-size: 26px;
+    }
+
+    .mplookbook-marker-tooltip .easypin-marker:hover .easypin-popover {
+        opacity: 1;
+        visibility: visible;
+        display: block !important;
+        z-index: 999;
+    }
+
+    .mplookbook-lookbook .popBg {
+        background-color: #fff;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+    }
+
+    .mplookbook-popBody .product-image-container {
+        width: 70px !important;
+        height: 70px !important;
+        display: block;
+        flex-shrink: 0;
+    }
+
+    .mplookbook-popBody .product-image-container img {
+        width: 70px !important;
+        height: 70px !important;
+        object-fit: cover;
+        border-radius: 6px;
+    }
+
+    .mplookbook-popBody .product-item-info .product {
+        display: flex !important;
+        flex-direction: column;
+    }
+</style>

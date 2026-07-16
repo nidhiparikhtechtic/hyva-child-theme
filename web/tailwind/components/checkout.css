@@ -1,0 +1,129 @@
+#hyva-checkout-main {
+    [x-cloak] {
+        display: none !important;
+    }
+}
+
+#hyva-checkout-main {
+    @apply flex flex-col
+}
+
+.hyva_checkout-index-index #shipping .group-street {
+    @apply col-span-12;
+}
+
+.hyva_checkout-index-index #billing .group-street {
+    @apply col-span-12;
+}
+
+.hyva_checkout-index-index form .field.field-reserved,
+.hyva_checkout-index-index fieldset .field.field-reserved {
+    @apply mb-4 md:mb-6 lg:mb-7
+}
+
+[wire\:key="field-wrapper-shipping-address-street-0"] div div:first-of-type div {
+    @apply w-full;
+}
+
+[wire\:key="field-wrapper-shipping-address-street-0"] div div:last-of-type div {
+    @apply w-full;
+}
+
+#form-tooltip-telephone {
+    @apply left-[-130px] sm:right-0
+}
+
+#form-tooltip-telephone #tooltip-content {
+    @apply left-[133px] sm:right-2
+}
+
+.hyva_checkout-index-index h1 {
+    @apply text-2xl md:text-3xl;
+}
+.hyva_checkout-index-index .checkout-summary{
+    @apply bg-transparent;
+}
+.hyva_checkout-index-index .title-page{
+    @apply hidden
+}
+:where(#hyva-checkout-main) .form-input, :where(#hyva-checkout-main) .form-email, :where(#hyva-checkout-main) .form-select, :where(#hyva-checkout-main) .form-multiselect, :where(#hyva-checkout-main) .form-textarea {
+    @apply !text-teakea-gray !border-container-lighter;
+}
+/* [type='checkbox']:checked { */
+	/* background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='black' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e"); */
+    /* @apply border-black bg-transparent; */
+/* } */
+.hyva_checkout-index-index fieldset#billing-details{
+    @apply mt-0
+}
+.hyva_checkout-index-index fieldset#shipping-details .address-form .field-telephone .field-wrapper-inner .form-hint-text{
+    @apply hidden
+}
+.hyva_checkout-index-index .advice-content{
+    @apply 2xl:top-[45%] xl:left-[33%] xl:top-[40%] lg:top-[30%] lg:left-[30%] md:top-[25%] md:left-[29%];
+}
+.hyva_checkout-index-index .advice .pagebuilder-mobile-only img{
+    @apply sm:!h-[400px] sm:object-cover;
+}
+.hyva_checkout-index-index .page.messages .stroke-current{
+    stroke: #000;
+}
+.label.label-city span::after , .label.label-street span::after , .label.label-firstname span::after ,.label.label-lastname span::after ,.label.label-country_id span::after  ,.label.label-email_address span::after , .label.label-telephone span::after {
+  content: "*";
+  color: red;
+  margin-left: 0px;
+}
+.hyva_checkout-index-index .global-contact-faq{
+    @apply pb-20 md:pb-0;
+}
+
+.hyva_checkout-index-index form .field.field-reserved, .hyva_checkout-index-index fieldset .field.field-reserved{
+        @apply lg:mb-4 mb-2.5;
+}
+.hyva_checkout-index-index form form .field, .hyva_checkout-index-index fieldset .field{
+    @apply !mt-0;
+}
+ .hyva_checkout-index-index .input-group ,.hyva_checkout-index-index .form-input,.hyva_checkout-index-index .form-select,.hyva_checkout-index-index .form-multiselect,.hyva_checkout-index-index .form-textarea{
+    @apply !rounded-lg;
+}
+.hyva_checkout-index-index .form-input.email ,.hyva_checkout-index-index .form-input.telephone {
+    @apply !rounded-tr-none !rounded-br-none;}
+:where(#hyva-checkout-main) .input-group :where(.form-input-addon) {
+    @apply !rounded-tr-lg !rounded-br-lg;
+}
+.checkout-onepage-success .title-page{
+    @apply container;
+}
+
+.hyva_checkout-index-index [type='checkbox']:checked, [type='radio']:checked {
+    background-color: #A01937;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    --tw-ring-offset-width: 2px;
+    --tw-ring-offset-color: #FFFFFF;
+    --tw-ring-color: #A01937;
+    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) #A01937;
+    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+}
+
+.hyva_checkout-index-index [type='checkbox'], [type='radio'] {
+    color: #A01937;
+}
+
+.hyva_checkout-index-index .form-input:focus {
+    outline: none;
+    outline-offset: 0;
+    --tw-ring-inset: var(--tw-empty, );
+    --tw-ring-offset-width: 0px;
+    --tw-ring-offset-color: #fff;
+    --tw-ring-color: #fff;
+    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+    box-shadow: none;
+    border-color: #fff;
+}
+
+.checkout-cart-index #maincontent > div.columns > div > div.product-slider.crosssell-product-slider {
+    @apply block;
+}

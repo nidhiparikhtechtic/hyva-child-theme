@@ -1,0 +1,6 @@
+.amsl-registration-page{
+    @apply container;
+    .amsl-social-wrapper{
+        @apply card;
+    }
+}

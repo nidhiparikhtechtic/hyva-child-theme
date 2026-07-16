@@ -1,0 +1,23 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Most Viewed or Automatic Related Products Hyva Compatibility by Amasty
+ */
+
+use Amasty\Mostviewed\Block\Checkout\Cart\Bundle;
+
+/** @var Bundle $block */
+
+$bundle = $block->getBundle();
+?>
+
+<?php if ($bundle): ?>
+    <div
+        class="amrelated-cart-bundle w-full mt-[30px] py-0 px-[5px] md:p-0"
+        data-pack-id="<?= /* @noEscape */ $bundle->getPackId() ?>"
+    >
+        <?= /* @noEscape */ $block->renderBundle($bundle) ?>
+    </div>
+<?php endif ?>
+

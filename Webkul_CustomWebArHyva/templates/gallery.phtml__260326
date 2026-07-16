@@ -1,0 +1,1013 @@
+<?php
+
+/**
+ * Webkul Software.
+ *
+ * @category  Webkul
+ * @package   Webkul_CustomWebArHyva
+ * @author    Webkul Software Private Limited
+ * @copyright Webkul Software Private Limited (https://webkul.com)
+ * @license   https://store.webkul.com/license.html
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\StoreConfig;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Hyva\Theme\ViewModel\HeroiconsSolid;
+use Magento\Catalog\Block\Product\View\Gallery;
+use Magento\Catalog\Helper\Image;
+use Magento\Framework\Escaper;
+
+/** @var Escaper $escaper */
+/** @var Gallery $block */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var StoreConfig $storeConfig */
+$storeConfig = $viewModels->require(StoreConfig::class);
+
+/** @var HeroiconsOutline $heroicons */
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+
+/** @var HeroiconsSolid $heroiconsSolid */
+$heroiconsSolid = $viewModels->require(HeroiconsSolid::class);
+
+$images = $block->getGalleryImages()->getItems();
+$mainImage = current(array_filter($images, [$block, 'isMainImage']));
+
+if (!empty($images) && empty($mainImage)) {
+    $mainImage = reset($images);
+}
+
+/** @var Image $helper */
+$helper = $block->getData('imageHelper');
+$mainImageData = $mainImage ? $mainImage->getData('small_image_url') : $block->getViewFileUrl('Magento_Catalog::images/product/placeholder/image.jpg');
+$smallWidth   = $block->getImageAttribute('product_page_image_small',  'width',  100);
+$smallHeight  = $block->getImageAttribute('product_page_image_small',  'height', 100);
+$mediumWidth  = $block->getImageAttribute('product_page_image_medium', 'width',  530);
+$mediumHeight = $block->getImageAttribute('product_page_image_medium', 'height', 570);
+
+// Admin Config
+$galleryOptionShowRelated = $storeConfig->getStoreConfig('catalog/product_video/show_related')      ?? false;
+$galleryOptionVideoLoop   = $storeConfig->getStoreConfig('catalog/product_video/video_auto_restart') ?? false;
+
+// view.xml Config
+$galleryOptionVideoAutoplay     = (bool) $block->getVar('gallery/autoplay',             'Magento_Catalog');
+$galleryOptionAllowfullscreen   = (bool) $block->getVar('gallery/allowfullscreen',      'Magento_Catalog');
+$galleryOptionLoop              = (bool) $block->getVar('gallery/loop',                 'Magento_Catalog');
+$galleryOptionShowCaption       = (bool) $block->getVar('gallery/caption',              'Magento_Catalog');
+$galleryOptionShowMagnifier     = (bool) $block->getVar('gallery/magnifier/enable',     'Magento_Catalog');
+$galleryOptionShowFullscreenBtn = (bool) $block->getVar('gallery/magnifier/fullscreen', 'Magento_Catalog');
+$galleryOptionShowMagnifierBtn  = $block->getVar('gallery/magnifier/trigger', 'Magento_Catalog') !== "hover";
+$galleryOptionMagnifierZoom     = (int)  $block->getVar('gallery/magnifier/zoom',       'Magento_Catalog');
+$galleryOptionAppendOnReceive   = (string)$block->getVar('gallery_switch_strategy', 'Magento_ConfigurableProduct') === 'append';
+
+$productName  = $block->getProduct()->getName();
+$wkViewModel  = $block->getWkViewModel();
+$display      = false;
+$modelUrl     = $iosModelUrl = '';
+$imageJson    = $block->getGalleryImagesJson();
+$imgJsonArray = $wkViewModel->getJsonHelper()->unserialize($imageJson ?? '{}');
+$imageCount   = count($imgJsonArray);
+$params       = $block->getRequest()->getParams();
+$productId    = 0;
+
+if (isset($params['id'])) {
+    $productId = $params['id'] ?? 0;
+}
+
+// Fallback: if no id param (e.g. cart drawer), try to get product from block directly
+$product = $wkViewModel->getProductData($productId);
+if (!$product || !is_object($product)) {
+    $product = $block->getProduct();
+}
+
+$productType  = ($product && is_object($product)) ? $product->getTypeId() : 'simple';
+$moduleStatus = $wkViewModel->isModuleEnabled();
+$mediaUrl     = $wkViewModel->getMediaUrl();
+
+$defaultVariantAttribute = ($productType == "configurable" && $product) ? $product->getModelVariantAttribute() : '';
+if ($defaultVariantAttribute == "") {
+    $defaultVariantAttribute = "0";
+}
+
+$showSeperateGlb        = ($product && is_object($product)) ? (int)$product->getAllowGlbInChildProducts() : 0;
+$associatedProducts     = ($productType == "configurable" && $product) ? $wkViewModel->getAssociatedProductModels($product) : [];
+$associatedProductsJson = $wkViewModel->getJsonHelper()->serialize($associatedProducts ?? []);
+
+$btnConfig    = $wkViewModel->getARButtonConfig();
+$lightAttrs   = $wkViewModel->getLightingAndSkyboxAttributesConfig();
+$cameraAttrs  = $wkViewModel->getStagingAndCamerasAttributesConfig();
+$imagesConfig = $wkViewModel->getImageAttributesConfig();
+
+$loading            = $wkViewModel->getModelViewerAttributeValue('webar/loading_attribute_settings/loading') ?? 'auto';
+$canShowOtherImages = $wkViewModel->canShowOtherImages();
+
+$isGalleryImageShow = true;
+if ($moduleStatus && !$canShowOtherImages) {
+    $isGalleryImageShow = false;
+}
+
+$showCustomImageInThumbnail = $wkViewModel->canShowCustomImageInThumbnail($imagesConfig["modelThumbnail"]);
+
+$performInterpolationDecay = 0;
+if ($cameraAttrs["autoRotate"] == 0 && $cameraAttrs["interpolationDecay"] != '') {
+    $performInterpolationDecay = 1;
+    $cameraAttrs["autoRotateDelay"] = 0;
+}
+
+$attrConfigJson   = $wkViewModel->getAttributeConfigJson($lightAttrs, $cameraAttrs, $imagesConfig, $loading);
+$isPlaceHolderImg = $wkViewModel->getIsPlaceHolderImg($imageCount, $imgJsonArray);
+
+$isArProduct = false;
+if ($moduleStatus) {
+    $display     = true;
+    $isArProduct = false;
+    $check3dEnabled = $wkViewModel->get3dModelFile($productId);
+    if (!empty($check3dEnabled['model_file'])) {
+        $isArProduct = true;
+        $modelUrl    = $mediaUrl . 'catalog/product/glbmodels/' . $check3dEnabled['model_file'];
+    }
+    if (!empty($check3dEnabled['ios_file'])) {
+        $isArProduct = true;
+        $iosModelUrl = $mediaUrl . 'catalog/product/glbmodels/ios/' . $check3dEnabled['ios_file'];
+    }
+    foreach ($associatedProducts as $assocPro) {
+        if (strpos($assocPro['modelUrl'], '3DModelNotExists.glb') === false) {
+            $isArProduct = true;
+        }
+    }
+}
+
+if (!$canShowOtherImages) {
+    $imageCount = 0;
+}
+if ($showSeperateGlb == 1 && $modelUrl != "") {
+    $modelUrl = "";
+}
+
+if ($modelUrl == "" && $showSeperateGlb == 1 && $display && !empty($associatedProducts)) {
+    $modelUrl    = $wkViewModel->getDefault3DModelUrl();
+    $iosModelUrl = $wkViewModel->getDefault3DIosModelUrl();
+}
+
+if ($isPlaceHolderImg && $productType == "configurable") {
+    if ($wkViewModel->getIsAssociatedProductHasImgFlag()) {
+        $isPlaceHolderImg = 0;
+    }
+}
+
+$modelThumbnailImg = $mainImageData;
+if ($showCustomImageInThumbnail && $imagesConfig["modelThumbnail"] != '') {
+    $modelThumbnailImg = $imagesConfig["modelThumbnail"];
+}
+?>
+
+<style>
+    [x-cloak] {
+        display: none !important;
+    }
+</style>
+
+<div class="w-full" x-data="initStackedGallery()" x-bind="eventListeners" id="gallery">
+
+    <!-- ════════════════════════════════════════════════════════
+         MOBILE: PURE CSS SCROLL-SNAP PEEK SLIDER
+    ════════════════════════════════════════════════════════ -->
+    <div class="md:hidden">
+
+        <!-- -- Peek track: flex scroll container, snap, no scrollbar -- -->
+        <div class="flex overflow-x-auto scroll-smooth snap-x snap-mandatory
+                    [-webkit-overflow-scrolling:touch]
+                    [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
+                    gap-2.5 pt-0.5 pb-1.5"
+            id="peek-track"
+            @scroll.passive="onPeekScroll($event)">
+
+            <template x-for="(image, index) in images.filter(i => !i.isArModel)"
+                :key="'mob-' + index">
+                <div class="flex-none w-[85%] snap-start aspect-[4/3]
+                            overflow-hidden rounded-xl border border-gray-200 shadow-sm"
+                    @click="openLightbox(image, index)">
+                    <img :src="image.img"
+                        :alt="image.caption || '<?= $escaper->escapeJs($productName) ?>'"
+                        :title="image.caption ? image.caption : '<?= $escaper->escapeJs($productName) ?> - Teakea'"
+                        width="<?= /* @noEscape */ $mediumWidth ?>"
+                        height="<?= /* @noEscape */ $mediumHeight ?>"
+                        class="w-full h-full object-cover block"
+                        :loading="index === 0 ? 'eager' : 'lazy'"
+                        :fetchpriority="index === 0 ? 'high' : 'auto'">
+                </div>
+            </template>
+        </div>
+
+        <!-- Dot indicators -->
+        <div class="flex justify-center items-center gap-1.5 pt-3"
+            x-show="images.filter(i => !i.isArModel).length > 1"
+            x-cloak>
+            <template x-for="(image, index) in images.filter(i => !i.isArModel)"
+                :key="'dot-' + index">
+                <div class="h-1.5 bg-gray-300 transition-all duration-300 ease-out"
+                    :class="mobileActiveIndex === index ? 'w-4 rounded-md bg-gray-700' : 'w-1.5 rounded-full'">
+                </div>
+            </template>
+        </div>
+
+        <!-- Mobile AR pills -->
+        <div class="flex gap-2.5 justify-center flex-wrap py-3.5" x-show="isArAvailable" x-cloak>
+            <button @click="load3DModel()"
+                class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold
+                       border border-yellow-600/60 bg-yellow-50 text-gray-900
+                       shadow-sm hover:-translate-y-px hover:shadow-md transition-all duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
+                </svg>
+                <?= $escaper->escapeHtml(__('View in 3D')) ?>
+            </button>
+            <button @click="handleARView()"
+                class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold
+                       border border-yellow-600/60 bg-yellow-50 text-gray-900
+                       shadow-sm hover:-translate-y-px hover:shadow-md transition-all duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                </svg>
+                <?= $escaper->escapeHtml(__('View in AR')) ?>
+            </button>
+        </div>
+
+        <!-- Mobile 3D viewer -->
+        <div x-show="show3DModel" x-cloak class="mt-3">
+            <div id="wk3dimage-container-mobile"
+                class="w-full rounded-xl border border-gray-200 bg-gray-50 overflow-hidden transition-opacity duration-300"
+                style="aspect-ratio:4/3;"
+                :class="{ 'opacity-0': !modelLoaded, 'opacity-100': modelLoaded }">
+            </div>
+            <button @click="hide3DModel()"
+                class="mt-3 text-sm text-gray-500 underline underline-offset-2 block mx-auto">
+                ← <?= $escaper->escapeHtml(__('Back to images')) ?>
+            </button>
+        </div>
+    </div>
+    <!-- ════ END MOBILE ════ -->
+
+
+    <!-- ════════════════════════════════════════════════════════
+         DESKTOP: STACKED EDITORIAL GALLERY
+    ════════════════════════════════════════════════════════ -->
+    <div class="hidden md:flex flex-col gap-2" id="stacked-gallery">
+
+        <!-- ALWAYS-VISIBLE rows -->
+        <template x-for="(row, rowIndex) in visibleRows" :key="'vr-' + rowIndex">
+            <div :class="row.layout === 'halves'
+                    ? 'grid grid-cols-2 gap-2'
+                    : 'grid grid-cols-1 gap-2'">
+
+                <!-- Image cells -->
+                <template x-for="(image, imgIndex) in row.images" :key="'vi-' + imgIndex">
+                    <div class="group relative overflow-hidden rounded-xl border border-gray-200 cursor-zoom-in"
+                        :style="row.layout === 'halves' ? 'aspect-ratio:1/1;' : 'aspect-ratio:4/3;'"
+                        @click="openLightbox(image, image._origIndex)">
+
+                        <img :src="image.img"
+                            :alt="image.caption || '<?= $escaper->escapeJs($productName) ?>'"
+                            :title="image.caption ? image.caption : '<?= $escaper->escapeJs($productName) ?> - Teakea'"
+                            width="<?= /* @noEscape */ $mediumWidth ?>"
+                            height="<?= /* @noEscape */ $mediumHeight ?>"
+                            class="w-full h-full object-cover block transition duration-500 ease-out group-hover:scale-[1.045]"
+                            :loading="rowIndex === 0 && imgIndex === 0 ? 'eager' : 'lazy'"
+                            :fetchpriority="rowIndex === 0 && imgIndex === 0 ? 'high' : 'auto'">
+
+                        <div class="absolute inset-0 rounded-xl bg-black/0 transition duration-300 group-hover:bg-black/10 flex items-center justify-center">
+                            <span class="bg-white/90 rounded-full p-2 shadow-lg opacity-0 scale-90 transition duration-300 ease-out group-hover:opacity-100 group-hover:scale-100">
+                                <?= $heroicons->arrowsExpandHtml('text-gray-700', 18, 18, ['aria-hidden' => 'true']); ?>
+                            </span>
+                        </div>
+
+                        <?php if ($galleryOptionShowCaption): ?>
+                            <template x-if="image.caption && image.caption !== '<?= $escaper->escapeJs($productName) ?>'">
+                                <figcaption class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/50 to-transparent text-white text-sm px-4 py-3 rounded-b-xl"
+                                    x-text="image.caption"></figcaption>
+                            </template>
+                        <?php endif; ?>
+                    </div>
+                </template>
+
+                <!-- 3D model tile -->
+                <template x-if="row.is3dRow">
+                    <div class="relative overflow-hidden rounded-xl border border-gray-200 bg-gray-50"
+                        style="aspect-ratio:4/3; cursor:default;">
+                        <div id="wk3dimage-container"
+                            class="w-full h-full transition-opacity duration-300"
+                            style="min-height:300px;"
+                            :class="{ 'opacity-0': !modelLoaded, 'opacity-100': modelLoaded }">
+                        </div>
+                        <button @click.stop="hide3DModel()"
+                            class="absolute top-3 left-3 inline-flex items-center gap-1 text-xs font-semibold
+                                   bg-white/90 hover:bg-white rounded-full px-3 py-1.5 shadow transition-colors duration-150">
+                            <?= $heroicons->arrowLeftHtml('', 13, 13, ['aria-hidden' => 'true']); ?>
+                            <?= $escaper->escapeHtml(__('Back')) ?>
+                        </button>
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <!-- COLLAPSIBLE hidden rows -->
+        <template x-if="hasMoreRows">
+            <div>
+                <div class="relative overflow-hidden"
+                    :class="galleryExpanded ? '' : 'after:content-[\'\'] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[120px] after:bg-gradient-to-b after:from-white/0 after:to-white after:pointer-events-none'">
+                    <div class="flex flex-col gap-2 overflow-hidden transition-all duration-500 ease-in-out"
+                        :class="galleryExpanded ? 'max-h-[3000px]' : 'max-h-0'"
+                        :style="galleryExpanded
+                        ? 'max-height:9999px; transition:max-height .6s ease;'
+                        : 'max-height:0px; transition:max-height .4s ease;'">
+
+                        <template x-for="(row, rowIndex) in hiddenRows" :key="'hr-' + rowIndex">
+                            <div :class="row.layout === 'halves'
+                                    ? 'grid grid-cols-2 gap-2 mt-2'
+                                    : 'grid grid-cols-1 gap-2 mt-2'">
+                                <template x-for="(image, imgIndex) in row.images" :key="'hi-' + imgIndex">
+                                    <div class="group relative overflow-hidden rounded-xl border border-gray-200 cursor-zoom-in"
+                                        :style="row.layout === 'halves' ? 'aspect-ratio:1/1;' : 'aspect-ratio:4/3;'"
+                                        @click="openLightbox(image, image._origIndex)">
+
+                                        <img :src="image.img"
+                                            :alt="image.caption || '<?= $escaper->escapeJs($productName) ?>'"
+                                            :title="image.caption ? image.caption : '<?= $escaper->escapeJs($productName) ?> - Teakea'"
+                                            width="<?= /* @noEscape */ $mediumWidth ?>"
+                                            height="<?= /* @noEscape */ $mediumHeight ?>"
+                                            class="w-full h-full object-cover block transition duration-500 ease-out group-hover:scale-[1.045]"
+                                            :loading="rowIndex === 0 && imgIndex === 0 ? 'eager' : 'lazy'"
+                                            :fetchpriority="rowIndex === 0 && imgIndex === 0 ? 'high' : 'auto'">
+
+                                        <div class="absolute inset-0 rounded-xl bg-black/0 transition duration-300 group-hover:bg-black/10 flex items-center justify-center">
+
+                                            <span class="bg-white/90 rounded-full p-2 shadow-lg opacity-0 scale-90 transition duration-300 ease-out group-hover:opacity-100 group-hover:scale-100">
+
+                                                <?= $heroicons->arrowsExpandHtml('text-gray-700', 18, 18, ['aria-hidden' => 'true']); ?>
+
+                                            </span>
+                                        </div>
+
+                                        <?php if ($galleryOptionShowCaption): ?>
+                                            <template x-if="image.caption && image.caption !== '<?= $escaper->escapeJs($productName) ?>'">
+                                                <figcaption class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/50 to-transparent text-white text-sm px-4 py-3 rounded-b-xl"
+                                                    x-text="image.caption"></figcaption>
+                                            </template>
+                                        <?php endif; ?>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Show More / Show Less toggle -->
+                <button
+                    class="w-full mt-1.5 py-2.5 flex items-center justify-center gap-1.5 text-xs font-semibold tracking-wide text-gray-700 bg-gray-50 hover:bg-gray-100 border border-gray-200 hover:border-gray-300 rounded-xl transition duration-200 ease-out hover:shadow-sm"
+                    @click="toggleGallery()">
+
+                    <svg class="w-4 h-4 transition-transform duration-300"
+                        :class="{ 'rotate-180': galleryExpanded }"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+
+                    <span x-text="galleryExpanded ? '<?= $escaper->escapeJs(__('Show Less')) ?>' : '<?= $escaper->escapeJs(__('Show All Photos')) ?> (' + totalImageCount + ')'">
+                    </span>
+                </button>
+            </div>
+        </template>
+
+        <!-- Desktop AR pills -->
+        <div class="flex gap-2.5 justify-center flex-wrap py-3.5"
+            x-show="isArAvailable && !show3DModel" x-cloak>
+            <button @click="load3DModel()"
+                class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold
+                       border border-yellow-600/60 bg-yellow-50 text-gray-900
+                       shadow-sm hover:-translate-y-px hover:shadow-md transition-all duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
+                </svg>
+                <?= $escaper->escapeHtml(__('View in 3D')) ?>
+            </button>
+            <button @click="handleARView()"
+                class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold
+                       border border-yellow-600/60 bg-yellow-50 text-gray-900
+                       shadow-sm hover:-translate-y-px hover:shadow-md transition-all duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                </svg>
+                <?= $escaper->escapeHtml(__('View in AR')) ?>
+            </button>
+        </div>
+    </div>
+    <!-- ════ END DESKTOP ════ -->
+
+
+    <!-- ════════════════════════════════════════════════════════
+         PREMIUM LIGHTBOX — deep black backdrop, glass nav
+    ════════════════════════════════════════════════════════ -->
+    <template x-teleport="body">
+        <div x-show="lightboxOpen"
+            x-cloak
+            class="fixed inset-0 z-[9999] flex items-center justify-center"
+            style="background:rgba(6,6,10,.97); backdrop-filter:blur(20px) saturate(.5); -webkit-backdrop-filter:blur(20px) saturate(.5);"
+            @click.self="lightboxOpen = false"
+            @keydown.escape.window="lightboxOpen = false"
+            @keyup.arrow-right.window="lightboxNext()"
+            @keyup.arrow-left.window="lightboxPrev()"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0">
+
+            <!-- Counter -->
+            <div class="absolute top-5 left-1/2 -translate-x-1/2 text-xs tracking-widest uppercase tabular-nums"
+                style="color:rgba(255,255,255,.4);"
+                x-show="lightboxImages.length > 1">
+                <span x-text="lightboxIndex + 1"></span>&thinsp;/&thinsp;<span x-text="lightboxImages.length"></span>
+            </div>
+
+            <!-- Close -->
+            <button class="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center
+                           border transition-colors duration-200"
+                style="background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.1); color:rgba(255,255,255,.7);"
+                @mouseover="$el.style.background='rgba(255,255,255,.15)'; $el.style.color='#fff';"
+                @mouseleave="$el.style.background='rgba(255,255,255,.07)'; $el.style.color='rgba(255,255,255,.7)';"
+                @click="lightboxOpen = false"
+                aria-label="<?= $escaper->escapeHtmlAttr(__('Close')) ?>">
+                <?= $heroicons->xHtml('', 18, 18, ['aria-hidden' => 'true']); ?>
+            </button>
+
+            <!-- Image -->
+            <img
+                :key="lightboxIndex"
+                :src="lightboxImages[lightboxIndex]?.full || lightboxImages[lightboxIndex]?.img"
+                :alt="lightboxImages[lightboxIndex]?.caption || '<?= $escaper->escapeJs($productName) ?>'"
+                :title="lightboxImages[lightboxIndex]?.caption ? lightboxImages[lightboxIndex].caption : '<?= $escaper->escapeJs($productName) ?> - Teakea'"
+                class="max-h-[88vh] max-w-[88vw] object-contain rounded-sm select-none
+           transition duration-200 ease-[cubic-bezier(.22,1,.36,1)]"
+                style="box-shadow:0 0 0 1px rgba(255,255,255,.05), 0 40px 100px rgba(0,0,0,.95);"
+                draggable="false"
+
+                x-transition:enter="transition duration-200 ease-[cubic-bezier(.22,1,.36,1)]"
+                x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+                x-transition:enter-end="opacity-100 scale-100 translate-y-0" />
+
+            <!-- Prev -->
+            <button class="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full flex items-center justify-center border transition-colors duration-200"
+                style="background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.1); color:rgba(255,255,255,.7);"
+                @mouseover="$el.style.background='rgba(255,255,255,.15)'; $el.style.color='#fff';"
+                @mouseleave="$el.style.background='rgba(255,255,255,.06)'; $el.style.color='rgba(255,255,255,.7)';"
+                @click="lightboxPrev()"
+                x-show="lightboxImages.length > 1"
+                aria-label="<?= $escaper->escapeHtmlAttr(__('Previous')) ?>">
+                <?= $heroiconsSolid->arrowLeftHtml('', 18, 18, ['aria-hidden' => 'true']); ?>
+            </button>
+
+            <!-- Next -->
+            <button class="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full flex items-center justify-center border transition-colors duration-200"
+                style="background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.1); color:rgba(255,255,255,.7);"
+                @mouseover="$el.style.background='rgba(255,255,255,.15)'; $el.style.color='#fff';"
+                @mouseleave="$el.style.background='rgba(255,255,255,.06)'; $el.style.color='rgba(255,255,255,.7)';"
+                @click="lightboxNext()"
+                x-show="lightboxImages.length > 1"
+                aria-label="<?= $escaper->escapeHtmlAttr(__('Next')) ?>">
+                <?= $heroiconsSolid->arrowRightHtml('', 18, 18, ['aria-hidden' => 'true']); ?>
+            </button>
+        </div>
+    </template>
+
+
+    <!-- ════ QR CODE MODAL ════ -->
+    <template x-teleport="body">
+        <div x-show="showQrModal" x-cloak
+            class="fixed inset-0 z-[9998] flex items-center justify-content-center"
+            style="background:rgba(0,0,0,.55); backdrop-filter:blur(6px);"
+            @click.self="showQrModal = false"
+            @keydown.escape.window="showQrModal = false"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0">
+
+            <div class="relative bg-white rounded-2xl p-7 max-w-sm w-[calc(100%-2rem)] mx-auto shadow-2xl"
+                @click.stop
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 scale-95"
+                x-transition:enter-end="opacity-100 scale-100">
+
+                <button @click="showQrModal = false"
+                    class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 transition-colors duration-150">
+                    <?= $heroicons->xHtml('', 22, 22, ['aria-hidden' => 'true']); ?>
+                </button>
+                <div class="text-center mb-5">
+                    <h3 class="text-xl font-bold text-gray-900 mb-1"><?= $escaper->escapeHtml(__('View in AR')) ?></h3>
+                    <p class="text-gray-500 text-sm"><?= $escaper->escapeHtml(__('Scan with your phone camera to see this product in your space')) ?></p>
+                </div>
+                <div class="flex justify-center bg-gray-50 rounded-xl p-5 min-h-[240px] mb-5">
+                    <div x-show="qrCodeLoaded" x-html="qrCodeHtml" class="w-56 h-56"></div>
+                    <div x-show="!qrCodeLoaded" class="w-56 h-56 flex items-center justify-center">
+                        <svg class="animate-spin w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                        </svg>
+                    </div>
+                </div>
+                <button @click="showQrModal = false"
+                    class="w-full py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium text-gray-700 transition-colors duration-150">
+                    <?= $escaper->escapeHtml(__('Close')) ?>
+                </button>
+            </div>
+        </div>
+    </template>
+
+
+    <!-- ════ VIDEO LIGHTBOX ════ -->
+    <template x-teleport="body">
+        <div x-show="activeVideo" x-cloak
+            class="fixed inset-0 z-[9999] flex items-center justify-center"
+            style="background:rgba(6,6,10,.97); backdrop-filter:blur(20px) saturate(.5);"
+            @click.self="activeVideo = false"
+            @keydown.escape.window="activeVideo = false"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0">
+            <button class="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center border"
+                style="background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.1); color:rgba(255,255,255,.7);"
+                @click="activeVideo = false">
+                <?= $heroicons->xHtml('', 18, 18, ['aria-hidden' => 'true']); ?>
+            </button>
+            <template x-if="activeVideoData">
+                <iframe class="w-[90vw] aspect-video max-w-4xl"
+                    type="text/html" frameborder="0" loading="lazy"
+                    :src="activeVideoData.src" :allow="activeVideoData.allow"></iframe>
+            </template>
+        </div>
+    </template>
+
+</div>
+
+
+<script>
+    /* ── WebAR global config ──────────────────────────────── */
+    var webarOptions = {
+        mainImageData: "<?= /* @noEscape */ $mainImageData ?>",
+        showCustomImageInThumbnail: <?= /* @noEscape */ $showCustomImageInThumbnail ?>,
+        modelUrl: "<?= /* @noEscape */ $modelUrl ?>",
+        iosModelUrl: "<?= /* @noEscape */ $iosModelUrl ?>",
+        displayModel: <?= /* @noEscape */ $display ? 'true' : 'false' ?>,
+        isArProduct: <?= /* @noEscape */ $isArProduct ? 'true' : 'false' ?>,
+        attributeConfigs: <?= /* @noEscape */ $attrConfigJson ?>,
+        productHasOptions: <?= /* @noEscape */ ($product && is_object($product) ? (int)$product->hasOptions() : 0) ?>,
+        showCustomButton: <?= /* @noEscape */ (int)$btnConfig["showCustomButton"] ?? 0 ?>,
+        showCustomButtonText: "<?= /* @noEscape */ $btnConfig["configButtonText"] ?>",
+        showSeperateGlb: <?= /* @noEscape */ $showSeperateGlb ?>,
+        associatedProducts: <?= /* @noEscape */ $associatedProductsJson ?>,
+        productType: "<?= /* @noEscape */ $productType ?>",
+        defaultVariantAttribute: <?= /* @noEscape */ $defaultVariantAttribute ?>,
+        modelViewerScriptUrl: "<?= /* @noEscape */ $block->getViewFileUrl('Webkul_WebAr::js/webxr/mv/model-viewer.min.js') ?>"
+    };
+
+    var modelThumbnailImg = "<?= /* @noEscape */ $modelThumbnailImg ?>";
+    var modelViewerScriptLoaded = false;
+
+    function loadModelViewerScript() {
+        return new Promise((resolve, reject) => {
+            if (modelViewerScriptLoaded) {
+                resolve();
+                return;
+            }
+            const s = document.createElement('script');
+            s.type = 'module';
+            s.src = webarOptions.modelViewerScriptUrl;
+            s.onload = () => {
+                modelViewerScriptLoaded = true;
+                resolve();
+            };
+            s.onerror = reject;
+            document.head.appendChild(s);
+        });
+    }
+
+    /* ── Main Alpine component ─────────────────────────────── */
+    function initStackedGallery() {
+        return {
+
+            /* data ──────────────────────────────────────────── */
+            images: <?= /* @noEscape */ $block->getGalleryImagesJson() ?>,
+            initialImages: [],
+
+            INITIAL_ROW_LIMIT: 3,
+            allRows: [],
+            visibleRows: [],
+            hiddenRows: [],
+            hasMoreRows: false,
+            galleryExpanded: false,
+            totalImageCount: 0,
+
+            mobileActiveIndex: 0,
+
+            show3DModel: false,
+            modelRendered: false,
+            modelLoaded: false,
+            isArAvailable: false,
+
+            lightboxOpen: false,
+            lightboxImages: [],
+            lightboxIndex: 0,
+
+            showQrModal: false,
+            qrCodeLoaded: false,
+            qrCodeHtml: '',
+
+            activeVideo: false,
+            activeVideoData: null,
+
+            videoOptions: {
+                autoplay: <?= $galleryOptionVideoAutoplay ? 'true' : 'false' ?>,
+                loop: <?= $galleryOptionVideoLoop ? 'true' : 'false' ?>,
+                showRelated: <?= $galleryOptionShowRelated ? 'true' : 'false' ?>,
+                allowApi: false
+            },
+
+            /* init ──────────────────────────────────────────── */
+            init() {
+                this.initialImages = this.images.filter(img => !img.isArModel);
+                this.isArAvailable = webarOptions.isArProduct &&
+                    !!(webarOptions.modelUrl || webarOptions.iosModelUrl);
+
+                this.buildLayout();
+                this.buildLightboxImages();
+
+                this.$watch('images', () => {
+                    this.buildLayout();
+                    this.buildLightboxImages();
+                });
+                this.$watch('show3DModel', () => this.buildLayout());
+
+                this.$watch('showQrModal', show => {
+                    document.body.style.overflow = show ? 'hidden' : '';
+                    if (show) this.loadQRCode();
+                });
+                this.$watch('lightboxOpen', open => {
+                    document.body.style.overflow = open ? 'hidden' : '';
+                });
+                this.$watch('activeVideo', open => {
+                    document.body.style.overflow = open ? 'hidden' : '';
+                });
+            },
+
+            /* layout builder ─────────────────────────────────
+             * Pattern: row0=full, row1=halves, row2=full, …
+             * 3D model injected as full-width row 0 when active.
+             */
+            buildLayout() {
+                const filtered = this.images
+                    .filter(img => !img.isArModel)
+                    .map((img, i) => ({
+                        ...img,
+                        _origIndex: i
+                    }));
+
+                this.totalImageCount = filtered.length;
+                const rows = [];
+
+                if (this.show3DModel) {
+                    rows.push({
+                        layout: 'full',
+                        images: [],
+                        is3dRow: true
+                    });
+                }
+
+                let i = 0,
+                    patternPos = this.show3DModel ? 1 : 0;
+                while (i < filtered.length) {
+                    const isFull = (patternPos % 2 === 0);
+                    if (isFull) {
+                        rows.push({
+                            layout: 'full',
+                            images: [filtered[i]],
+                            is3dRow: false
+                        });
+                        i++;
+                    } else {
+                        const pair = filtered.slice(i, i + 2);
+                        rows.push({
+                            layout: pair.length === 2 ? 'halves' : 'full',
+                            images: pair,
+                            is3dRow: false
+                        });
+                        i += pair.length;
+                    }
+                    patternPos++;
+                }
+
+                this.allRows = rows;
+                this.visibleRows = rows.slice(0, this.INITIAL_ROW_LIMIT);
+                this.hiddenRows = rows.slice(this.INITIAL_ROW_LIMIT);
+                this.hasMoreRows = this.hiddenRows.length > 0;
+            },
+
+            toggleGallery() {
+                this.galleryExpanded = !this.galleryExpanded;
+                if (!this.galleryExpanded) {
+                    this.$nextTick(() => {
+                        const el = document.getElementById('stacked-gallery');
+                        if (el) el.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    });
+                }
+            },
+
+            buildLightboxImages() {
+                this.lightboxImages = this.images.filter(img => img.type !== 'video' && !img.isArModel);
+            },
+
+            /* mobile scroll spy ─────────────────────────────── */
+            onPeekScroll(e) {
+                const track = e.target;
+                const nonAr = this.images.filter(i => !i.isArModel);
+                const slideW = track.scrollWidth / Math.max(1, nonAr.length);
+                this.mobileActiveIndex = Math.round(track.scrollLeft / slideW);
+            },
+
+            /* lightbox ──────────────────────────────────────── */
+            openLightbox(image, origIndex) {
+                if (image.type === 'video') {
+                    this.activeVideoData = this.getVideoData(image);
+                    this.activeVideo = true;
+                    return;
+                }
+                const idx = this.lightboxImages.findIndex(img => img.img === image.img);
+                this.lightboxIndex = idx === -1 ? 0 : idx;
+                this.lightboxOpen = true;
+            },
+            lightboxNext() {
+                this.lightboxIndex = (this.lightboxIndex + 1) % this.lightboxImages.length;
+            },
+            lightboxPrev() {
+                this.lightboxIndex = (this.lightboxIndex - 1 + this.lightboxImages.length) % this.lightboxImages.length;
+            },
+
+            /* 3D model ──────────────────────────────────────── */
+            async load3DModel() {
+                if (!this.isArAvailable) return;
+                this.show3DModel = true;
+                if (!this.modelRendered) {
+                    try {
+                        await loadModelViewerScript();
+                        await new Promise(r => setTimeout(r, 100));
+                        this.$nextTick(() => {
+                            this.render3DModel();
+                            this.modelRendered = true;
+                        });
+                    } catch (err) {
+                        console.error('model-viewer error:', err);
+                    }
+                }
+            },
+
+            hide3DModel() {
+                this.show3DModel = false;
+            },
+
+            render3DModel() {
+                const container = document.getElementById('wk3dimage-container') ||
+                    document.getElementById('wk3dimage-container-mobile');
+                if (!container || !webarOptions.modelUrl) return;
+
+                this.modelLoaded = false;
+                const isSafari = this.detectSafari();
+                const a = webarOptions.attributeConfigs;
+
+                let html = `<model-viewer id="wk3dimage"
+                    data-js-focus-visible src="${webarOptions.modelUrl}"
+                    alt="3D model" camera-controls camera-orbit="33deg 67deg auto"
+                    style="width:100%;height:100%;min-height:300px;"
+                    ${webarOptions.productHasOptions
+                        ? 'ar ar-modes="webxr quick-look"'
+                        : 'ar ar-modes="scene-viewer webxr quick-look"'}`;
+
+                if (a.auto_rotate == 1) html += ' auto-rotate';
+                if (a.auto_rotate_delay) html += ` auto-rotate-delay="${a.auto_rotate_delay}"`;
+                if (a.disable_zoom == 1) html += ' disable-zoom';
+                if (a.disable_tap == 1) html += ' disable-tap';
+                if (a.touch_action) html += ` touch-action="${a.touch_action}"`;
+                if (a.interpolation_decay) html += ` interpolation-decay="${a.interpolation_decay}"`;
+                if (a.shadow_intensity !== '-1') html += ` shadow-intensity="${a.shadow_intensity}"`;
+                if (a.exposure !== '-1') html += ` exposure="${a.exposure}"`;
+                if (a.shadow_softness !== '-1') html += ` shadow-softness="${a.shadow_softness}"`;
+                if (a.apply_environment_image == 1) {
+                    if (a.environment_image && a.environment_image !== 'envurl')
+                        html += ` environment-image="${a.environment_image}"`;
+                    else if (a.environment_image === 'envurl' && a.environment_image_url)
+                        html += ` environment-image="${a.environment_image_url}"`;
+                }
+                if (a.skybox_image && a.apply_skybox_image != 0) html += ` skybox-image="${a.skybox_image}"`;
+                if (a.loading) html += ` loading="${a.loading}"`;
+                if (a.poster) html += ` poster="${a.poster}"`;
+                if (webarOptions.iosModelUrl) html += ` ios-src="${webarOptions.iosModelUrl}"`;
+                html += '>';
+
+                if (webarOptions.showCustomButton) {
+                    if (isSafari && webarOptions.iosModelUrl)
+                        html += `<button id="ar-button" class="ar-custom-button md:hidden"
+                            onclick="window.location.href='${webarOptions.iosModelUrl}'">${webarOptions.showCustomButtonText}</button>`;
+                    else
+                        html += `<button slot="ar-button" id="ar-button">${webarOptions.showCustomButtonText}</button>`;
+                }
+                html += `<button slot="ar-button" id="ar-button" class="hidden md:block"
+                    onclick="window.dispatchEvent(new CustomEvent('open-qr-modal'))">
+                    ${webarOptions.showCustomButtonText}</button></model-viewer>`;
+
+                container.innerHTML = html;
+                this.$nextTick(() => {
+                    const mv = document.getElementById('wk3dimage');
+                    if (mv) {
+                        mv.addEventListener('load', () => {
+                            this.modelLoaded = true;
+                        });
+                        setTimeout(() => {
+                            this.modelLoaded = true;
+                        }, 3000);
+                    }
+                });
+            },
+
+            detectSafari() {
+                const ua = navigator.userAgent.toLowerCase();
+                return ua.includes('safari') && !ua.includes('chrome') && !ua.includes('android');
+            },
+
+            /* QR ─────────────────────────────────────────────── */
+            async loadQRCode() {
+                if (this.qrCodeLoaded) return;
+                try {
+                    <?php $qrCodeDataUri = $block->getProductQrCode(); ?>
+                    <?php if ($qrCodeDataUri): ?>
+                        this.qrCodeHtml = `<img src="<?= /* @noEscape */ $qrCodeDataUri ?>"
+                            alt="<?= $escaper->escapeHtmlAttr(__('QR Code for %1', $productName)) ?>"
+                            title="<?= $escaper->escapeHtmlAttr(__('QR Code for %1', $productName)) ?>"
+                            class="w-56 h-56" width="224" height="224">`;
+                    <?php else: ?>
+                        this.qrCodeHtml = '<p class="text-red-500 text-sm text-center"><?= $escaper->escapeHtml(__('Unable to generate QR code')) ?></p>';
+                    <?php endif; ?>
+                    this.qrCodeLoaded = true;
+                } catch (err) {
+                    this.qrCodeHtml = '<p class="text-red-500 text-sm text-center">Error loading QR code</p>';
+                    this.qrCodeLoaded = true;
+                }
+            },
+
+            /* AR view ───────────────────────────────────────── */
+            async handleARView() {
+                if (!this.isArAvailable) return;
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                if (isMobile) {
+                    if (!this.modelRendered) {
+                        this.show3DModel = true;
+                        try {
+                            await loadModelViewerScript();
+                            await new Promise(r => setTimeout(r, 100));
+                            this.$nextTick(() => {
+                                this.render3DModel();
+                                this.modelRendered = true;
+                                setTimeout(() => {
+                                    const mv = document.getElementById('wk3dimage');
+                                    if (mv) mv.loaded ?
+                                        this.triggerAR(mv) :
+                                        mv.addEventListener('load', () => this.triggerAR(mv), {
+                                            once: true
+                                        });
+                                }, 1000);
+                            });
+                        } catch (err) {
+                            console.error('AR error:', err);
+                        }
+                    } else {
+                        this.show3DModel = true;
+                        this.$nextTick(() => {
+                            const mv = document.getElementById('wk3dimage');
+                            if (mv) this.triggerAR(mv);
+                        });
+                    }
+                } else {
+                    this.showQrModal = true;
+                }
+            },
+
+            triggerAR(mv) {
+                const btn = mv.querySelector('#ar-button');
+                if (btn) btn.click();
+                else if (mv.activateAR) mv.activateAR();
+            },
+
+            /* gallery / configurable events ─────────────────── */
+            receiveImages(images) {
+                <?php if ($galleryOptionAppendOnReceive): ?>
+                    const urls = this.initialImages.map(i => i.full);
+                    this.images = [...this.initialImages, ...images.filter(i => !urls.includes(i.full))];
+                <?php else: ?>
+                    this.images = images;
+                <?php endif; ?>
+                this.show3DModel = false;
+                this.modelRendered = false;
+                this.modelLoaded = false;
+                this.galleryExpanded = false;
+            },
+
+            updateArModel(detail) {
+                if (!webarOptions.showSeperateGlb || !webarOptions.associatedProducts) return;
+                const ap = webarOptions.associatedProducts[detail.productIndex];
+                if (!ap) return;
+                if (webarOptions.modelUrl !== (ap.modelUrl || '') ||
+                    webarOptions.iosModelUrl !== (ap.iosModelUrl || '')) {
+                    webarOptions.modelUrl = ap.modelUrl || '';
+                    webarOptions.iosModelUrl = ap.iosModelUrl || '';
+                    this.isArAvailable = webarOptions.isArProduct &&
+                        !!(webarOptions.modelUrl || webarOptions.iosModelUrl);
+                    this.modelRendered = false;
+                    this.show3DModel = false;
+                    this.modelLoaded = false;
+                }
+            },
+
+            resetGallery() {
+                this.images = [...this.initialImages];
+                this.show3DModel = false;
+                this.modelRendered = false;
+                this.modelLoaded = false;
+                this.galleryExpanded = false;
+                this.buildLayout();
+            },
+
+            /* video helper ──────────────────────────────────── */
+            getVideoData(source) {
+                const videoUrl = source.videoUrl;
+                const d = {
+                    id: null,
+                    type: null,
+                    src: null,
+                    additionalParams: '&autoplay=1',
+                    allow: 'fullscreen; picture-in-picture; autoplay;'
+                };
+                if (!videoUrl) return d;
+                if (this.videoOptions.loop) d.additionalParams += '&loop=1';
+
+                if (videoUrl.match(/youtube\.com|youtu\.be|youtube-nocookie.com/)) {
+                    const re = /^.*(?:(?:youtu\.be\/|v\/|vi\/|u\/\w\/|embed\/)|(?:(?:watch)?\?v(?:i)?=|\&v(?:i)?=))([^#\&\?]*).*/;
+                    const base = videoUrl.match(/youtube-nocookie.com/) ?
+                        'https://www.youtube-nocookie.com/embed' :
+                        'https://www.youtube.com/embed';
+                    d.type = 'youtube';
+                    d.id = videoUrl.match(re)[1];
+                    d.additionalParams += this.videoOptions.showRelated ? '&rel=1' : '&rel=0';
+                    if (this.videoOptions.loop) d.additionalParams += `&playlist=${d.id}`;
+                    d.src = `${base}/${d.id}?origin=<?= $block->getBaseUrl() ?>${d.additionalParams}`;
+                    d.allow += ' accelerometer; clipboard-write; encrypted-media; gyroscope;';
+                } else if (videoUrl.match(/vimeo\.com/)) {
+                    const re = new RegExp('https?:\\/\\/(?:www\\.|player\\.)?vimeo.com\\/(?:channels\\/(?:\\w+\\/)?|groups\\/([^\\/]*)\\/videos\\/|album\\/(\\d+)\\/video\\/|video\\/|)(\\d+)(?:$|\\/|\\?)');
+                    d.type = 'vimeo';
+                    d.id = videoUrl.match(re)[3];
+                    d.src = `https://player.vimeo.com/video/${d.id}?player_id=vimeo${d.id}${new Date().getTime()}${d.additionalParams}`;
+                }
+                return d;
+            },
+
+            /* event listeners ───────────────────────────────── */
+            eventListeners: {
+                ['@update-gallery.window'](e) {
+                    this.receiveImages(e.detail);
+                },
+                ['@configurable-selection-changed.window'](e) {
+                    this.updateArModel(e.detail);
+                },
+                ['@reset-gallery.window']() {
+                    this.resetGallery();
+                },
+                ['@open-qr-modal.window']() {
+                    this.showQrModal = true;
+                },
+            },
+        }
+    }
+</script>

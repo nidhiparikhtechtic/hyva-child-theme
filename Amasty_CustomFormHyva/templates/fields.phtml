@@ -1,0 +1,435 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Custom Form Compatibility with Hyva Theme
+ */
+use Amasty\CustomFormHyva\ViewModel\Form;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\Escaper;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+$field = $block->getField();
+$formId = $block->getFormId();
+$fieldKey = $block->getFieldKey();
+$currentForm = $block->getCurrentForm();
+
+$viewModel = $block->getviewModel();
+$viewModels = $block->getViewModels();
+
+$googleApiKey = $block->getGoogleApiKey();
+$requiredGroupClass = $block->getRequiredGroupClass();
+$formViewModel = $viewModels->require(Form::class);
+
+$colspanClass = 'col-span-6 ';
+
+if (isset($field['layout'])):
+    if ($field['layout'] === 'two'):
+        $colspanClass = 'col-span-3 ';
+    elseif ($field['layout'] === 'three'):
+        $colspanClass = 'col-span-2 ';
+    endif;
+endif;
+
+$colspanClass .= ' mb-1 fieldset-block relative';
+$isRequiredField = isset($field['required']) && $field['required'];
+$groupFieldsClass = ($isRequiredField ? $requiredGroupClass : '')
+    . ($field['type'] === 'checkboxtwo' || $field['type'] === 'radiotwo' ? ' flex flex-wrap ' : '');
+$requiredLabelStyle = $isRequiredField ? "after:content-['*'] after:ml-0.5 after:text-red-600" : '';
+
+$dependency = $field['dependency'] ?? [];
+$setJsObservable = null;
+
+if (count($dependency)) {
+    foreach ($dependency as $index => $dependencyField) {
+        $fieldName = $formViewModel->getDepFormFieldName($dependencyField['field']);
+        $optionName = $formViewModel->getDepFormFieldName($dependencyField['value']);
+        $setJsObservable[] = ($fieldName . (int)$formId . $optionName);
+    }
+
+    $setJsObservable = implode(', ', $setJsObservable);
+}
+
+$fieldValue = $formViewModel->getValue($field);
+$inputType = $formViewModel->getFieldInputType($field);
+$fieldValidation = $formViewModel->getFormFieldValidation($field);
+
+$style = isset($field['style']) && $field['style'] ? 'style="' . $field['style'] . ';"' : ' ';
+$addJsObservableAttr = $setJsObservable ? ('style="display: none;" data-dependency="' . $setJsObservable . '"') : '';
+
+if (isset($field['description']) && $field['description']) {
+    $tooltip = $block->getLayout()->createBlock(\Magento\Framework\View\Element\Template::class)
+        ->setTemplate("Amasty_CustomFormHyva::tooltip.phtml")->setData(['content' => $field['description']])->toHtml();
+}
+
+$whiteListClasses = ['-top-2.5', 'bottom-0'];
+$inputsDesign = $currentForm->getDesignClass();
+$inputClass = $field['className'];
+$inputClass .= ' border-gray-300 w-full ';
+$labelClass = ' label ';
+$dynamicLabelClass = '';
+
+if ($inputsDesign === 'linear-theme') {
+    $inputClass .= ' bg-transparent border-0 border-b rounded-none shadow-none focus:ring-0 pl-0 pb-0 ';
+
+    if ($field['type'] === 'textinput' || $field['type'] === 'number' || $field['type'] === 'textarea') {
+        $labelClass .= ' absolute left-0 transition-all duration-200 ease-in-out ';
+        $dynamicLabelClass = ':class="dynamicLabelClass"';
+        $inputClass .= ' mt-2.5 ';
+        $colspanClass .= ' mt-3 ';
+    }
+
+    if ($field['type'] === 'date' || $field['type'] === 'time' || $field['type'] === 'dropdown') {
+        $labelClass .= ' mb-0 ';
+    }
+}
+
+if ($inputsDesign === 'circle-theme') {
+    $inputClass .= ' rounded border-gray-300 w-full rounded-md ';
+}
+
+if ($inputsDesign === 'default') {
+    $inputClass .= ' border-gray-300 w-full py-1 ';
+}
+
+if ($field['type'] === 'file') {
+    $inputClass .= ' border-0 shadow-none rounded-l-none truncate flex text-xs md:text-base ';
+}
+?>
+
+<!-- Simple input -->
+<?php if ($field['type'] === 'textinput' || $field['type'] === 'number' || $field['type'] === 'date' ||
+    $field['type'] === 'time' || $field['type'] === 'file'): ?>
+    <?= $block->getLayout()
+        ->createBlock(Template::class)
+        ->setTemplate("Amasty_CustomFormHyva::init-field.phtml")
+        ->toHtml() ?>
+    <div class="<?= /* @noEscape */ $colspanClass ?>" <?= /* @noEscape */ $addJsObservableAttr ?>
+         data-field-value="<?= $escaper->escapeHtmlAttr($fieldValue) ?>"
+         x-data="initAmCustomFormField">
+        <?php if (isset($field['description']) && $field['description']): ?>
+        <div class="amcform-tooltip-wrapper flex items-center <?= /* @noEscape */ $labelClass ?>" <?= /* @noEscape */ $dynamicLabelClass ?>>
+            <?php endif; ?>
+            <label <?= /* @noEscape */ $dynamicLabelClass ?>
+                    class="<?= /* @noEscape */ $requiredLabelStyle . ' ' . /* @noEscape */ $labelClass ?>"
+                    for="<?= $escaper->escapeHtmlAttr($field['name']) ?>-form-<?= (int)$formId ?>">
+                <?= $escaper->escapeHtml($field['label']) ?>
+            </label>
+            <?php if (isset($field['description']) && $field['description']): ?>
+            <?= /* @noEscape */ $tooltip ?></div>
+    <?php endif; ?>
+        <input <?= /* @noEscape */ $inputType ?>
+            <?php if ($field['type'] === 'file'): ?>style="min-height: 31px;" <?php endif; ?>
+            id="<?= $escaper->escapeHtmlAttr($field['name']) ?>-form-<?= (int)$formId ?>"
+            <?php if (isset($field['multiple']) && $field['multiple']): ?>
+                name="<?= $escaper->escapeHtmlAttr($field['name']) ?>[]"
+            <?php else: ?>
+                name="<?= $escaper->escapeHtmlAttr($field['name']) ?>"
+            <?php endif; ?>
+            class="<?= /* @noEscape */ $inputClass ?>"
+            :value="value" @input="setValue" @focus="setFocusedTrue" @blur="setFocusedValue" :class="activeClass"
+            <?= /* @noEscape */ $style . ' ' . $fieldValidation ?>>
+        <span class="input-error-box block text-red-600 text-xs mt-1" style="display: none"></span>
+    </div>
+
+    <!-- Dropdown / Select -->
+<?php elseif ($field['type'] === 'dropdown' || $field['type'] === 'listbox'): ?>
+    <?php
+    $selectedOption = false;
+    foreach ($field['values'] as $key => $option) {
+        if ($key === 0 && $option['value'] !== ' ' ||
+            isset($option['selected']) && $option['selected'] && $option['value'] !== ' ') {
+            $selectedOption = $option['value'];
+        }
+    }
+    ?>
+
+    <?= $block->getLayout()
+        ->createBlock(Template::class)
+        ->setTemplate("Amasty_CustomFormHyva::init-select.phtml")
+        ->toHtml() ?>
+    <div class="<?= /* @noEscape */ $colspanClass ?>" <?= /* @noEscape */ $addJsObservableAttr ?>
+         data-selected-option="<?= $escaper->escapeHtmlAttr($selectedOption) ?>"
+         x-data="initAmCustomFormFieldSelect">
+        <?php if (isset($field['description']) && $field['description']): ?><div class="flex items-center"><?php endif; ?>
+            <label class="<?= /* @noEscape */ $requiredLabelStyle . ' ' . /* @noEscape */ $labelClass ?>"
+                <?= /* @noEscape */ $dynamicLabelClass ?>
+                   for="<?= $escaper->escapeHtmlAttr($field['name']) ?>-form-<?= (int)$formId ?>">
+                <?= $escaper->escapeHtml($field['label']) ?>
+            </label>
+            <?php if (isset($field['description']) && $field['description']): ?><?= /* @noEscape */ $tooltip ?></div><?php endif; ?>
+        <select id="<?= $escaper->escapeHtmlAttr($field['name']) ?>-form-<?= (int)$formId ?>"
+                name="<?= $escaper->escapeHtmlAttr($field['name'] . ($field['type'] === 'listbox' ? '[]' : '')) ?>"
+                class="<?= /* @noEscape */ $inputClass ?>"
+                @change="updateSelection" @focus="setFocusedTrue" @blur="setFocusedValue"
+            <?= /* @noEscape */ $style . ' ' . $fieldValidation ?>
+            <?= $field['type'] === 'listbox' ? 'multiple' : '' ?>>
+            <?php foreach ($field['values'] as $option): ?>
+                <?php $fieldName = $formViewModel->getDepFormFieldName($field['name']);
+                $optionName = $formViewModel->getDepFormFieldName($option['value']);
+                $optionSelected = isset($option['selected']) && $option['selected'] ? 'selected' : '';
+                $optionLabel = ((!$option['value'] || $option['value'] === ' ')
+                    && (!$option['label'] || $option['label'] === ' ')
+                    && isset($field['placeholder']) && $field['placeholder']) ?
+                    $field['placeholder'] : $option['label'];
+                ?>
+                <option x-ref="<?= $escaper->escapeHtmlAttr($fieldName . (int)$formId . $optionName) ?>"
+                    <?= $escaper->escapeHtmlAttr($optionSelected) ?>
+                        value="<?= $escaper->escapeHtmlAttr($option['value']) ?>"
+                        data-value="<?= $escaper->escapeHtmlAttr($option['value']) ?>"
+                        :selected="isSelected">
+                    <?= $escaper->escapeHtml($optionLabel) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <span class="input-error-box block text-red-600 text-xs mt-1" style="display: none"></span>
+    </div>
+
+    <!-- Textarea -->
+<?php elseif ($field['type'] === 'textarea'): ?>
+    <?= $block->getLayout()
+        ->createBlock(Template::class)
+        ->setTemplate("Amasty_CustomFormHyva::init-field.phtml")
+        ->toHtml() ?>
+    <div class="<?= /* @noEscape */ $colspanClass ?>" <?= /* @noEscape */ $addJsObservableAttr ?>
+         data-field-value="<?= $escaper->escapeHtmlAttr($fieldValue) ?>"
+         x-data="initAmCustomFormField">
+        <?php if (isset($field['description']) && $field['description']): ?><div class="flex items-center"><?php endif; ?>
+            <label <?= /* @noEscape */ $dynamicLabelClass ?>
+                    class="<?= /* @noEscape */ $requiredLabelStyle . ' ' . /* @noEscape */ $labelClass ?>"
+                    for="<?= $escaper->escapeHtmlAttr($field['name']) ?>-form-<?= (int)$formId ?>">
+                <?= $escaper->escapeHtml($field['label']) ?>
+            </label>
+            <?php if (isset($field['description']) && $field['description']): ?><?= /* @noEscape */ $tooltip ?></div><?php endif; ?>
+        <textarea id="<?= $escaper->escapeHtmlAttr($field['name']) ?>-form-<?= (int)$formId ?>"
+                  name="<?= $escaper->escapeHtmlAttr($field['name']) ?>"
+                  class="focus:border-gray-500 <?= /* @noEscape */ $inputClass ?>"
+            <?= /* @noEscape */ $style . ' ' . $fieldValidation ?>
+            :value="value" @input="setValue" @focus="setFocusedTrue" @blur="setFocusedValue" :class="activeClass"
+                  rows="<?= $escaper->escapeHtmlAttr(isset($field['rows']) && $field['rows']) ? /* @noEscape */ $field['rows'] : '1' ?>">
+        </textarea>
+        <span class="input-error-box block text-red-600 text-xs mt-1" style="display: none"></span>
+    </div>
+
+    <!-- Checkboxes -->
+<?php elseif ($field['type'] === 'checkbox' || $field['type'] === 'checkboxtwo' || $field['type'] === 'single-checkbox'): ?>
+    <div class="<?= /* @noEscape */ $colspanClass ?>" <?= /* @noEscape */ $addJsObservableAttr ?>>
+        <?php if ($field['type'] !== 'single-checkbox'): ?>
+            <div class="flex items-center">
+                <span class="<?= /* @noEscape */ $requiredLabelStyle . ' ' . /* @noEscape */ $labelClass ?>">
+                    <?= $escaper->escapeHtml($field['label']) ?>
+                </span>
+                <?php if (isset($field['description']) && $field['description']): ?><?= /* @noEscape */ $tooltip ?><?php endif; ?>
+            </div>
+        <?php endif; ?>
+        <div class="<?= /* @noEscape */ $groupFieldsClass ?>">
+            <?php foreach ($field['values'] as $option): ?>
+                <?php $fieldName = $formViewModel->getDepFormFieldName($field['name']);
+                $optionName = $formViewModel->getDepFormFieldName($option['value']); ?>
+                <div class="<?= ($field['type'] === 'checkboxtwo') ? ' mb-2 mt-2 ' : ' mt-2 ' ?>" <?= /* @noEscape */ $style ?>>
+                    <?php if (isset($field['toggle']) && $field['toggle']): ?>
+                    <?= $block->getLayout()
+                        ->createBlock(Template::class)
+                        ->setTemplate("Amasty_CustomFormHyva::init-checkbox.phtml")
+                        ->toHtml() ?>
+                    <div x-data="initAmCustomFormFieldCheckbox"
+                         data-toggle-on="<?= $escaper->escapeHtmlAttr(isset($option['selected']) && $option['selected'] ? true : false) ?>"
+                         :class="toggleCssClass"
+                         class="kc-toggle relative mt-[4px] mr-0 mb-0 ml-[2px] w-[60px] h-[21px] rounded cursor-pointer
+                                overflow-hidden inline-block bg-gray-200 border-[1px] border-solid border-gray-300
+                                align-bottom select-none top-[-4px]"
+                         @click="changeToggle">
+                        <?php endif; ?>
+                        <input type="checkbox"
+                               class="<?= isset($field['toggle']) && $field['toggle'] ? ' absolute z-[-1] opacity-0 m-0 p-0 w-full h-full top-[-2px] ' : ' relative ' ?> <?= $escaper->escapeHtmlAttr($field['className']) ?>"
+                               x-ref="<?= $escaper->escapeHtmlAttr($fieldName . (int)$formId . $optionName) ?>"
+                               id="<?= $escaper->escapeHtmlAttr($field['name'] . '-' . $option['value']) ?>-form-<?= (int)$formId ?>"
+                               name="<?= $escaper->escapeHtmlAttr($field['name']) ?>[]"
+                               value="<?= $escaper->escapeHtmlAttr($option['value']) ?>"
+                            <?= isset($option['selected']) && $option['selected'] ? 'checked' : '' ?>>
+                        <?php if (isset($field['toggle']) && $field['toggle']): ?>
+                        <div class="kct-inner absolute top-0 left-[-28px] w-[115px] h-full transition-left duration-150">
+                            <div class="kct-on relative w-[28px] h-full text-green-500 text-[12px] text-center leading-5 font-bold float-left"><?= $escaper->escapeHtml(__('On')) ?></div>
+                            <div class="kct-handle relative w-[28px] h-[17px] bg-gradient-to-b from-white to-gray-300
+                                    border-[1px] border-solid border-gray-400 font-thin text-gray-600 text-[12px] text-center
+                                    rounded m-[1px] leading-5 font-bold float-left"></div>
+                            <div class="kct-off relative w-[28px] h-full text-gray-500 text-[12px] text-center leading-5 font-bold float-left"><?= $escaper->escapeHtml(__('Off')) ?></div>
+                        </div>
+                    </div>
+                <?php endif; ?>
+                    <label for="<?= $escaper->escapeHtmlAttr($field['name'] . '-' . $option['value']) ?>-form-<?= (int)$formId ?>"
+                           class="inline pr-4 ml-1 <?=/* @noEscape */ ($field['type'] === 'single-checkbox') ? $requiredLabelStyle : '' ?>">
+                        <?= $escaper->escapeHtml($option['label']) ?>
+                    </label>
+                </div>
+            <?php endforeach; ?>
+            <span class="input-error-box block text-red-600 text-xs mt-1" style="display: none"></span>
+        </div>
+    </div>
+
+    <!-- Radio Buttons -->
+<?php elseif ($field['type'] === 'radio' || $field['type'] === 'radiotwo'): ?>
+    <div class="<?= /* @noEscape */ $colspanClass ?>" <?= /* @noEscape */ $addJsObservableAttr ?>>
+        <div class="flex items-center">
+            <span class="<?= /* @noEscape */ $requiredLabelStyle . ' ' . /* @noEscape */ $labelClass ?>">
+                <?= $escaper->escapeHtml($field['label']) ?>
+            </span>
+            <?php if (isset($field['description']) && $field['description']): ?><?= /* @noEscape */ $tooltip ?><?php endif; ?>
+        </div>
+        <div class="<?= /* @noEscape */ $groupFieldsClass ?>">
+            <?php foreach ($field['values'] as $option): ?>
+                <?php $fieldName = $formViewModel->getDepFormFieldName($field['name']);
+                $optionName = $formViewModel->getDepFormFieldName($option['value']); ?>
+                <div class="flex items-center mt-1" <?= /* @noEscape */ $style ?>>
+                    <input type="radio"
+                           class="relative mb-0.5 <?= $escaper->escapeHtmlAttr($field['className']) ?>"
+                           x-ref="<?= $escaper->escapeHtmlAttr($fieldName . (int)$formId . $optionName) ?>"
+                           id="<?= $escaper->escapeHtmlAttr($field['name'] . '-' . $option['value']) ?>-form-<?= (int)$formId ?>"
+                           name="<?= $escaper->escapeHtmlAttr($field['name']) ?>"
+                           value="<?= $escaper->escapeHtmlAttr($option['value']) ?>"
+                        <?= isset($option['selected']) && $option['selected'] ? 'checked' : '' ?>>
+                    <label class="inline mb-0 pr-4 ml-2" for="<?= $escaper->escapeHtmlAttr($field['name'] . '-' . $option['value']) ?>-form-<?= (int)$formId ?>">
+                        <?= $escaper->escapeHtml($option['label']) ?>
+                    </label>
+                </div>
+            <?php endforeach; ?>
+            <span class="input-error-box block text-red-600 text-xs mt-1" style="display: none"></span>
+        </div>
+    </div>
+
+    <!-- Wysiwyg -->
+<?php elseif ($field['type'] === 'wysiwyg'): ?>
+    <div class="<?= /* @noEscape */ $colspanClass ?>" <?= /* @noEscape */ $addJsObservableAttr ?>>
+        <?php if (isset($field['description']) && $field['description']): ?>
+            <div class="flex items-center"><?= /* @noEscape */ $tooltip ?></div>
+        <?php endif; ?>
+        <?= /* @noEscape */ $fieldValue ?>
+    </div>
+
+    <!-- Rating -->
+<?php elseif ($field['type'] === 'rating'): ?>
+    <div class="<?= /* @noEscape */ $colspanClass ?>" <?= /* @noEscape */ $addJsObservableAttr ?>>
+        <?php if (isset($field['description']) && $field['description']): ?><div class="flex items-center"><?php endif; ?>
+            <label class="<?= /* @noEscape */ $requiredLabelStyle . ' ' . /* @noEscape */ $labelClass ?>"
+                   for="<?= $escaper->escapeHtmlAttr($field['name']) ?>-form-<?= (int)$formId ?>">
+                <?= $escaper->escapeHtml($field['label']) ?>
+            </label>
+            <?php if (isset($field['description']) && $field['description']): ?><?= /* @noEscape */ $tooltip ?></div><?php endif; ?>
+        <?php
+        $selectedStar = $iterator = 1;
+        foreach ($field['values'] as $star) {
+            if (isset($star['selected']) && $star['selected']) {
+                $selectedStar = $iterator;
+            }
+            $iterator++;
+        } ?>
+        <?= $block->getLayout()
+            ->createBlock(Template::class)
+            ->setTemplate("Amasty_CustomFormHyva::init-rating.phtml")
+            ->toHtml() ?>
+        <div class="flex flex-row flex-grow-0 flex-wrap"
+             data-clicked-rating-id="<?= $escaper->escapeHtmlAttr($selectedStar) ?>"
+             x-data="initAmCustomFormFieldRating">
+            <?php $iterator = 1; foreach ($field['values'] as $star): ?>
+                <div class="relative"
+                     data-iterator="<?= (int)$iterator ?>"
+                     @click="changeRating">
+                    <input
+                            class="absolute opacity-0 bottom-0 left-0 cursor-pointer peer <?= $escaper->escapeHtmlAttr($field['className']) ?>"
+                            type="radio"
+                            name="<?= $escaper->escapeHtmlAttr($field['name']) ?>"
+                            aria-label="<?= $escaper->escapeHtmlAttr(__('%1 %2', $iterator, $iterator > 1 ? __('stars') : __('star'))) ?>"
+                            id="<?= $escaper->escapeHtmlAttr($field['name']) ?>-form-<?= (int)$formId  . '_' . /* @noEscape */ $star['value'] ?>"
+                            <?php if ($iterator === 1 && $isRequiredField): ?>required<?php endif; ?>
+                            <?php if (isset($star['selected']) && $star['selected']): ?>checked<?php endif; ?>
+                            value="<?= $escaper->escapeHtmlAttr($iterator) ?>"/>
+                    <label
+                            class="rating-<?= (int)$iterator ?> m-0 cursor-pointer ring-current peer-focus:ring-2"
+                            for="<?= $escaper->escapeHtmlAttr($field['name']) ?>-form-<?= (int)$formId  . '_' . /* @noEscape */ $star['value'] ?>"
+                            title="<?= $escaper->escapeHtmlAttr(__('%1 %2', $iterator, $iterator > 1 ? __('stars') : __('star'))) ?>"
+                            id="<?= $escaper->escapeHtmlAttr($field['name']) ?>-form-<?= (int)$formId  . '_' . /* @noEscape */ $star['value'] ?>_label">
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 viewBox="0 0 20 20" fill="currentColor"
+                                 class="fill-current h-8 w-8"
+                                 data-iterator="<?= (int)$iterator ?>"
+                                 :class="currentRatingCssClass">
+                                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0
+                                  00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364
+                                  1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0
+                                  00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1
+                                  1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1
+                                  0 00.951-.69l1.07-3.292z"/>
+                            </svg>
+                        </span>
+                    </label>
+                </div>
+                <?php $iterator++; ?>
+            <?php endforeach; ?>
+            <span class="input-error-box block text-red-600 text-xs mt-1" style="display: none"></span>
+        </div>
+        <span class="input-error-box block text-red-600 text-xs mt-1" style="display: none"></span>
+    </div>
+
+    <!-- Google Map-->
+<?php elseif ($field['type'] === 'googlemap'): ?>
+    <div class="<?= /* @noEscape */ $colspanClass ?>" <?= /* @noEscape */ $addJsObservableAttr ?>>
+    <?php if ($googleApiKey): ?>
+        <?= $block->getLayout()
+            ->createBlock(Template::class)
+            ->setTemplate("Amasty_CustomFormHyva::init-google-map.phtml")
+            ->toHtml() ?>
+        <div id="amform-google-map-<?= (int)$formId . (int)$fieldKey ?>"
+             data-map-id="<?= $escaper->escapeHtmlAttr((int)$formId . (int)$fieldKey) ?>"
+             data-google-api-key="<?= $escaper->escapeHtmlAttr($googleApiKey) ?>"
+             data-map-position-lat="<?= $escaper->escapeHtmlAttr($field ? $field['map_position']['lat'] : 0) ?>"
+             data-map-position-lng="<?= $escaper->escapeHtmlAttr($field ? $field['map_position']['lng'] : 0) ?>"
+             x-data="initAmCustomFormGoogleMap">
+            <?php if (isset($field['description']) && $field['description']): ?><div class="flex items-center"><?php endif; ?>
+                <label class="<?= /* @noEscape */ $requiredLabelStyle . ' ' . /* @noEscape */ $labelClass ?>"
+                       for="<?= $escaper->escapeHtmlAttr($field['name']) ?>">
+                    <?= $escaper->escapeHtml($field['label']) ?>
+                </label>
+            <?php if (isset($field['description']) && $field['description']): ?><?= /* @noEscape */ $tooltip ?></div><?php endif; ?>
+            <input type="googlemap" x-ref="mapInputValue"
+                id="<?= $escaper->escapeHtmlAttr($field['name']) ?>"
+                name="<?= $escaper->escapeHtmlAttr($field['name']) ?>"
+                class="hidden <?= /* @noEscape */ $inputClass ?>"
+                <?= /* @noEscape */ $fieldValidation ?>/>
+            <input hidden="true" x-ref="searchBox"/>
+            <div id="map-form-<?= (int)$formId . (int)$fieldKey ?>" x-ref="mapForm"
+                 class="h-64 <?= /* @noEscape */ $colspanClass ?> <?= $escaper->escapeHtmlAttr($field['className']) ?>"
+                ></div>
+        </div>
+    <?php else: ?>
+        <?= $escaper->escapeHtml(__('Google API key is missing')) ?>
+    <?php endif; ?>
+</div>
+
+    <!-- Titles -->
+<?php elseif ($field['type'] === 'hone'): ?>
+    <h1 class="<?= /* @noEscape */ $colspanClass . ' ' . $field['className'] ?>" <?= /* @noEscape */ $addJsObservableAttr ?>>
+        <?= $escaper->escapeHtml($field['label']) ?>
+    </h1>
+<?php elseif ($field['type'] === 'htwo'): ?>
+    <h2 class="<?= /* @noEscape */ $colspanClass . ' ' . $field['className'] ?>" <?= /* @noEscape */ $addJsObservableAttr ?>>
+        <?= $escaper->escapeHtml($field['label']) ?>
+    </h2>
+<?php elseif ($field['type'] === 'hthree'): ?>
+    <h3 class="<?= /* @noEscape */ $colspanClass . ' ' . $field['className'] ?>" <?= /* @noEscape */ $addJsObservableAttr ?>>
+        <?= $escaper->escapeHtml($field['label']) ?>
+    </h3>
+<?php elseif ($field['type'] === 'text'): ?>
+    <p class="<?= /* @noEscape */ $colspanClass . ' ' . $field['className'] ?>" <?= /* @noEscape */ $addJsObservableAttr ?>>
+        <?= $escaper->escapeHtml($field['label']) ?>
+    </p>
+<?php else: ?>
+    <div class="<?= /* @noEscape */ $colspanClass . ' ' . $field['className'] ?>" <?= /* @noEscape */ $addJsObservableAttr ?>>
+        <strong><?= $escaper->escapeHtml(__('Form field not yet supported')) ?></strong>
+        <pre class="bg-gray-100 border border-gray-300 p-4"><?= /* @noEscape */ $field['type'] ?></pre>
+    </div>
+<?php endif; ?>

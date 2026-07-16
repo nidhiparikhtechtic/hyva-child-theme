@@ -1,0 +1,41 @@
+<?php
+
+/** @var \Hyva\Theme\Model\ViewModelRegistry $viewModels */
+$zoofyViewModel = $viewModels->require(\Techtic\Customization\ViewModel\ZoofyViewModel::class);
+
+$zoofyUrl = $zoofyViewModel->getZoofyUrl();
+?>
+
+<!-- zoofy POPUP MODAL -->       
+<div x-data="{
+        zoofyOpen: false,
+        closeZoofy() {
+            this.zoofyOpen = false;
+            document.getElementById('zoofyCheckbox').checked = false;
+        }
+    }"
+    x-on:zoofy-open.window="zoofyOpen = true">    
+    <div
+        x-show="zoofyOpen"
+        x-cloak
+        class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-2xl w-11/12 max-w-2xl relative py-2.5 lg:py-5 lg:px-10 px-2.5">
+
+            <!-- CLOSE BUTTON -->
+            <button
+                @click="closeZoofy()"
+                class="absolute lg:top-8 top-5 lg:right-10 right-5 pt-1">
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6.4 19L5 17.6L10.6 12L5 6.4L6.4 5L12 10.6L17.6 5L19 6.4L13.4 12L19 17.6L17.6 19L12 13.4L6.4 19Z" fill="#646464"></path>
+                </svg>
+            </button>
+
+            <!-- IFRAME -->
+            <iframe
+                id="iframeplayer-jobform"
+                src="<?= $zoofyUrl ?>"
+                class="w-full max-h-full"
+                height="530"></iframe>
+        </div>
+    </div>
+</div>

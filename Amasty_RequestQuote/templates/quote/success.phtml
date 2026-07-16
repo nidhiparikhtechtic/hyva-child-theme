@@ -1,0 +1,64 @@
+<?php
+
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Request a Quote Hyva Compatibility
+ */
+
+use Amasty\RequestQuote\Block\Quote\Success;
+use Magento\Framework\Escaper;
+
+/** @var Success $block  */
+/** @var Escaper $escaper */
+?>
+<div class="checkout-success">
+    <?php if ($block->getQuoteId()): ?>
+        <p class="quote-interest-message font-semibold py-4">
+            <?= $escaper->escapeHtml(__('Thank you for your interest!')) ?>
+        </p>
+        <p>
+            <?= $escaper->escapeHtml(__('Your Quote Request # is:')) ?>
+            <?php if ($block->getCanViewQuote()): ?>
+                <a href="<?= $escaper->escapeUrl($block->getViewQuoteUrl()) ?>"
+                    class="text-blue-600 font-semibold hover:underline">
+                    <?= $escaper->escapeHtml($block->getQuoteId()) ?>
+                </a>
+            <?php else: ?>
+                <?= $escaper->escapeHtml($block->getQuoteId()) ?>
+            <?php endif; ?>
+        </p>
+        <p>
+            <?= $escaper->escapeHtml(__('We\'ll email you a Quote Request confirmation email with a link to track progress.')) ?>
+        </p>
+
+        <script>
+            window.dataLayer = window.dataLayer || [];
+
+            if (!window.gtmTrackedEvents) window.gtmTrackedEvents = {};
+
+            if (!window.gtmTrackedEvents['generate_lead']) {
+                window.gtmTrackedEvents['generate_lead'] = true;
+
+                window.dataLayer.push({
+                    event: "generate_lead",
+                    quote_id: "<?= $escaper->escapeJs($block->getQuoteId()) ?>",
+                    ecommerce: {
+                        currency: "EUR",
+                        value: 0
+                    }
+                });
+            }
+        </script>
+    <?php endif; ?>
+
+    <?= $block->getAdditionalInfoHtml() ?>
+
+    <div class="flex items-center justify-start mt-4 pt-4 border-t">
+        <div class="flex">
+            <a class="btn btn-primary" href="<?= $escaper->escapeUrl($block->getContinueUrl()) ?>">
+                <?= $escaper->escapeHtml(__('Continue Shopping')) ?>
+            </a>
+        </div>
+    </div>
+</div>

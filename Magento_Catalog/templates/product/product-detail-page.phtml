@@ -1,0 +1,150 @@
+<?php
+
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Magento\Catalog\Block\Product\View;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\ProductPage;
+use Magento\Framework\Escaper;
+use Techtic\Customization\ViewModel\ProductCmsBlockViewModel;
+
+/** @var View $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+/** @var \Techtic\Customization\ViewModel\ProductCmsBlockViewModel $viewModel */
+/** @var \Magento\Catalog\Model\Product $product */
+
+$product = $block->getProduct();
+$price = (float) $product->getFinalPrice();
+$inStock = (bool)$product->getIsSalable();
+
+$showShowroomButton = $price > 500 && $inStock;
+
+/** @var ProductPage $productViewModel */
+$productViewModel = $viewModels->require(ProductPage::class);
+
+/** @var ProductCmsBlockViewModel $productCmsBlockViewModel */
+$productCmsBlockViewModel = $viewModels->require(productCmsBlockViewModel::class);
+
+// Get product name
+$productName = $escaper->escapeHtml($product->getName());
+
+// Get product image
+$imageUrl = $productViewModel->getImage($product, 'product_page_image_small')->getImageUrl();
+?>
+
+<section class="text-gray-700 body-font rounded-br-teak">
+    <div class="md:pb-0 !px-0 container">
+        <div class="grid grid-rows-auto grid-cols-1 md:gap-x-5 md:grid-cols-[42%_minmax(0,_1fr)] md:grid-rows-[min-content_minmax(0,_1fr)] lg:gap-x-10 lg:grid-cols-2 w-full">
+            <?= $block->getChildHtml('product.media') ?>
+            <?= $block->getChildHtml('product.info') ?>
+            <?php if ($showShowroomButton): ?>
+                <div class="showroom-cta mt-4 mb-6">
+                    <button type="button"
+                        onclick="window.location.href='<?= $escaper->escapeUrl('https://www.teakea.nl/showroom') ?>'"
+                        class="flex items-center justify-center btn btn-secondary text-sm w-full mr-auto gap-x-2.5 uppercase">
+
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+
+                        <?= $escaper->escapeHtml(__('Plan Showroom Visit')) ?>
+                    </button>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</section>
+<section>
+    <?= $block->getChildHtml('product_options_wrapper_bottom') ?>
+</section>
+
+<!-- Product Add to Cart Scroll Section -->
+<?php if ($product->isSaleable()):
+?>
+    <?php echo $block->getLayout()->createBlock(\Magento\Framework\View\Element\Template::class)
+        ->setTemplate('Magento_Catalog::product/view/addtocart-scroll.phtml')->toHtml();
+    ?>
+<?php endif;
+?>
+
+<?php
+$cmsBlockId = $productCmsBlockViewModel->getCmsBlockId($product);
+
+if ($cmsBlockId): ?>
+    <section class="why-choose-teakea">
+        <?= $block->getLayout()
+            ->createBlock(\Magento\Cms\Block\Block::class)
+            ->setBlockId($cmsBlockId)
+            ->toHtml(); ?>
+    </section>
+<?php endif; ?>
+
+
+<!-- Product features Section -->
+<section>
+    <?php echo $block->getLayout()->createBlock(\Magento\Framework\View\Element\Template::class)
+        ->setTemplate('Magento_Catalog::product/view/features-icons.phtml')->toHtml(); ?>
+</section>
+
+<!-- Product Doofinder + Relative Product Slider  -->
+<!-- <section
+    x-data="{ hasAi: false, checked: false }"
+    x-init="
+        const check = () => {
+            const el = document.querySelector('.doofinder-productpage-selector.text-teakea-white');
+            if (el && el.innerHTML.trim() !== '') {
+                hasAi = true;
+                checked = true;
+            } else {
+                setTimeout(check, 1000);
+            }
+        };
+        // Also set a timeout to stop checking after reasonable time
+        setTimeout(() => { checked = true; }, 5000);
+        check();
+    ">
+     Show Doofinder when it has content 
+<section x-show="hasAi">
+    <section class="doofinder-productpage-selector text-teakea-white"></section>
+</section>
+
+Show related products when Doofinder is empty or check is complete 
+<section x-show="!hasAi && checked">
+    <? //= $block->getChildHtml('related') 
+    ?>
+</section>
+</section> -->
+
+<section>
+    <?= $block->getChildHtml('related') ?>
+    <?= $block->getChildHtml('upsell') ?>
+    <?= $block->getChildHtml('review_list') ?>
+    <?= $block->getChildHtml('review_form') ?>
+</section>
+
+<!-- Atelier Tolbert CMS Block -->
+<?php if ($product && $product->getEnableAtelierTolbertBlock()): ?>
+
+    <section class="atelier-tolbert">
+        <?= $block->getLayout()
+            ->createBlock(\Magento\Cms\Block\Block::class)
+            ->setBlockId('atelier_tolbert')
+            ->toHtml(); ?>
+    </section>
+
+<?php endif; ?>
+
+<!-- zoofy POPUP MODAL -->
+<?php echo $block->getLayout()->createBlock(\Magento\Framework\View\Element\Template::class)
+    ->setTemplate('Magento_Catalog::product/view/zoofy-model.phtml')->toHtml(); ?>

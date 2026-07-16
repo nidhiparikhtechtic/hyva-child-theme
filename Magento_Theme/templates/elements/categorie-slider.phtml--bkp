@@ -1,0 +1,132 @@
+<?php
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var HeroiconsOutline $heroicons */
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+
+$currentCategory = \Magento\Framework\App\ObjectManager::getInstance()
+    ->get(\Magento\Framework\Registry::class)
+    ->registry('current_category');
+$catId = $currentCategory->getId();
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$subcategory = $objectManager->create('Magento\Catalog\Model\Category')->load($catId);
+$subcats = $subcategory->getChildrenCategories();
+
+if (!$itemCount = count($subcats)) {
+    return '';
+}
+
+?>
+<script>
+    'use strict';
+
+    function initSliderComponent() {
+        return {
+            active: 0,
+            itemCount: 0,
+            getSlider() {
+                return this.$root.querySelector('.js_slides');
+            },
+            pageSize: 4,
+            pageFillers: 0,
+            calcPageSize() {
+                const slider = this.getSlider();
+                if (slider) {
+                    this.itemCount = slider.querySelectorAll('.js_slide').length;
+                    this.pageSize = Math.round(slider.clientWidth / slider.querySelector('.js_slide').clientWidth);
+                    this.pageFillers = (
+                        this.pageSize * Math.ceil(this.itemCount / this.pageSize)
+                    ) - this.itemCount;
+                }
+            },
+            calcActive() {
+                const slider = this.getSlider();
+                if (slider) {
+                    const sliderItems = this.itemCount + this.pageFillers;
+                    const calculatedActiveSlide = slider.scrollLeft / (slider.scrollWidth / sliderItems);
+                    this.active = Math.round(calculatedActiveSlide / this.pageSize) * this.pageSize;
+                }
+            },
+            scrollPrevious() {
+                this.scrollTo(this.active - this.pageSize);
+            },
+            scrollNext() {
+                this.scrollTo(this.active + this.pageSize);
+            },
+            scrollTo(idx) {
+                const slider = this.getSlider();
+                if (slider) {
+                    const slideWidth = slider.scrollWidth / (this.itemCount + this.pageFillers);
+                    slider.scrollLeft = Math.floor(slideWidth) * idx;
+                    this.active = idx;
+                }
+            }
+        }
+    }
+</script>
+<section
+    class="mt-5 w-full bg-secondary pt-4"
+    x-data="initSliderComponent()"
+    x-init="calcPageSize();"
+    @resize.window.debounce="calcPageSize(); $nextTick( function() { calcActive() })"
+>
+<div class="relative md:container">
+    <div class="flex justify-center mx-10 md:mx-0">
+    <div class="relative w-full overflow-x-hidden max-w-screen-2xl rounded-xl px-3">
+        <div class="relative flex flex-nowrap w-full overflow-auto js_slides snap rounded-lg gap-5"
+             @scroll.debounce="calcActive"
+        >
+            <?php foreach ($subcats as $subcat): ?>
+                <div class="single-slide flex shrink-0 py-1 js_slide min-h-[100px] max-h-[400px] min-w-[35%] max-w-[35%] lg:min-w-[12.5%] lg:max-w-[12.5%]">
+                    <a class=" flex-col rounded-lg w-full font-bold text-center align-middle flex text-center text-ellipsis overflow-hidden" href="<?php echo $subcat->getUrl(); ?>">
+                        <?php $sub_category = $objectManager->create('Magento\Catalog\Model\Category')->load($subcat->getId());
+                        $subcat_url = $subcat->getUrl(); ?>
+                        <img class="rounded-lg w-[100px] sm:w-[150px] md:w-[150px] h-[100px] md:h-[150px] object-cover mx-auto" src="<?php echo $sub_category->getImageUrl() ?>" height="300px" width="240px">
+                    <div class="font text-sm lg:text-base mx-auto break-word hyphens-auto py-2">
+                        <?php echo $subcat->getName(); ?>
+                    </div>
+                </a>
+                </div>
+            <?php endforeach; ?>
+
+        </div>
+    </div>
+    </div>
+
+
+
+    <!--            pagination-->
+    <div>
+        <template x-if="itemCount > pageSize">
+            <div class="flex items-center justify-between container">
+                <button
+                    aria-label="<?= $escaper->escapeHtml(__('Previous')) ?>"
+                    tabindex="-1"
+                    class="2xl:ml-[-60px] ml-[-20px] md:ml-[-50px] mt-[-250px] md:mt-[-350px] text-black rounded-full outline-none focus:outline-none flex-none lg:block"
+                    :class="{ 'opacity-[0] pointer-events-none' : active === 0 }"
+                    @click="scrollPrevious">
+                    <?= $heroicons->chevronLeftHtml("p-2 stroke-white h-[45px] sm:h-[50px] w-[45px] sm:w-[50px] lg:h-[45px] lg:w-[45px] hover:bg-[#2F2F2F] rounded-full bg-[#e1e1e1]", 25, 25) ?>
+                </button>
+
+                <button
+                    aria-label="<?= $escaper->escapeHtml(__('Next')) ?>"
+                    tabindex="-1"
+                    class="2xl:mr-[-60px] mr-[-20px] md:mr-[-50px] mt-[-250px] md:mt-[-350px] text-black rounded-full outline-none focus:outline-none flex-none lg:block"
+                    :class="{ 'opacity-[0] pointer-events-none' : active >= itemCount-pageSize }"
+                    @click="scrollNext">
+                    <?= $heroicons->chevronRightHtml("p-2 stroke-white h-[45px] sm:h-[50px] w-[45px] sm:w-[50px] lg:h-[45px] lg:w-[45px] hover:bg-[#2F2F2F] rounded-full bg-[#e1e1e1]", 25, 25) ?>
+                </button>
+            </div>
+        </template>
+    </div>
+</div>
+</section>

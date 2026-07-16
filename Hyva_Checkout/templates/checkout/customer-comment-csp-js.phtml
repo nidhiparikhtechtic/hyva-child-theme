@@ -1,0 +1,55 @@
+<?php
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+
+/** @var ViewModelRegistry $viewModels */
+$hyvaCsp = $viewModels->require(\Hyva\Theme\ViewModel\HyvaCsp::class);
+?>
+<script>
+    function mountainITTeakeaHyvaCheckoutCustomerComment() {
+        return {
+            visible: false,
+            content: this.$wire?.comment ?? '',
+            limit: Number(this.$el.dataset.limit || 250),
+
+            get remaining() {
+                return this.limit - (this.content?.length ?? 0)
+            },
+            get rotateClass() {
+                return this.visible ? 'rotate-180' : ''
+            },
+
+            toggleVisible() {
+                this.visible = !this.visible
+            },
+
+            mountainITTeakeaHyvaCheckoutCustomerCommentInput226(event) {
+                this.content = event.target.value
+            },
+            mountainITTeakeaHyvaCheckoutCustomerCommentClass229() {
+                return {
+                    25: 'text-green-700',
+                    50: 'text-purple-700 font-medium',
+                    75: 'text-yellow-600 font-semibold',
+                    100: 'text-red-600 font-bold'
+                }[(100 - (Math.round(this.remaining / 25) * 25))]
+            },
+            mountainITTeakeaHyvaCheckoutCustomerCommentShow228() {
+                return this.remaining < 75 && this.remaining !== 0
+            },
+            mountainITTeakeaHyvaCheckoutCustomerCommentShow230() {
+                return this.remaining === 0
+            },
+            mountainITTeakeaHyvaCheckoutCustomerCommentText227() {
+                return (this.remaining + '/' + this.limit)
+            },
+            mountainITTeakeaHyvaCheckoutCustomerCommentInit225() {}
+        }
+    }
+
+    window.addEventListener('alpine:init', () => {
+        Alpine.data('mountainITTeakeaHyvaCheckoutCustomerComment', mountainITTeakeaHyvaCheckoutCustomerComment);
+    }, { once: true });
+</script>
+<?php $hyvaCsp->registerInlineScript(); ?>

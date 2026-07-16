@@ -1,0 +1,106 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\CurrentCategory;
+use Hyva\Theme\ViewModel\ProductListItem;
+use Hyva\Theme\ViewModel\ProductPage;
+use Magento\Catalog\Block\Product\ListProduct;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+
+/** @var ListProduct $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+/** @var ProductPage $productViewModel */
+/** @var CurrentCategory $currentCategoryViewModel */
+
+$productViewModel         = $viewModels->require(ProductPage::class);
+$productListItemViewModel = $viewModels->require(ProductListItem::class);
+$currentCategoryViewModel = $viewModels->require(CurrentCategory::class);
+
+$currentCategoryId = null;
+if ($currentCategoryViewModel === null) {
+    $currentCategoryId = 1;
+} else {
+    $fetchedViewModel = $currentCategoryViewModel->fetch();
+    $currentCategoryId = $fetchedViewModel ? (string)$fetchedViewModel->getId() : null;
+}
+$hideRatingSummary = (bool) $block->getData('hide_rating_summary');
+$hideDetails = (bool) $block->getData('hideDetails');
+$eagerLoadImagesCount = (int) ($block->getData('eager_load_images_count') ?? 3);
+
+$productCollection = $block->getLoadedProductCollection();
+
+//get blocks by categoryID
+$blockLeft = $this->getLayout()->createBlock(\Magento\Cms\Block\Block::class)->setBlockId($currentCategoryId . '-left-catalog-img')->toHtml();
+$blockRight = $this->getLayout()->createBlock(\Magento\Cms\Block\Block::class)->setBlockId($currentCategoryId . '-right-catalog-img')->toHtml();
+
+$leftStatus = empty($blockLeft);
+$rightStatus = empty($blockRight);
+
+?>
+<?php if (!$productCollection->count()): ?>
+    <div class="message info empty">
+        <div>
+            <?= $escaper->escapeHtml(__('We can\'t find products matching the selection.')) ?>
+        </div>
+    </div>
+<?php else: ?>
+    <section class="py-8" id="product-list" aria-label="<?= $escaper->escapeHtmlAttr(__('Product list')) ?>" tabindex="-1">
+        <?= $block->getToolbarHtml() ?>
+        <?= $block->getAdditionalHtml() ?>
+        <?php
+        if ($block->getMode() == 'grid') {
+            $viewMode         = 'grid';
+            $imageDisplayArea = 'category_page_grid';
+            $showDescription  = false;
+            $templateType     = \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW;
+        } else {
+            $viewMode         = 'list';
+            $imageDisplayArea = 'category_page_list';
+            $showDescription  = true;
+            $templateType     = \Magento\Catalog\Block\Product\ReviewRendererInterface::FULL_VIEW;
+        }
+        /**
+         * Position for actions regarding image size changing in vde if needed
+         */
+        $pos = $block->getPositioned();
+        ?>
+        <div class="products wrapper mode-<?= /* @noEscape */$viewMode ?> products-<?= /* @noEscape */$viewMode ?>">
+            <div class="mx-auto pt-4 pb-12 grid gap-y-4 gap-x-2.5 sm:gap-x-3 grid-cols-2 <?= /* @noEscape */$viewMode === 'grid' ? 'lg:grid-cols-3 xl:grid-cols-4' : '' ?>">
+                <?php
+                /** @var \Magento\Catalog\Model\Product $product */
+                foreach (array_values($productCollection->getItems()) as $i => $product) {
+                    $plate = match ($i) {
+                        4 => $leftStatus ? "" : "<div class='catalog-eyecatcher aspect-square lg:aspect-auto lg:min-h-full row-span-2 col-span-2 bg-primary cut-br grid aspect-w-3 aspect-h-1'>". $blockLeft ."</div>",
+                        14 => $rightStatus ? "" : "<div class='catalog-eyecatcher row-span-1 col-span-2 cut-bl bg-container block'>" . $blockRight . "</div>",
+//                        20,36,52 => "<div class='row-span-2 col-span-2 border border-black bg-primary cut-br ml-[-35%] hidden lg:block'>     </div>",
+//                        14,30,46
+//                        20,36,52
+                        default => '',
+                    };
+                    echo $plate;
+                    if ($i < $eagerLoadImagesCount) {
+                        $product->setData('image_custom_attributes', ['loading' => 'eager', 'fetchpriority' => 'high']);
+                    }
+                    echo $productListItemViewModel->getItemHtml(
+                        $product,
+                        $block,
+                        $viewMode,
+                        $templateType,
+                        $imageDisplayArea,
+                        $showDescription
+                    );
+                } ?>
+            </div>
+        </div>
+        <?= $block->getChildBlock('toolbar')->setIsBottom(true)->toHtml() ?>
+    </section>
+<?php endif; ?>

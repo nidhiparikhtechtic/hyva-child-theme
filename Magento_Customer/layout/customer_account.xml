@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+
+    <head>
+        <script src="Magento_Customer::js/account-sidebar.js" defer="true"/>
+    </head>
+    
+    <body>
+
+        <referenceBlock name="page.main.title" remove="true"/>
+
+        <referenceBlock name="customer_account_dashboard_address" remove="true"/>
+
+        <referenceBlock name="customer_account_navigation">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">
+                    Magento_Customer::account/navigation.phtml
+                </argument>
+            </action>
+        </referenceBlock>
+
+    </body>
+</page>

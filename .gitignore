@@ -1,0 +1,9 @@
+node_modules/
+pub/
+vendor/
+generated/
+var/
+.idea/
+.vscode/
+.DS_Store
+web/css/styles.css

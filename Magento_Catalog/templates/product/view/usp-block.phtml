@@ -1,0 +1,50 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Catalog\Block\Product\AbstractProduct;
+use Magento\Framework\Escaper;
+
+/** @var ViewModelRegistry $viewModels */
+/** @var AbstractProduct $block */
+/** @var Escaper $escaper */
+
+?>
+
+<div class="flex flex-col sm:flex-row gap-y-2 sm:gap-y-0 gap-x-4 py-4 md:py-6 border-b border-[#3a3b42]">
+    <a href="#" class="w-full sm:w-1/3 hover:underline">
+        <div class="flex flex-row sm:flex-col gap-x-2.5 sm:gap-x-0 items-center text-start sm:text-center">
+            <svg class="h-[50px] sm:h-[65px] w-[55px] sm:w-[70px]" xmlns="http://www.w3.org/2000/svg" fill="#639d02" viewBox="0 0 512 512" height="65" width="70">
+                <path
+                    d="M114.6 243.1C140.5 230.8 169.5 224 200 224l112 0c4.4 0 8 3.6 8 8s-3.6 8-8 8l-112 0c-31.8 0-61.6 8-87.7 22.2c-.2 3.2-.3 6.5-.3 9.8c0 88.4 71.6 160 160 160c0 0 0 0 0 0l.9 0C393.5 431.4 496 311.3 496 156.6c0-35.1-5.3-68.5-15-99.3C457.8 90.3 419.5 112 376 112l-104 0c-78.5 0-143.8 56.5-157.4 131.1zm-17.5 9.4C106.8 164.5 181.4 96 272 96l104 0c42.7 0 79.9-23.9 98.8-59.1c3.5-6.5 13.6-6.8 16.2 .1c13.5 36.5 21.1 77 21.1 119.6C512 317.1 405.1 447.3 273 448l-1 0c-97.1 0-175.9-78.7-176-175.8C47.7 305.4 16 361 16 424l0 48c0 4.4-3.6 8-8 8s-8-3.6-8-8l0-48c0-72.8 38.9-136.5 97.1-171.5z"/>
+            </svg>
+            <p><?= $escaper->escapeHtml(__('Sustainable & Certified Wood')) ?></p>
+        </div>
+    </a>
+    <a href="#" class="w-full sm:w-1/3 hover:underline">
+        <div class="flex flex-row sm:flex-col gap-x-2.5 sm:gap-x-0 items-center text-start sm:text-center">
+            <svg class="h-[50px] sm:h-[65px] w-[55px] sm:w-[70px]" xmlns="http://www.w3.org/2000/svg" fill="#4078dc" viewBox="0 0 640 512" height="65" width="70">
+                <path
+                    d="M0 240.2C0 169.4 57.4 112 128.2 112c32.7 0 64.2 12.5 88 35L320 245l103.8-98c23.8-22.5 55.3-35 88-35C582.6 112 640 169.4 640 240.2l0 31.6C640 342.6 582.6 400 511.8 400c-32.7 0-64.2-12.5-88-35L320 267 216.2 365c-23.8 22.5-55.3 35-88 35C57.4 400 0 342.6 0 271.8l0-31.6zM308.3 256L205.3 158.6c-20.8-19.7-48.4-30.6-77-30.6C66.2 128 16 178.2 16 240.2l0 31.6C16 333.8 66.2 384 128.2 384c28.7 0 56.2-11 77-30.6L308.3 256zm23.3 0l103.1 97.4c20.8 19.7 48.4 30.6 77 30.6c62 0 112.2-50.2 112.2-112.2l0-31.6c0-62-50.2-112.2-112.2-112.2c-28.6 0-56.2 11-77 30.6L331.7 256z"/>
+            </svg>
+            <p><?= $escaper->escapeHtml(__('Long lasting due to good quality')) ?></p>
+        </div>
+    </a>
+    <a href="#" class="w-full sm:w-1/3 hover:underline">
+        <div class="flex flex-row sm:flex-col gap-x-2.5 sm:gap-x-0 items-center text-start sm:text-center">
+            <svg class="h-[50px] sm:h-[65px] w-[55px] sm:w-[70px]" xmlns="http://www.w3.org/2000/svg" fill="#8b4513" viewBox="0 0 640 512" height="65" width="70">
+                <path
+                    d="M491.3 44.7l-24-24c-6.2-6.2-16.4-6.2-22.6 0L415.3 50.1l46.6 46.6 29.4-29.4c6.2-6.2 6.2-16.4 0-22.6l11.3-11.3c12.5 12.5 12.5 32.8 0 45.3L473.3 108l52 52 82.7 0c17.7 0 32 14.3 32 32c0 123.7-100.3 224-224 224c-17.7 0-32-14.3-32-32l0-82.7L233.4 150.6c-12.5-12.5-12.5-32.8 0-45.3l96-96c12.5-12.5 32.8-12.5 45.3 0L404 38.7 433.4 9.4c12.5-12.5 32.8-12.5 45.3 0l24 24L491.3 44.7zM240.1 202.6l11.3 11.3L20.7 444.7c-6.2 6.2-6.2 16.4 0 22.6l24 24L33.4 502.6l-24-24c-12.5-12.5-12.5-32.8 0-45.3L240.1 202.6zM33.4 502.6l11.3-11.3c6.2 6.2 16.4 6.2 22.6 0L298.1 260.6l11.3 11.3L78.6 502.6c-12.5 12.5-32.8 12.5-45.3 0zM525.3 176c-4.2 0-8.3-1.7-11.3-4.7L363.3 20.7c-6.2-6.2-16.4-6.2-22.6 0l-96 96c-6.2 6.2-6.2 16.4 0 22.6L395.3 289.9c3 3 4.7 7.1 4.7 11.3l0 82.7c0 8.8 7.2 16 16 16c114.9 0 208-93.1 208-208c0-8.8-7.2-16-16-16l-82.7 0zM584 224.5c-4.8 72.7-62.7 130.6-135.4 135.4c-4.4 .3-8.2-3-8.5-7.4s3-8.2 7.4-8.5c64.7-4.3 116.2-55.8 120.6-120.6c.3-4.4 4.1-7.7 8.5-7.5s7.7 4.1 7.4 8.5z"/>
+            </svg>
+            <p><?= $escaper->escapeHtml(__('Own furniture workshop & real craftsmanship')) ?></p>
+        </div>
+    </a>
+
+</div>

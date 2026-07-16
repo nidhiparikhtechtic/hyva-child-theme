@@ -1,0 +1,50 @@
+<?php
+
+/**
+ * Mageplaza Lookbook - Theme Override
+ */
+$product = $block->getProduct();
+?>
+<div class="popBg borderRadius rounded-lg"></div>
+<div class="mplookbook-popBody relative pt-[5px] pr-[5px] pb-[5px] pl-[10px] z-[999]">
+    <div class="widget">
+        <div class="product-item">
+            <div class="product-item-info flex text-left w-fit md:w-max">
+                <a href="<?=
+                            /** @noEscape */
+                            $block->getProductUrl($product) ?>"
+                    class="product photo slider-product-item-photo" style="vertical-align: middle;">
+                    <?=
+                    /** @noEscape */
+                    $block->getImage($product, 'product_thumbnail_image')->toHtml() ?>
+                </a>
+                <div class="product details product-item-details space-y-2.5" style="vertical-align: middle;display: inline-block; padding-left: 10px;">
+                    <strong class="product name product-item-name">
+                        <a class="product-item-link text-lg teakea-neutral font-normal leading-6 font-garamond line-clamp-2 hover:text-teakea-red hover:underline max-w-[260px]"
+                            title="<?=
+                                    /** @noEscape */
+                                    $block->escapeHtml($product->getName()) ?>"
+                            href="<?=
+                                    /** @noEscape */
+                                    $block->getProductUrl($product) ?>">
+                            <?=
+                            /** @noEscape */
+                            $block->escapeHtml($product->getName()) ?>
+                        </a>
+                    </strong>
+                    <div class="price font-normal text-base leading-5 text-[#282828]">
+                        <?=
+                        /** @noEscape */
+                        $block->getProductPrice($product) ?> 
+                    </div>
+                    <!-- View Product Link -->
+
+                    <a href="<?= $block->getProductUrl($product) ?>"
+                        class="inline-block text-sm sm:text-base font-medium text-teakea-dark-gray hover:text-teakea-red hover:underline">
+                        <?= $escaper->escapeHtml(__('View Product')) ?>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

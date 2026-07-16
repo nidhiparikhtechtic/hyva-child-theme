@@ -1,0 +1,138 @@
+<?php
+
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+?>
+
+<div
+        x-data="{
+        sticky: false,
+        showModal: false,
+        onSubmit(event) {
+            event.preventDefault();
+            let form = document.getElementById('product_addtocart_form');
+
+            // submit via fetch
+            fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form),
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.backUrl) {
+                    this.showModal = true;
+                } else {
+                    window.location.href = data.backUrl;
+                }
+            })
+            .catch(err => console.error('Add to cart error:', err));
+        },
+        init() {
+            window.addEventListener('scroll', () => {
+                this.sticky = window.scrollY > 600;
+            });
+        }
+    }"
+        x-init="init()"
+        x-watch="showModal"
+        x-effect="
+            if (showModal) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        ">
+
+        <!-- Sticky Add to Cart Button -->
+        <div
+                x-data="{ sticky: false }"
+                x-init="() => {
+                        if (window.innerWidth < 768) {
+                                window.addEventListener('scroll', () => {
+                                        sticky = window.scrollY > 100;
+                                });
+                        }
+                }"
+                :class="{ 'fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow-lg px-2.5 pt-2.5 pb-8 z-[100]': sticky }"
+                :style="sticky ? 'box-shadow: 0px -6px 13px 0px rgba(0, 0, 0, 0.10);' : ''"
+                class="transition-all duration-300 ease-in-out">
+                <button
+                        @click="onSubmit"
+                        title="Add to Cart"
+                        class="flex bg-teakea-gold text-black text-sm font-semibold items-center py-3.5 px-5 md:px-7 gap-x-2.5 uppercase w-full justify-center rounded-lg">
+                        <svg class="w-5 h-5" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 3H4.66667L5 4.66667M6.33333 11.3333H14.6667L18 4.66667H5M6.33333 11.3333L5 4.66667M6.33333 11.3333L4.42259 13.2441C3.89762 13.769 4.26942 14.6667 5.01184 14.6667H14.6667M14.6667 14.6667C13.7462 14.6667 13 15.4129 13 16.3333C13 17.2538 13.7462 18 14.6667 18C15.5871 18 16.3333 17.2538 16.3333 16.3333C16.3333 15.4129 15.5871 14.6667 14.6667 14.6667ZM8 16.3333C8 17.2538 7.25381 18 6.33333 18C5.41286 18 4.66667 17.2538 4.66667 16.3333C4.66667 15.4129 5.41286 14.6667 6.33333 14.6667C7.25381 14.6667 8 15.4129 8 16.3333Z"
+                                        stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <span
+                                class="flex md:flex"
+                                x-show="sticky || isDesktop"
+                                x-transition
+                                x-data="{ isDesktop: window.innerWidth >= 768 }"
+                                x-init="window.addEventListener('resize', () => isDesktop = window.innerWidth >= 768)">
+                                <?= $block->getData('is_cart_configure')
+                                        ? $escaper->escapeHtml(__('Update item'))
+                                        : $escaper->escapeHtml(__('Add to Cart')) ?>
+                        </span>
+                </button>
+        </div>
+
+        <!-- Modal -->
+        <div x-show="showModal"
+                x-transition
+                @click.self="showModal = false"
+                @keydown.escape.window="showModal = false"
+                class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50"
+                style="display: none;">
+                <div class="bg-white rounded-lg py-5 px-10 lg:pt-5 lg:pb-11 lg:px-16 w-11/12 max-w-md text-center shadow-xl relative">
+                        <h2 class="text-xl lg:text-2xl font-bold text-[#292929] mb-5"><?= $escaper->escapeHtml(__('Product Added to Cart!')) ?></h2>
+                        <p class="text-lg text-[#646464] mb-9"><?= $escaper->escapeHtml(__('What would you like to do next?')) ?></p>
+
+                        <div class="flex flex-col gap-3">
+                                <a href="<?= $escaper->escapeUrl($block->getUrl('checkout/cart')) ?>"
+                                        class="flex items-center justify-center gap-x-2.5 bg-teakea-gold text-teakea-black py-3.5 px-4 font-semibold rounded-lg uppercase">
+                                        <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M3 2.5H4.66667L5 4.16667M6.33333 10.8333H14.6667L18 4.16667H5M6.33333 10.8333L5 4.16667M6.33333 10.8333L4.42259 12.7441C3.89762 13.269 4.26942 14.1667 5.01184 14.1667H14.6667M14.6667 14.1667C13.7462 14.1667 13 14.9129 13 15.8333C13 16.7538 13.7462 17.5 14.6667 17.5C15.5871 17.5 16.3333 16.7538 16.3333 15.8333C16.3333 14.9129 15.5871 14.1667 14.6667 14.1667ZM8 15.8333C8 16.7538 7.25381 17.5 6.33333 17.5C5.41286 17.5 4.66667 16.7538 4.66667 15.8333C4.66667 14.9129 5.41286 14.1667 6.33333 14.1667C7.25381 14.1667 8 14.9129 8 15.8333Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                        <span><?= $escaper->escapeHtml(__('View Cart')) ?></span>
+                                </a>
+                                <a href="<?= $escaper->escapeUrl($block->getUrl('checkout')) ?>"
+                                        class="flex items-center justify-center gap-x-2.5 bg-teakea-red text-white font-semibold py-3.5 px-4 rounded-lg uppercase">
+                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M2.5 8.33334H17.5M5.83333 12.5H6.66667M10 12.5H10.8333M5 15.8333H15C16.3807 15.8333 17.5 14.714 17.5 13.3333V6.66667C17.5 5.28596 16.3807 4.16667 15 4.16667H5C3.61929 4.16667 2.5 5.28596 2.5 6.66667V13.3333C2.5 14.714 3.61929 15.8333 5 15.8333Z" stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                        <span><?= $escaper->escapeHtml(__('Proceed to Checkout')) ?></span>
+                                </a>
+                                <button @click="showModal = false"
+                                        class="flex items-center justify-center gap-x-2.5 bg-white border border-black text-black font-semibold py-3.5 px-4 rounded-lg uppercase">
+                                        <span><?= $escaper->escapeHtml(__('Continue Shopping')) ?></span>
+                                </button>
+                        </div>
+
+                        <button @click="showModal = false"
+                                class="absolute top-6 right-5 cursor-pointer">
+                                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M6.4 19L5 17.6L10.6 12L5 6.4L6.4 5L12 10.6L17.6 5L19 6.4L13.4 12L19 17.6L17.6 19L12 13.4L6.4 19Z" fill="#646464" />
+                                </svg>
+                        </button>
+                </div>
+        </div>
+</div>
+<?= $block->getChildHtml('', true) ?>

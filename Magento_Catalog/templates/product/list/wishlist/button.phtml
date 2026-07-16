@@ -1,0 +1,243 @@
+<?php
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\LucideIcons;
+use Hyva\Theme\ViewModel\ProductAttributes as ProductAttributes;
+use Magento\Catalog\Model\Product;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+/** @var LucideIcons $lucideIcons */
+$lucideIcons = $viewModels->require(LucideIcons::class);
+
+/** @var Product $product */
+if (! ($product = $block->getData('product'))) {
+    return;
+}
+
+$productId    = $product->getId();
+$productAttribute = $viewModels->require(ProductAttributes::class);
+$productName  = $productAttribute->getValue($product, 'name');
+?>
+
+<div
+    x-data="initWishlistToggle(<?= (int)$productId ?>)"
+    x-init="initFromSections()"
+    @private-content-loaded.window="onSectionsLoaded($event.detail.data)">
+    <button
+        @click.prevent="toggleWishlist()"
+        :aria-label="isInWishlist
+            ? '<?= $escaper->escapeHtmlAttr(__('Remove from Wish List') . ' ' . $productName) ?>'
+            : '<?= $escaper->escapeHtmlAttr(__('Add to Wish List') . ' ' . $productName) ?>'"
+        type="button"
+        :disabled="isLoading"
+        class="transition-colors duration-200 focus:outline-none"
+        :class="{
+            'text-red-500 hover:text-red-600': isInWishlist,
+            'text-teakea-black hover:text-red-400': !isInWishlist,
+            'opacity-50 cursor-wait': isLoading
+        }"
+        data-addto="wishlist">
+        <!-- Filled heart -->
+        <svg
+            x-show="isInWishlist"
+            x-cloak
+            xmlns="http://www.w3.org/2000/svg"
+            width="20" height="20"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            aria-hidden="true">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+        </svg>
+
+        <!-- Outline heart -->
+        <svg
+            x-show="!isInWishlist"
+            x-cloak
+            xmlns="http://www.w3.org/2000/svg"
+            width="20" height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+        </svg>
+    </button>
+</div>
+
+<script>
+    function initWishlistToggle(productId) {
+        return {
+            productId: productId,
+            isInWishlist: false,
+            wishlistItemId: null,
+            isLoading: false,
+
+            // ── Called on x-init and when sections reload ──────────────────────
+            initFromSections() {
+                // Listen for Hyvä's section data (fires on page load too)
+                this.$watch('isInWishlist', () => {}); // keep reactivity alive
+            },
+
+            onSectionsLoaded(data) {
+
+                const wishlist = data?.wishlist;
+
+                if (!wishlist) return;
+
+                const productId = parseInt(this.productId);
+
+                // check using product_ids (all wishlist products)
+                if (wishlist.product_ids && wishlist.product_ids.length) {
+                    this.isInWishlist = wishlist.product_ids.includes(productId);
+                }
+
+                // optional: still detect item id from preview items
+                if (wishlist.items && wishlist.items.length) {
+
+                    const found = wishlist.items.find(
+                        item => parseInt(item.product_id) === productId
+                    );
+
+                    if (found) {
+                        this.wishlistItemId = found.wishlist_item_id;
+                    }
+                }
+            },
+
+            // ── Main toggle ────────────────────────────────────────────────────
+            async toggleWishlist() {
+                if (this.isLoading) return;
+
+                if (this.isInWishlist) {
+                    await this.removeFromWishlist();
+                } else {
+                    await this.addToWishlist();
+                }
+            },
+
+            // ── Add ────────────────────────────────────────────────────────────
+            async addToWishlist() {
+                this.isLoading = true;
+
+                // Optimistic update — heart turns red immediately
+                this.isInWishlist = true;
+
+                try {
+                    const formKey = this.getFormKey();
+                    const url = `/wishlist/index/add/product/${this.productId}/`;
+
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        body: new URLSearchParams({
+                            form_key: formKey,
+                            product: this.productId,
+                            qty: 1
+                        })
+                    });
+
+                    // Guest → redirect to login
+                    if (response.redirected && response.url.includes('customer/account/login')) {
+                        this.isInWishlist = false; // revert optimistic
+                        window.location.href = response.url;
+                        return;
+                    }
+
+                    if (!response.ok) throw new Error('Add failed');
+
+                    // Reload sections → updates header counter + fires private-content-loaded
+                    this.reloadSections();
+                    this.notify('success', '<?= $escaper->escapeJs(__('Product added to wish list.')) ?>');
+
+                } catch (e) {
+                    this.isInWishlist = false; // revert on error
+                    console.error('Wishlist add error:', e);
+                    this.notify('error', '<?= $escaper->escapeJs(__('Could not add to wish list.')) ?>');
+                } finally {
+                    this.isLoading = false;
+                }
+            },
+
+            // ── Remove ─────────────────────────────────────────────────────────
+            async removeFromWishlist() {
+                if (!this.wishlistItemId) {
+                    this.notify('error', '<?= $escaper->escapeJs(__('Could not find wish list item.')) ?>');
+                    return;
+                }
+
+                this.isLoading = true;
+
+                // Optimistic update — heart empties immediately
+                this.isInWishlist = false;
+                const savedItemId = this.wishlistItemId;
+                this.wishlistItemId = null;
+
+                try {
+                    const formKey = this.getFormKey();
+                    const url = `/wishlist/index/remove/item/${savedItemId}/`;
+
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        body: new URLSearchParams({
+                            form_key: formKey
+                        })
+                    });
+
+                    if (!response.ok) throw new Error('Remove failed');
+
+                    // Reload sections → updates header counter
+                    this.reloadSections();
+                    this.notify('success', '<?= $escaper->escapeJs(__('Product removed from wish list.')) ?>');
+
+                } catch (e) {
+                    // Revert on error
+                    this.isInWishlist = true;
+                    this.wishlistItemId = savedItemId;
+                    console.error('Wishlist remove error:', e);
+                    this.notify('error', '<?= $escaper->escapeJs(__('Could not remove from wish list.')) ?>');
+                } finally {
+                    this.isLoading = false;
+                }
+            },
+
+            // ── Helpers ────────────────────────────────────────────────────────
+            reloadSections() {
+                // Hyvä / Magento customer-data reload — updates header counter
+                // and re-fires private-content-loaded so onSectionsLoaded() runs
+                window.dispatchEvent(new CustomEvent('reload-customer-section-data'));
+            },
+
+            notify(type, message) {
+                window.dispatchEvent(new CustomEvent('add-message', {
+                    detail: {
+                        type,
+                        message
+                    }
+                }));
+            },
+
+            getFormKey() {
+                return document.querySelector('input[name="form_key"]')?.value ||
+                    window.FORM_KEY ||
+                    (document.cookie.match(/form_key=([^;]+)/) || [])[1] ||
+                    '';
+            }
+        }
+    }
+</script>

@@ -1,0 +1,64 @@
+<?php
+
+declare(strict_types=1);
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See https://www.mageworx.com/terms-and-conditions for license details.
+ */
+?>
+
+<?php
+
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\Escaper;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var HeroiconsOutline $heroicons */
+
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+?>
+
+<label class="label text-black text-lg font-semibold capitalize mb-4 mt-2 sm:my-0 text-left w-full sm:w-1/3 relative">
+    <div class="flex gap-x-2">
+        <div>
+            <span :class="{'border-b-2 border-dotted border-gray-400': 
+                (option.description && config.get_option_description_mode === OPTIONS_DESCRIPTION_MODE.TOOLTIP)}"
+                x-text="option.title + option.outOfStockLabel" @mouseover.prevent.stop="option.isVisibleDesc = true"
+                @mouseleave.prevent.stop="option.isVisibleDesc = false"></span>
+            <template x-if="option.isDynamicOption">
+                <span x-text="option.dynamicOptionData.unitText"></span>
+            </template>
+            <span x-show="option.required" class="text-red-500">*</span>
+        </div>
+        <template x-if="option.isDynamicOption && option.dynamicOptionData.hasTooltip">
+            <div @mouseover.prevent.stop="option.dynamicOptionData.isShowTooltip = true"
+                @mouseleave.prevent.stop="option.dynamicOptionData.isShowTooltip = false">
+                <?= $heroicons->questionMarkCircleHtml('w-5 h-5') ?>
+                <div x-show="option.dynamicOptionData.isShowTooltip">
+                    <div class="shadow-lg">
+                        <div class="absolute left-0 z-10 max-w-64 p-2 transform-translate-x-full bg-white rounded-lg shadow-lg p-4"
+                            style="bottom: calc(100% + 10px)"
+                            x-html="option.dynamicOptionData.tooltipHtml">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+    <div x-show="config.get_option_description_mode === OPTIONS_DESCRIPTION_MODE.TOOLTIP && option.isVisibleDesc && option.description">
+        <div class="shadow-lg">
+            <div class="absolute left-0 z-10 max-w-64 p-2 transform-translate-x-full bg-white rounded-lg shadow-lg p-4 text-sm"
+                style="bottom: calc(100% + 10px)"
+                x-html="option.description">
+            </div>
+        </div>
+    </div>
+    <div x-show="config.get_option_description_mode === OPTIONS_DESCRIPTION_MODE.PLAIN_TEXT && option.description" class="my-2 sm:mb-0 text-sm"
+        x-html="option.description">
+    </div>
+    <template x-if="option.selectionLimitText && option.selectionLimitText !== ''">
+        <div class="flex flex-wrap gap-y-2 gap-x-2 mb-4 italic" x-text="option.selectionLimitText"></div>
+    </template>
+</label>

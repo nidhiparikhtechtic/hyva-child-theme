@@ -1,0 +1,559 @@
+<?php
+
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\StoreConfig;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Hyva\Theme\ViewModel\HeroiconsSolid;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Escaper $escaper */
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+
+$storeConfig = $viewModels->require(StoreConfig::class);
+$maxItemsToDisplay = $storeConfig->getStoreConfig('checkout/sidebar/max_items_display_count');
+
+/** @var HeroiconsOutline $heroIcons */
+$heroIcons = $viewModels->require(HeroiconsOutline::class);
+
+/** @var HeroiconsSolid $heroIconsSolid */
+$heroIconsSolid = $viewModels->require(HeroiconsSolid::class);
+
+$miniCartOptionQtyStyle = (string) $block->getQtyStyle() ?: 'default';
+$miniCartOptionShowSku = $block->getShowSku() !== null ? (bool) $block->getShowSku() : false;
+$miniCartOptionQtySaveAuto = $miniCartOptionQtyStyle === "incrementor" || $miniCartOptionQtyStyle === "select";
+?>
+
+<script>
+    function initCartDrawer() {
+        return {
+            open: false,
+            isLoading: false,
+            cart: {},
+            maxItemsToDisplay: <?= (int) $maxItemsToDisplay ?>,
+            itemsCount: 0,
+            showSku: <?= $miniCartOptionShowSku ? 'true' : 'false' ?>,
+            threshold: 300,
+            remaining: null,
+            progress: 0,
+            storeDefaultCountry: '<?= $escaper->escapeJs($storeConfig->getStoreConfig('general/country/default')) ?>',
+            eligibleCountries: ['NL', 'BE'],
+            getData(data) {
+                if (data.cart) {
+                    this.cart = data.cart;
+                    this.itemsCount = data.cart.items && data.cart.items.length || 0;
+                    this.setCartItems();
+                    this.calculateFreeShipping();
+                }
+                this.isLoading = false;
+            },
+            cartItems: [],
+            getItemCountTitle() {
+                return hyva.strf('<?= $escaper->escapeJs(__('%0 of %1 products in cart displayed')) ?>', this.maxItemsToDisplay, this.itemsCount)
+            },
+            setCartItems() {
+                this.cartItems = this.cart.items && this.cart.items.sort((a, b) => b.item_id - a.item_id) || [];
+
+                if (this.maxItemsToDisplay > 0) {
+                    this.cartItems = this.cartItems.slice(0, parseInt(this.maxItemsToDisplay, 10));
+                }
+            },
+            calculateFreeShipping() {
+
+                console.log('🛒 Free shipping triggered');
+
+                if (!this.cart.subtotal) {
+                    console.log('No subtotal found');
+                    this.remaining = null;
+                    return;
+                }
+
+                // Remove HTML tags + currency symbols
+                const subtotalRaw = this.cart.subtotal || '';
+
+                const subtotalText = subtotalRaw
+                    .replace(/<[^>]*>/g, '')
+                    .replace(/[^0-9.,]/g, '')
+                    .replace(',', '.');
+
+                const subtotal = parseFloat(subtotalText);
+
+                if (isNaN(subtotal)) {
+                    console.log('Subtotal parsing failed');
+                    this.remaining = null;
+                    return;
+                }
+
+                console.log('Parsed subtotal:', subtotal);
+
+                // Store country check
+                const country = this.storeDefaultCountry;
+
+                if (!this.eligibleCountries.includes(country)) {
+                    console.log('Country not eligible');
+                    this.remaining = null;
+                    return;
+                }
+
+                this.remaining = Math.max(this.threshold - subtotal, 0);
+                this.progress = Math.min((subtotal / this.threshold) * 100, 100);
+
+                console.log('Remaining:', this.remaining);
+                console.log('Progress:', this.progress);
+            },
+            updateItemQty(form) {
+                if (!form.action) return;
+                this.isLoading = true;
+                const action = form.action;
+                const formData = new FormData(form);
+                formData.append('form_key', hyva.getFormKey());
+
+                if (!formData.uenc) {
+                    formData.append('uenc', hyva.getUenc());
+                }
+
+                fetch(action, {
+                    body: formData,
+                    method: 'POST',
+                    mode: "cors",
+                    credentials: "include"
+                }).then((result) => {
+                    return result.text()
+                }).then((content) => {
+                    hyva.replaceDomElement('#maincontent', content);
+                }).catch((error) => {
+                    window.dispatchMessages && window.dispatchMessages([{
+                        type: 'error',
+                        text: '<?= $escaper->escapeJs(__("Something went wrong. Please try again.")) ?>'
+                    }]);
+                }).finally(() => {
+                    this.isLoading = false;
+                })
+            },
+            deleteItemFromCart(itemId) {
+                this.isLoading = true;
+
+                const formKey = hyva.getFormKey();
+                const postUrl = BASE_URL + 'checkout/sidebar/removeItem/';
+
+                fetch(postUrl, {
+                    headers: {
+                        "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+                    },
+                    body: "form_key=" + formKey + "&item_id=" + itemId,
+                    method: "POST",
+                    mode: "cors",
+                    credentials: "include"
+                }).then(response => {
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                    } else if (response.ok) {
+                        return response.json();
+                    } else {
+                        window.dispatchMessages && window.dispatchMessages([{
+                            type: 'warning',
+                            text: '<?= $escaper->escapeJs(__('Could not remove item from quote.')) ?>'
+                        }]);
+                        this.isLoading = false;
+                    }
+                }).then(result => {
+                    window.dispatchMessages && window.dispatchMessages([{
+                        type: result.success ? 'success' : 'error',
+                        text: result.success ?
+                            '<?= $escaper->escapeJs(__('You removed the item.')) ?>' : result.error_message
+                    }], result.success ? 5000 : 0)
+                    window.dispatchEvent(new CustomEvent('reload-customer-section-data'));
+                });
+            },
+            scrollLock(use = true) {
+                document.documentElement.style.scrollbarGutter = use ? "stable" : "";
+                document.body.style.overflow = use ? "hidden" : "";
+            },
+            toggleCartDrawer(event) {
+                if (event.detail && event.detail.isOpen) {
+                    this.open = event.detail.isOpen;
+                } else {
+                    this.open = !this.open;
+                }
+
+                if (this.open) {
+                    this.$root.showModal();
+                } else {
+                    this.$root.close();
+                }
+
+                this.scrollLock(this.open);
+            },
+            openCartDrawer() {
+                this.$root.showModal();
+                this.open = true;
+                this.scrollLock(true);
+            },
+            closeCartDrawer() {
+                this.$root.close();
+                this.open = false;
+                this.scrollLock(false);
+            },
+            onDialogBackdropClickHelper(event, target) {
+                const rect = target.getBoundingClientRect();
+                const isInDialog =
+                    rect.top <= event.clientY &&
+                    event.clientY <= rect.top + rect.height &&
+                    rect.left <= event.clientX &&
+                    event.clientX <= rect.left + rect.width;
+                return isInDialog;
+            },
+            cartListeners: {
+                ['@private-content-loaded.window'](event) {
+                    this.getData(event.detail.data);
+                },
+                ['@click'](event) {
+                    if (this.onDialogBackdropClickHelper(event, this.$root)) return;
+                    this.closeCartDrawer();
+                },
+                ['@toggle-cart.window'](event) {
+                    this.toggleCartDrawer(event);
+                },
+                ['@keydown.window.escape']() {
+                    this.closeCartDrawer();
+                }
+            }
+        }
+    }
+</script>
+
+<dialog
+    id="cart-drawer"
+    aria-labelledby="cart-drawer-title"
+    class="z-30 fixed inset-0 flex flex-col p-0 gap-y-5 max-h-screen max-w-full h-full mr-0 w-[480px] md:w-[640px]
+        transition ease-in-out shadow-2xl bg-white backdrop:bg-black/25 backdrop:backdrop-blur-sm"
+    x-show="open"
+    x-transition:enter="duration-700"
+    x-transition:enter-start="translate-x-full"
+    x-transition:enter-end="translate-x-0"
+    x-transition:leave="duration-500"
+    x-transition:leave-start="translate-x-0"
+    x-transition:leave-end="translate-x-full"
+    x-ref="cartDialogContent"
+    x-data="initCartDrawer()"
+    x-bind="cartListeners"
+    x-cloak>
+    <?= $block->getChildHtml('cart-drawer.top'); ?>
+
+    <div class="flex gap-2 justify-between items-center p-4">
+        <p id="cart-drawer-title" class="text-2xl text-teak-ink font-normal font-garamond">
+            <?= $escaper->escapeHtml(__('Your Shopping Cart')) ?>
+            <span
+                class="items-total text-xs"
+                x-show="maxItemsToDisplay && maxItemsToDisplay < itemsCount"
+                x-text="getItemCountTitle()"></span>
+        </p>
+        <button
+            type="button"
+            class="justify-center disabled:shadow-none disabled:bg-white disabled:border-slate-200 disabled:text-slate-600 disabled:opacity-70"
+            @click="closeCartDrawer"
+            aria-label="<?= $escaper->escapeHtmlAttr(__('Close minicart')) ?>">
+            <svg class="w-6 h-6 text-teak-muted hover:text-teak-ink" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6.4 19L5 17.6L10.6 12L5 6.4L6.4 5L12 10.6L17.6 5L19 6.4L13.4 12L19 17.6L17.6 19L12 13.4L6.4 19Z" fill="currentColor" />
+            </svg>
+        </button>
+    </div>
+
+    <!-- FREE SHIPPING PROGRESS -->
+    <template x-if="remaining !== null">
+        <div class="mx-4 border border-gray-300 rounded-lg p-4">
+
+            <template x-if="remaining > 0">
+                <div>
+                    <div class="flex gap-1 text-xs font-mono font-medium text-teak-ink mb-2">
+                        <svg class="w-3.5 h-3.5 text-teak-gold" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M3 7h13v8h-1.5a2.5 2.5 0 0 0-5 0H8a2.5 2.5 0 0 0-5 0H3V7zm15 2h2.5L23 12v3h-1a2.5 2.5 0 0 0-5 0h-1V9zM6 17.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm12 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"></path>
+                        </svg>
+                        <div>
+                            <?= $escaper->escapeHtml(__('Only € ')) ?>
+                            <span x-text="remaining.toFixed(2)"></span>
+                            <?= $escaper->escapeHtml(__(' more for free delivery')) ?>
+                        </div>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded h-2 mb-2">
+                        <div
+                            class="bg-gradient-to-r from-teak-gold to-teak-green h-2 rounded transition-all duration-500"
+                            :style="'width:' + progress + '%'"></div>
+                    </div>
+                </div>
+            </template>
+
+            <template x-if="remaining <= 0">
+                <p class="text-sm font-semibold text-green-600">
+                    <?= $escaper->escapeHtml(__('🎉 You qualify for free delivery!')) ?>
+                </p>
+            </template>
+
+        </div>
+    </template>
+
+    <?= $block->getChildHtml('cart-drawer.items.before'); ?>
+
+    <template x-if="!itemsCount">
+        <div class="grow grid place-items-center">
+            <div class="text-center">
+                <div class="max-w-full max-h-full aspect-square w-44 h-44 inline-flex items-center justify-center rounded-full
+                    bg-teakea-red text-white outline-2 outline-dashed outline-teakea-red  outline-offset-8">
+                    <?= $heroIconsSolid->shoppingCartHtml('', 120, 120, ['aria-hidden' => 'true']); ?>
+                </div>
+                <p class="mt-10 text-xl">
+                    <strong><?= $escaper->escapeHtml(__('Your cart is empty')) ?></strong>
+                </p>
+                <p class="text-teakea-black">
+                    <?= $escaper->escapeHtml(__("Looks like you haven't made your choice yet.")) ?>
+                </p>
+            </div>
+        </div>
+    </template>
+
+    <template x-if="itemsCount">
+        <ul class="grow flex flex-col overflow-y-auto overscroll-y-contain mask-overflow mask-dir-y px-8">
+            <template x-for="item in cartItems">
+                <li class="flex gap-2.5 items-start py-5 first:pt-0 last:border-b-0 border-b border-[#D8D8D8]">
+                    <a
+                        class="block shrink-0 max-w-[25%]"
+                        :href="item.product_url"
+                        :title="hyva.str('<?= $escaper->escapeJs(__('Product "%1"')) ?>', item.product_name)">
+                        <img
+                            :src="item.product_image.src"
+                            :width="item.product_image.width"
+                            :height="item.product_image.height"
+                            loading="lazy"
+                            :alt="hyva.str('<?= $escaper->escapeJs(__('Product "%1"')) ?>', item.product_name)" />
+                    </a>
+                    <div class="grow space-y-1.5">
+                        <div class="flex gap-2 justify-between items-center font-garamond">
+                            <p class="text-lg">
+                                <?php if ($miniCartOptionQtyStyle === "text"): ?>
+                                    <span x-text="item.qty + ' x '"></span>
+                                <?php endif; ?>
+                                <strong x-html="item.product_name" class="text-base text-teak-ink line-clamp-2 font-normal"></strong>
+                            </p>
+                            <span class="[&_.price]:font-normal text-base text-teak-ink font-medium" x-html="item.product_price"></span>
+                        </div>
+
+                        <div class="text-xs text-teak-muted">
+                            <span class="uppercase">SKU:</span>
+                            <span x-html="item.product_sku"></span>
+                        </div>
+
+                        <template x-if="item.options && item.options.length || showSku">
+                            <dl class="table text-xs bg-teak-stone-light border border-[#F0F0F0] rounded-lg p-2.5 mb-2">
+                                <template x-if="showSku">
+                                    <div class="table-row">
+                                        <dt class="table-cell font-normal text-teak-muted min-w-[theme(spacing.16)] pr-1 pb-0.5">
+                                            <?= $escaper->escapeHtml(__('Sku')) ?>
+                                        </dt>
+                                        <dd class="table-cell font-semibold text-teak-ink pb-0.5" x-html="item.product_sku"></dd>
+                                    </div>
+                                </template>
+                                <template x-for="option in item.options">
+                                    <div class="table-row">
+                                        <dt
+                                            class="table-cell font-normal text-teak-muted min-w-[theme(spacing.16)] pr-1 pb-0.5"
+                                            x-text="option.label"></dt>
+                                        <dd class="table-cell font-semibold text-teak-ink pb-0.5" x-html="option.value"></dd>
+                                    </div>
+                                </template>
+                            </dl>
+                        </template>
+                        <div class="flex flex-wrap gap-2 <?= $miniCartOptionQtyStyle === "text" ? 'justify-end' : 'justify-between' ?> items-center">
+                            <?php if ($miniCartOptionQtyStyle !== "text"): ?>
+                                <form
+                                    action="<?= $escaper->escapeUrl($block->getUrl('checkout/cart/updatePost')) ?>"
+                                    x-data="{
+                                        initQty: item.qty,
+                                        itemQty: item.qty,
+                                        prevQty: item.qty,
+                                        updateQty() {
+                                            const submitEvent = new Event('submit', { cancelable: true });
+                                            this.$root.dispatchEvent(submitEvent);
+                                        },
+                                        setQtyDefaults() {
+                                            this.initQty = item.qty;
+                                            this.itemQty = item.qty;
+                                            this.prevQty = item.qty;
+                                        }
+                                    }"
+                                    @submit.prevent="updateItemQty($event.target);"
+                                    x-init="$watch('item.qty', () => setQtyDefaults());"
+                                    method="post"
+                                    class="form form-cart flex gap-1">
+                                    <?= $block->getBlockHtml('formkey') ?>
+                                    <?php if ($miniCartOptionQtyStyle === "incrementor"): ?>
+                                        <button
+                                            type="button"
+                                            @click="itemQty <= 0 ? itemQty = 0 : itemQty--"
+                                            @click.debounce.1000ms="updateQty($event);"
+                                            class="btn p-3 rounded text-slate-900 bg-transparent hover:bg-slate-50 active:bg-slate-100 shadow-none">
+                                            <?= $heroIcons->minusHtml('', 20, 20, ['aria-hidden' => 'true']); ?>
+                                        </button>
+                                    <?php endif; ?>
+                                    <label class="mb-0">
+                                        <span class="sr-only"><?= $escaper->escapeHtml(__('Qty')) ?></span>
+                                        <input
+                                            type="number"
+                                            class="qty text-black border border-[#F0F0F0] rounded-lg shadow-none [-moz-appearance:textfield]
+                                                <?= $miniCartOptionQtyStyle === "select"
+                                                    ? 'form-select py-1.5 pr-7 pl-3.5 focus:bg-none [&::-webkit-list-button]:w-0 [&::-webkit-calendar-picker-indicator]:!hidden'
+                                                    : 'form-input' ?>
+                                                <?= $miniCartOptionQtyStyle === "incrementor" ? 'w-16 text-center' : 'w-16' ?>
+                                                <?= $miniCartOptionQtyStyle === "select" || $miniCartOptionQtyStyle === "incrementor"
+                                                    ? '[&::-webkit-inner-spin-button]:hidden'
+                                                    : 'hover:[-moz-appearance:auto] [&::-webkit-inner-spin-button]:invisible hover:[&::-webkit-inner-spin-button]:visible' ?>"
+                                            required
+                                            min="0"
+                                            step="any"
+                                            x-model.number="itemQty"
+                                            :id="`minicart-${item.item_id}-qty`"
+                                            :name="`cart[${item.item_id}][qty]`"
+                                            <?php if ($miniCartOptionQtyStyle === "select"): ?>
+                                            :placeholder="initQty"
+                                            <?php endif; ?>
+                                            <?php if ($miniCartOptionQtySaveAuto): ?>
+                                            @change.debounce.1000ms="updateQty($event)"
+                                            <?php endif; ?>
+                                            <?php if ($miniCartOptionQtyStyle === "select"): ?>
+                                            list="minicart-autocomplete"
+                                            @focus="prevQty = itemQty; itemQty = null"
+                                            @blur="itemQty === null ? itemQty = prevQty : () => {}"
+                                            <?php endif; ?>>
+                                    </label>
+                                    <?php if ($miniCartOptionQtyStyle === "incrementor"): ?>
+                                        <button
+                                            type="button"
+                                            @click="itemQty++"
+                                            @click.debounce.1000ms="updateQty($event);"
+                                            class="btn p-3 rounded text-slate-900 bg-transparent hover:bg-slate-50 active:bg-slate-100 shadow-none">
+                                            <?= $heroIcons->plusHtml('', 20, 20, ['aria-hidden' => 'true']); ?>
+                                        </button>
+                                    <?php endif; ?>
+                                    <?php if (!$miniCartOptionQtySaveAuto): ?>
+                                        <button
+                                            type="submit"
+                                            class="justify-center rounded-lg p-2.5 text-base bg-teakea-red text-white disabled:shadow-none transition
+                                               disabled:bg-slate-600 disabled:text-slate-50 disabled:opacity-70 disabled:invisible"
+                                            :disabled="itemQty === initQty || itemQty === null"
+                                            :aria-label="hyva.str(
+                                                '<?= $escaper->escapeJs(__('Update qty for "%1"')) ?>',
+                                                item.product_name
+                                            )">
+                                            <?= $heroIconsSolid->checkHtml('', 20, 20, ['aria-hidden' => 'true']); ?>
+                                        </button>
+                                    <?php endif; ?>
+                                </form>
+                            <?php endif; ?>
+                            <div class="inline-flex flex-wrap items-center gap-1">
+                                <a
+                                    :href="item.configure_url"
+                                    x-show="item.product_type !== 'grouped'"
+                                    class="hidden justify-center py-2.5 sm:py-2.5 px-2.5 text-base bg-teakea-lighter-gray rounded-lg disabled:bg-slate-50 disabled:text-slate-600 disabled:opacity-70"
+                                    :aria-label="hyva.str(
+                                        '<?= $escaper->escapeJs(__('Edit product "%1"')) ?>',
+                                        item.product_name
+                                    )">
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M10.0312 5.23541C10.4438 5.99982 10.9664 6.70111 11.584 7.31647V7.31744C12.1992 7.9352 12.9007 8.45841 13.665 8.87115L8.29785 14.2403C7.82205 14.7161 7.61797 14.9179 7.39746 15.0899L7.39648 15.0909C7.19551 15.2479 6.98177 15.3877 6.75781 15.5098L6.53125 15.626C6.40493 15.6861 6.27398 15.7393 6.09473 15.8038L5.36719 16.0508L2.06934 17.1505L2.06836 17.1514C2.02429 17.1661 1.97686 17.1679 1.93164 17.1573C1.88631 17.1466 1.84445 17.1238 1.81152 17.0909C1.77862 17.058 1.75577 17.0161 1.74512 16.9708C1.73449 16.9255 1.73716 16.8782 1.75195 16.834V16.8331L2.85156 13.5352C3.06428 12.8971 3.15642 12.6247 3.27637 12.3721C3.42297 12.0648 3.603 11.7744 3.8125 11.5059C3.98461 11.2852 4.18692 11.0807 4.66309 10.6046L10.0312 5.23541ZM14.1113 2.22076C14.7929 2.22079 15.4467 2.49174 15.9287 2.97369C16.4107 3.45565 16.6816 4.10949 16.6816 4.79108C16.6816 5.47267 16.4106 6.12646 15.9287 6.60846L15.4854 7.05084C14.6669 6.72383 13.9221 6.23339 13.2988 5.60651L13.2969 5.60358L13.0439 5.33795C12.5363 4.77253 12.1334 4.12125 11.8516 3.4151L12.2939 2.97369C12.7759 2.49179 13.4297 2.22076 14.1113 2.22076Z" stroke="#0A0A0A" stroke-width="1.21154" />
+                                    </svg>
+                                </a>
+                                <button
+                                    type="button"
+                                    class="flex items-center gap-1 text-xs justify-center py-1.5 px-2 text-teak-muted hover:text-teakea-red disabled:bg-white disabled:border-slate-200 disabled:text-slate-600 disabled:opacity-70"
+                                    @click="deleteItemFromCart(item.item_id)"
+                                    :aria-label="hyva.str(
+                                        '<?= $escaper->escapeJs(__('Remove product "%1" from cart')) ?>',
+                                        item.product_name
+                                    )">
+                                    <svg class="w-3.5 h-3.5" stroke="currentColor" stroke-width="1.21154" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M16.7103 4.82932C14.0207 4.56278 11.315 4.42548 8.61726 4.42548C7.01803 4.42548 5.4188 4.50625 3.81957 4.66778L2.17188 4.82932" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M6.61719 4.01414L6.79488 2.95606C6.92411 2.18876 7.02103 1.6153 8.38603 1.6153H10.5022C11.8672 1.6153 11.9722 2.22106 12.0933 2.96414L12.271 4.01414" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M14.9716 7.38281L14.4466 15.5163C14.3578 16.7843 14.2851 17.7697 12.0316 17.7697H6.84625C4.59279 17.7697 4.5201 16.7843 4.43125 15.5163L3.90625 7.38281" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M8.09375 13.3269H10.7834" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M7.42188 10.0961H11.4603" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                    <?= __('Remove') ?>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </template>
+        </ul>
+    </template>
+
+    <?= $block->getChildHtml('cart-drawer.bottom'); ?>
+
+    <template x-if="itemsCount">
+        <div class="px-4 pt-4 pb-6 bg-teak-stone-light border border-t-0.5 border-[#1e4d2b14]">
+            <?= $block->getChildHtml('cart-drawer.totals.before'); ?>
+
+            <dl class="flex gap-2 justify-between items-center text-teak-ink font-garamond text-lg leading-none capitalize">
+                <dt class=""><?= $escaper->escapeHtml(__('Totaalbedrag')) ?></dt>
+                <dd x-html="cart.subtotal"></dd>
+            </dl>
+
+            <div class="flex flex-col gap-y-2.5 mt-5">
+                <a href="<?= $escaper->escapeUrl($block->getUrl('checkout')) ?>"
+                    class="flex gap-2 rounded py-3 px-6 text-white bg-[linear-gradient(180deg,_#1E4D2B_0%,_#163A20_100%)] shadow-[0_1px_0_rgba(0,0,0,0.04),0_2px_12px_-3px_rgba(30,77,43,0.35)] hover:shadow-[0_4px_18px_-4px_rgba(30,77,43,0.45)] hover:-translate-y-[1px] justify-center text-center text-base items-center font-normal">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-3.75 11.25h16.5a1.5 1.5 0 0 0 1.5-1.5v-9a1.5 1.5 0 0 0-1.5-1.5H3.75a1.5 1.5 0 0 0-1.5 1.5v9a1.5 1.5 0 0 0 1.5 1.5Z"></path>
+                    </svg>
+                    <?= $escaper->escapeHtml(__('Checkout securely')) ?>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path>
+                    </svg>
+                </a>
+                <a
+                    href="<?= $escaper->escapeUrl($block->getUrl('checkout/cart')) ?>"
+                    class="text-sm text-teak-muted hover:text-teak-green underline-offset-4 hover:underline text-center">
+                    <?= $escaper->escapeHtml(__('View and Edit Cart')) ?>
+                </a>
+
+                <?= $block->getLayout()
+                    ->createBlock(\Magento\Cms\Block\Block::class)
+                    ->setBlockId('minicart_summury_trust_line')
+                    ->toHtml(); ?>
+                <?= $block->getChildHtml('extra_actions') ?>
+            </div>
+        </div>
+    </template>
+
+    <template x-if="!itemsCount">
+        <div class="flex flex-col px-4 pt-4 pb-6 bg-teak-stone-light border border-t-0.5 border-[#1e4d2b14]">
+            <a href="<?= $escaper->escapeUrl($block->getUrl('best-verkopers')) ?>"
+                @click="closeCartDrawer"
+                class="flex gap-2 justify-center items-center rounded py-3 px-6 text-base border border-teakea-red hover:bg-teakea-red text-teakea-red hover:text-white disabled:opacity-70">
+
+                <?= $escaper->escapeHtml(__('Discover our bestsellers')) ?>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path>
+                </svg>
+            </a>
+        </div>
+    </template>
+
+    <?php if ($miniCartOptionQtyStyle === "select"): ?>
+        <datalist id="minicart-autocomplete">
+            <template x-for="i in 100">
+                <option :value="i"></option>
+            </template>
+        </datalist>
+    <?php endif; ?>
+
+    <?= $block->getChildHtml('loading') ?>
+</dialog>

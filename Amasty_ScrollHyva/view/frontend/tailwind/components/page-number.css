@@ -1,0 +1,19 @@
+/*
+/*  Page number component styles
+/*  --------------------------------------------- */
+
+.amscroll-page-num {
+    @apply clear-both mt-4;
+
+&.-amscroll-button {
+     @apply inline-block p-3 border rounded-md bg-amscroll-background-color leading-5;
+ }
+
+&.-amscroll-divider {
+     @apply border-b-2 border-gray-300 font-semibold;
+ }
+
+&.-amscroll-background {
+     @apply bg-amscroll-background-color px-3 py-2 shadow;
+ }
+}

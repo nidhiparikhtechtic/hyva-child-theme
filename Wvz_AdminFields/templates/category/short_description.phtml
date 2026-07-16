@@ -1,0 +1,62 @@
+<?php
+
+/**
+ * Category view template
+ *
+ * @var $block \Magento\Catalog\Block\Category\View
+ *
+ */
+?>
+
+
+<style>
+    .bg-cat-img {
+        background: url("<?= $imgUrl = $block->getCurrentCategory()->getImageUrl(); ?>");
+        object-fit: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
+        color: white;
+    }
+</style>
+
+
+<?php if ($_description = $block->getCurrentCategory()->getInchooShortDescription()): ?>
+    <div x-data="{ expanded: false }" class="w-full">
+        <div class="category-shortdescription w-full bg-cat-img pb-0 mt-0 pr-2 flex items-start flex-col sm:min-h-[340px] min-h-[300px] relative">
+            <div class="container m-auto py-4 z-[1]">
+                <div class="min-h-[35px]">
+                    <valued-widget layout="button" size="medium" align="left" theme="light"></valued-widget>
+                </div>
+
+                <h1 class="page-title mt-4 sm:text-4xl text-3xl font-medium text-white pb-2.5">
+                    <?= /* @escapeNotVerified */ $block->getCurrentCategory()->getName(); ?>
+                </h1>
+                <div x-cloak :class="expanded ? '' : 'sm:max-h-[92px] max-h-[50px] overflow-hidden'" class="transition-max-height duration-500 ease-in-out text-sm ml:w-[875px] shor-description-text">
+                    <!-- Your dynamic content goes here, ensure it's part of this div to control the height -->
+                    <?= /* @escapeNotVerified */ $this->helper('Magento\Catalog\Helper\Output')->categoryAttribute($block->getCurrentCategory(), $_description, 'inchoo_short_description') ?>
+
+                </div>
+                <button @click="expanded = !expanded" x-cloak class="font-semibold text-white pb-5 text-sm underline">
+                    <span class="leading-[22px]" x-show="!expanded"><?= $escaper->escapeHtml(__('Read More')) ?></span>
+                    <span class="leading-[22px]" x-show="expanded"><?= $escaper->escapeHtml(__('Read less')) ?></span>
+                </button>
+
+                <?php if ($block->getCurrentCategory()->getUrlKey() == 'eetkamerstoelen') { ?>
+                    <div class="flex flex-wrap gap-4">
+                        <a class="inline-block bg-teakea-terracotta py-3 px-8 rounded-lg transition-all duration-300 hover:bg-opacity-90 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
+                            href="https://teakea.stoelconfigurator.nl/nl-nl"
+                            target="blank"
+                            title="Stel je stoel samen en personaliseer het ontwerp naar jouw wensen"
+                            aria-label="Stel je stoel samen en personaliseer het ontwerp naar jouw wensen">
+                            <span class="text-sm text-white font-semibold uppercase" aria-hidden="true">
+                                Stel je stoel samen
+                            </span>
+                        </a>
+                    </div>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+<!--$imgUrl = $block->getCurrentCategory()->getImageUrl();-->

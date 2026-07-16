@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+
+    <body>
+
+        <!-- Remove breadcrumb -->
+        <referenceBlock name="breadcrumbs" remove="true" />
+
+        <!-- Add additional class -->
+        <referenceContainer name="product.info.main" htmlClass="product-info-main container" />
+        <referenceContainer name="main.content" htmlClass="pb-4 xl:pb-7" />
+
+        <!-- Add SKU section -->
+        <referenceBlock name="product.info.form">
+            <block class="Magento\Framework\View\Element\Template"
+                name="custom.product.sku.afterqty"
+                template="Magento_Catalog::product/view/get-product-sku.phtml"
+                before="product.info.details" />
+        </referenceBlock>
+
+        <!-- Remove Description / Detail Tab -->
+        <referenceBlock name="product.info.details" remove="true" />
+
+        <!-- Remove Reviews all functionality Tab -->
+        <referenceBlock name="reviews" remove="true" />
+        <referenceBlock name="product.reviews" remove="true" />
+        <referenceBlock name="product.review.form" remove="true" />
+        <referenceBlock name="product.info.reviews" remove="true" />
+        <referenceBlock name="product.info.review" remove="true" />
+
+        <!-- 1) Banner BEFORE product.info.main -->
+        <referenceContainer name="content">
+            <block class="Magento\Cms\Block\Block"
+                name="eettafel-configurator-banner"
+                before="-">
+                <arguments>
+                    <argument name="block_id" xsi:type="string">eettafel-configurator-banner</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+
+        <!-- 2) Why Choose AFTER product.info.main -->
+        <referenceContainer name="content">
+            <block class="Magento\Cms\Block\Block"
+                name="eettafel-configurator-why-choose"
+                after="product.info.main">
+                <arguments>
+                    <argument name="block_id" xsi:type="string">
+                        eettafel-configurator-why-choose</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+
+        <!-- 3) Little Things AFTER Why Choose -->
+        <referenceContainer name="content">
+            <block class="Magento\Cms\Block\Block"
+                name="eettafel-configurator-little-things"
+                after="eettafel-configurator-why-choose">
+                <arguments>
+                    <argument name="block_id" xsi:type="string">
+                        eettafel-configurator-little-things</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

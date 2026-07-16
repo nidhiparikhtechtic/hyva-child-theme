@@ -1,0 +1,14 @@
+<?php
+/** @var $block \Magento\Framework\View\Element\Template */
+$_product = $block->getProduct();
+if (!$_product) {
+    // try to load product from registry (fallback)
+    $_product = $block->getLayout()->getBlock('product.info') ? $block->getLayout()->getBlock('product.info')->getProduct() : null;
+}
+?>
+
+<?php if ($_product && $_product->getSku()): ?>
+    <div class="product-sku my-2 text-sm">
+        SKU#: <?= $block->escapeHtml($_product->getSku()); ?>
+    </div>
+<?php endif; ?>

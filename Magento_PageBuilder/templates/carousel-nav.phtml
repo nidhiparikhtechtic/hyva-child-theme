@@ -1,0 +1,41 @@
+<?php
+
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\Escaper;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var HeroiconsOutline $heroicons */
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+?>
+
+<div class="flex items-center justify-center flex-1 gap-x-2.5 absolute left-1/2 bottom-8">
+    <button
+        aria-label="<?= $escaper->escapeHtml(__('Previous')) ?>"
+        class="glider-prev text-black rounded-full outline-none focus:outline-none border border-[#EDEDED] p-2">
+        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 12H20M4 12L8 8M4 12L8 16" stroke="black" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+    </button>
+    <div role="tablist" class="glider-dots select-none flex flex-wrap mx-1 justify-center p-0 focus:outline-none"></div>
+    <button
+        aria-label="<?= $escaper->escapeHtml(__('Next')) ?>"
+        class="glider-next text-black rounded-full outline-none focus:outline-none border border-[#EDEDED] p-2">
+        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 12H20M20 12L16 8M20 12L16 16" stroke="black" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+    </button>
+</div>

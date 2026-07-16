@@ -1,0 +1,139 @@
+<?php
+
+declare(strict_types=1);
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See https://www.mageworx.com/terms-and-conditions for license details.
+ */
+?>
+
+<?php
+
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\Escaper;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+
+$product = $block->getLayout()->getBlock('product.info')->getProduct();
+if (!$product || !$product->getEnableAtelierTolbertBlock()) { return; }
+
+$placeholderText = __('Tell us what you need here (e.g., non-standard sizes, recess mounting, tapered side).');
+?>
+
+<template x-if="option.__typename === 'CustomizableAreaOption' && option.isShow">
+    <div class="border-t border-gray-300 pt-2">
+
+        <div class="atelier-tolbert-textarea-companion mt-1 text-center"
+            x-data="atelierTolbertTextareaCompanion()"
+            x-init="$nextTick(() => init())"
+            x-show="visible"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 -translate-y-1"
+            x-transition:enter-end="opacity-100 translate-y-0"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            x-cloak
+            aria-live="polite">
+            <p class="inline-flex items-center gap-2 px-3 py-1.5 mb-2 rounded-full bg-[#1E4D2B]/8 border border-[#1E4D2B]/20
+                    text-xs md:text-sm font-mono uppercase tracking-wider text-teak-green">
+                <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" aria-hidden="true"></span>
+                <?= $escaper->escapeHtml(__('Patrick will review your note personally · within 24 hours')) ?>
+            </p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row border-gray-300 py-2 last:mb-6 last:border-b w-full items-center" :class="option.div_class">
+            <?= $block->getChildHtml('mageworx.apo.product.form.textarea_option.label') ?>
+            <div class="sm:ml-2 text-gray-900 text-left w-full sm:w-2/3 mw-apo-control">
+                <textarea x-model="option.value"
+                :placeholder="option.title.includes('Specifieke maatwerkwensen') ? '<?= $escaper->escapeHtmlAttr($placeholderText) ?>' : option.title"
+                :readonly="isLoading"
+                class="product-custom-option form-input w-full" @change="onChangeNonDepField()"
+                :id="'options_' + option.option_id + '_text'" :required="option.required"
+                form="product_addtocart_form" :name="'options[' + option.option_id + ']'"></textarea>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+(function () {
+    if (window.atelierTolbertTextareaCompanion) {
+        return;
+    }
+
+    window.atelierTolbertTextareaCompanion = function () {
+        return {
+            visible: false,
+            textarea: null,
+            observer: null,
+            selectors: [
+                'textarea.product-custom-option',
+                'textarea[id^="options_"][id$="_text"]',
+                'textarea[name^="options["]',
+                'form#product_addtocart_form textarea',
+                '#maatwerk-wensen textarea',
+                '.amquote-message-block textarea',
+            ],
+
+            init() {
+                this.findTextarea();
+
+                // If not found immediately,
+                if (!this.textarea) {
+                    this.observer = new MutationObserver(() => {
+                        this.findTextarea();
+                        if (this.textarea) {
+                            this.bindEvents();
+                            this.observer.disconnect();
+                        }
+                    });
+                    this.observer.observe(document.body, {
+                        childList: true,
+                        subtree: true
+                    });
+                } else {
+                    this.bindEvents();
+                }
+            },
+
+            findTextarea() {
+                for (const selector of this.selectors) {
+                    const field = document.querySelector(selector);
+                    if (field) {
+                        this.textarea = field;
+                        return;
+                    }
+                }
+            },
+
+            bindEvents() {
+                if (!this.textarea) {
+                    return;
+                }
+                const updateVisibility = () => {
+                    const value = this.textarea.value || '';
+                    this.visible = value.trim().length > 0;
+
+                    // analytics event
+                    if (this.visible && !this._tracked) {
+                        this._tracked = true;
+                        window.dataLayer = window.dataLayer || [];
+                        window.dataLayer.push({
+                            event: 'pdp_atelier_tolbert_custom_note_started'
+                        });
+                    }
+                };
+
+                this.textarea.addEventListener('input', updateVisibility);
+                this.textarea.addEventListener('blur', updateVisibility);
+
+                // initial check
+                updateVisibility();
+            }
+        };
+    };
+
+})();
+</script>

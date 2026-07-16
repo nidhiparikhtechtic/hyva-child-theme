@@ -1,0 +1,14 @@
+.cart-card-prices .unit-price span .price{
+    @apply font-normal text-xs md:text-sm;
+}
+
+.cart-card-prices .price-including-tax .price {
+    @apply text-sm sm:text-base md:text-lg;
+}
+
+#shopping-cart-items .card-wrap:first-child .item-info:first-child {
+    @apply pt-0;
+}
+.checkout-cart-index .page-wrapper .page-main .title-page{
+    @apply container;
+}

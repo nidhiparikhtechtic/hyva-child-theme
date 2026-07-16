@@ -1,0 +1,101 @@
+<?php
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\CurrentProduct;
+use Magento\Catalog\Model\Product;
+
+/** @var \Magento\Framework\View\Element\Template $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var CurrentProduct $currentProduct */
+
+$currentProduct = $viewModels->require(CurrentProduct::class);
+$product = $block->getData('product') ?: $currentProduct->get();
+
+if (!$product || !$product->getId()) {
+    return;
+}
+
+$attributeText = $product->getAttributeText('features_icons');
+
+if (empty($attributeText)) {
+    return;
+}
+
+$selectedOptions = is_array($attributeText) ? $attributeText : explode(',', $attributeText);
+
+$features = [
+    'Sustainable Certified Wood' => [
+        'icon' => 'features/sustainable_wood.svg',
+        'class' => 'sustainable_wood',
+        'title' => 'Sustainable Certified Wood',
+        'desc' => 'Our furniture is crafted from sustainably sourced wood, respecting nature and future generations.'
+    ],
+    'Made for Generations' => [
+        'icon' => 'features/made_for_generations.svg',
+        'class' => 'made_for_generations',
+        'title' => 'Made for Generations',
+        'desc' => 'Built to last - timeless craftsmanship and durable materials ensure longevity.'
+    ],
+    'Craftsmanship from our own workshop' => [
+        'icon' => 'features/craftsmanship.svg',
+        'class' => 'craftsmanship',
+        'title' => 'Craftsmanship from our own workshop',
+        'desc' => 'Designed and made by skilled artisans in our own workshop for authentic quality.'
+    ],
+    'Fast & Careful Delivery' => [
+        'icon' => 'features/fast_delivery.svg',
+        'class' => 'fast_delivery',
+        'title' => 'Fast & Careful Delivery',
+        'desc' => 'Order today, receive it quickly. Carefully packaged and delivered directly from our workshop.'
+    ],
+];
+?>
+
+<div
+    x-data="{ active: '<?= $selectedOptions[0] ?? '' ?>' }"
+    class="grid grid-cols-1 lg:grid-cols-3 border border-teakea-light-gray rounded-lg overflow-hidden mt-12">
+    <!-- Left Side (Tabs) -->
+    <div class="lg:col-span-1">
+        <?php foreach ($selectedOptions as $option): ?>
+            <?php if (isset($features[$option])): ?>
+                <button
+                    class="flex w-full items-center gap-2.5 py-2.5 px-5 space-x-5 border-b lg:border-r border-teakea-light-gray cursor-pointer transition-colors"
+                    :class="active === '<?= $option ?>' ? 'bg-teakea-cream lg:border-r-0' : ''"
+                    @click="active = '<?= $option ?>'">
+                    <div class="w-14 h-14 bg-white border border-[#0000004D] rounded-full flex items-center justify-center">
+                        <img src="<?= $block->getViewFileUrl('images/' . $features[$option]['icon']); ?>"
+                            alt="<?= $features[$option]['title']; ?>"
+                            title="<?= $features[$option]['title']; ?>"
+                            class="h-8 w-8">
+                    </div>
+
+                    <span class="text-base lg:text-lg font-medium leading-6 text-teakea-dark-gray"
+                        :class="active === '<?= $option ?>' ? 'font-bold' : ''">
+                        <?= $escaper->escapeHtml(__($features[$option]['title'])); ?></span>
+                </button>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    </div>
+
+    <!-- Right Side (Content) -->
+    <div class="lg:col-span-2 bg-teakea-cream rounded-br-lg rounded-bl-lg lg:rounded-bl-none lg:rounded-tr-lg p-5 pb-7 lg:py-7 lg:pr-5 lg:pl-14">
+        <?php foreach ($selectedOptions as $option): ?>
+            <?php if (isset($features[$option])): ?>
+                <div class="<?= $features[$option]['class'] ?>" x-show="active === '<?= $option ?>'" x-transition style="display:none;">
+                    <h3 class="text-lg lg:text-xl font-bold text-teakea-neutral-dark mb-5"><?= $escaper->escapeHtml(__($features[$option]['title'])); ?></h3>
+                    <p class="text-base text-[#666]"><?= $escaper->escapeHtml(__($features[$option]['desc'])); ?></p>
+
+
+                    <?php if ($option === 'Sustainable Certified Wood'): ?>
+                        <div class="mt-2.5">
+                            <?= $this->getLayout()->renderElement('product.info.fsc.badge'); ?>
+                        </div>
+                    <?php endif; ?>
+
+                </div>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    </div>
+</div>

@@ -1,0 +1,67 @@
+<?php
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsSolid;
+use Magento\Catalog\Block\Product\View\Details;
+use Magento\Framework\Escaper;
+
+/** @var ViewModelRegistry $viewModels */
+/** @var Details $block */
+/** @var Escaper $escaper */
+
+$heroicons = $viewModels->require(HeroiconsSolid::class);
+?>
+
+<div class="mt-5 space-y-4">
+
+    <?php foreach ($block->getGroupSortedChildNames('detailed_info', '') as $sectionName): ?>
+        <?php
+        $sectionBlock = $block->getLayout()->getBlock($sectionName);
+        if (!$sectionBlock) {
+            continue;
+        }
+
+        $html = trim((string) $sectionBlock->toHtml());
+        if ($html === '') {
+            continue;
+        }
+
+        $title = __($sectionBlock->getTitle() ?: $sectionName);
+        ?>
+
+        <!-- ACCORDION ITEM -->
+        <div
+            x-data="{ open: (window.innerWidth < 768 && '<?= $escaper->escapeJs($title) ?>' === 'Snelle informatie') }"
+            x-init="if ('<?= $escaper->escapeJs($title) ?>' === 'Meer informatie') { open = false; }"
+            class="border border-teakea-light-gray rounded-lg overflow-hidden">
+
+            <!-- HEADER -->
+            <button
+                @click="open = !open"
+                class="w-full flex items-center justify-between px-6 py-4 text-left font-semibold text-lg transition-colors duration-200"
+                :class="open ? 'bg-black text-white' : 'bg-white text-black'">
+
+                <span><?= $escaper->escapeHtml($title) ?></span>
+
+                <span
+                    class="transition-transform"
+                    :class="{ 'rotate-180': open }">
+                    <?= $heroicons->chevronDownHtml('', 20, 20, ['aria-hidden' => true]) ?>
+                </span>
+            </button>
+
+            <!-- CONTENT -->
+            <div x-show="open" x-collapse x-cloak>
+                <div class="p-2.5">
+                    <?=
+                    /** @noEscape */
+                    $html ?>
+                </div>
+            </div>
+        </div>
+
+    <?php endforeach; ?>
+
+</div>

@@ -1,0 +1,163 @@
+<?php
+
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Customer\LoginButton;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Hyva\Theme\ViewModel\HeroiconsSolid;
+use Hyva\Theme\ViewModel\ReCaptcha;
+use Magento\Customer\Block\Form\Login;
+use Magento\Framework\Escaper;
+
+/** @var Escaper $escaper */
+/** @var Login $block */
+/** @var LoginButton $loginButtonViewModel */
+/** @var ViewModelRegistry $viewModels */
+/** @var ReCaptcha $recaptcha */
+/** @var HeroiconsOutline $heroiconsoutline */
+/** @var HeroiconsSolid $heroiconssolid */
+
+$heroiconsoutline = $viewModels->require(HeroiconsOutline::class);
+$heroiconssolid = $viewModels->require(HeroiconsSolid::class);
+$loginButtonViewModel = $viewModels->require(LoginButton::class);
+
+// Do not replace this with $viewModels->require(ReCaptcha::class); that might break the dependency
+// on the Magento_ReCaptchaCustomer module
+$recaptcha = $block->getData('viewModelRecaptcha');
+?>
+<div class="w-full mt-5">
+    <form class="form form-login"
+        action="<?= $escaper->escapeUrl($block->getPostActionUrl()) ?>"
+        method="post"
+        x-data="initCustomerLoginForm()"
+        @submit.prevent="submitForm()"
+        id="customer-login-form">
+        <?= $block->getBlockHtml('formkey') ?>
+
+        <div class="mb-5">
+            <label for="email" class="block text-sm font-semibold text-teak-ink mb-1.5">
+                <?= $escaper->escapeHtml(__('Email address')) ?>
+            </label>
+            <input name="login[username]"
+                required
+                value="<?= $escaper->escapeHtmlAttr($block->getUsername()) ?>"
+                autocomplete="<?= $block->isAutocompleteDisabled() ? 'off' : 'email' ?>"
+                id="email"
+                type="email"
+                inputmode="email"
+                title="<?= $escaper->escapeHtmlAttr(__('Email address')) ?>"
+                class="w-full border border-teakea-light-gray rounded-lg px-4 py-3 text-sm
+                       placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#163A20]/30 focus:border-[#163A20]" />
+        </div>
+
+        <div class="mb-4">
+            <div class="flex items-center justify-between mb-1.5">
+                <label for="pass" class="block text-sm font-semibold text-teak-ink mb-0">
+                    <?= $escaper->escapeHtml(__('Password')) ?>
+                </label>
+                <a href="<?= $escaper->escapeUrl($block->getForgotPasswordUrl()) ?>"
+                    class="text-sm font-semibold text-teakea-terracotta">
+                    <?= $escaper->escapeHtml(__('Forgot?')) ?>
+                </a>
+            </div>
+            <div class="relative">
+                <div class="sr-only" aria-live="polite">
+                    <template x-if="!showPassword">
+                        <span><?= $escaper->escapeHtml(__('Password hidden')) ?></span>
+                    </template>
+                    <template x-if="showPassword">
+                        <span><?= $escaper->escapeHtml(__('Password shown')) ?></span>
+                    </template>
+                </div>
+                <input name="login[password]"
+                    required
+                    :type="showPassword ? 'text' : 'password'"
+                    autocomplete="<?= $block->isAutocompleteDisabled() ? 'off' : 'current-password' ?>"
+                    id="pass"
+                    title="<?= $escaper->escapeHtmlAttr(__('Password')) ?>"
+                    class="w-full border border-teakea-light-gray rounded-lg px-4 py-3 text-sm pr-11
+                           placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#163A20]/30 focus:border-[#163A20]" />
+                <button
+                    type="button"
+                    x-on:click="showPassword = !showPassword"
+                    :aria-pressed="showPassword ? 'true' : 'false'"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    :aria-label="showPassword ? '<?= $escaper->escapeJs(__('Hide Password')) ?>' : '<?= $escaper->escapeJs(__('Show Password')) ?>'">
+                    <template x-if="!showPassword">
+                        <?= $heroiconssolid->eyeHtml('w-4 h-4'); ?>
+                    </template>
+                    <template x-if="showPassword">
+                        <?= $heroiconssolid->eyeOffHtml('w-4 h-4'); ?>
+                    </template>
+                </button>
+            </div>
+        </div>
+        <?= $block->getLayout()
+            ->createBlock(\Magento\Persistent\Block\Form\Remember::class)
+            ->setTemplate('Magento_Persistent::remember_me.phtml')
+            ->toHtml(); ?>
+
+
+        <?= $recaptcha ? $recaptcha->getInputHtml(ReCaptcha::RECAPTCHA_FORM_ID_CUSTOMER_LOGIN) : '' ?>
+        <?= $block->getChildHtml('form_additional_info') ?>
+
+        <div class="mb-5">
+            <template x-if="displayErrorMessage">
+                <p class="text-red-600 flex items-start gap-2 text-sm mb-4">
+                    <span class="inline-block w-5 h-5 flex-shrink-0 mt-0.5">
+                        <?= $heroiconsoutline->exclamationCircleHtml(); ?>
+                    </span>
+                    <template x-for="errorMessage in errorMessages">
+                        <span x-html="errorMessage"></span>
+                    </template>
+                </p>
+            </template>
+        </div>
+
+        <button type="submit"
+            name="send"
+            <?php if ($loginButtonViewModel->disabled()): ?> disabled="disabled" data-recaptcha-btn<?php endif; ?>
+            class="w-full flex gap-2 rounded py-3 px-6 text-white bg-[linear-gradient(180deg,_#1E4D2B_0%,_#163A20_100%)] shadow-[0_1px_0_rgba(0,0,0,0.04),0_2px_12px_-3px_rgba(30,77,43,0.35)] hover:shadow-[0_4px_18px_-4px_rgba(30,77,43,0.45)] hover:-translate-y-[1px] justify-center text-center text-base items-center font-normal transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            <?= $escaper->escapeHtml(__('Sign in securely')) ?>
+        </button>
+    </form>
+
+    <?= $block->getChildHtml('login_form_bottom') ?>
+
+    <div class="w-full mt-4">
+        <?= $recaptcha ? $recaptcha->getLegalNoticeHtml(ReCaptcha::RECAPTCHA_FORM_ID_CUSTOMER_LOGIN) : '' ?>
+    </div>
+</div>
+
+<script>
+    function initCustomerLoginForm() {
+        return {
+            errors: 0,
+            hasCaptchaToken: 0,
+            showPassword: false,
+            displayErrorMessage: false,
+            errorMessages: [],
+            setErrorMessages(messages) {
+                this.errorMessages = [messages]
+                this.displayErrorMessage = this.errorMessages.length
+            },
+            submitForm() {
+                // do not rename $form, the variable is the expected name in the recaptcha output
+                const $form = document.querySelector('#customer-login-form');
+                <?= $recaptcha ? $recaptcha->getValidationJsHtml(ReCaptcha::RECAPTCHA_FORM_ID_CUSTOMER_LOGIN) : '' ?>
+
+                if (this.errors === 0) {
+                    $form.submit();
+                }
+            }
+        }
+    }
+</script>

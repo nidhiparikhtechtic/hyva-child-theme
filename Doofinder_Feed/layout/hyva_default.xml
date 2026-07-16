@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+
+    <head>
+        <!-- Remove default Doofinder script -->
+        <remove src="Doofinder_Feed::js/df_add_to_cart.js" />
+
+        <!-- Add Hyvä version of the script (deferred) -->
+        <script src="Doofinder_Feed::js/df_add_to_cart_hyva.js" defer="defer" />
+    </head>
+
+    <body>
+        <referenceBlock name="head.additional">
+            <block name="doofinderfeed_display_layer"
+                class="Doofinder\Feed\Block\Display\Layer"
+                template="Doofinder_Feed::display/layer.phtml"
+                ifconfig="doofinder_config_config/doofinder_layer/doofinder_layer_enabled"
+                after="-" />
+        </referenceBlock>
+    </body>
+</page>

@@ -1,0 +1,132 @@
+<?php
+
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Request a Quote Hyva Compatibility
+ */
+
+use Amasty\RequestQuote\Block\Cart\Quote\Link;
+use Magento\Framework\Escaper;
+
+/** @var Link $block */
+/** @var Escaper $escaper */
+?>
+
+<button x-data="initAmQuoteSubmitButton"
+    @click.prevent="processSubmitQuoteClick"
+    type="button"
+    title="<?= $escaper->escapeHtmlAttr(__(__('Submit Quote'))) ?>"
+    class="inline-flex btn bg-teak-gold hover:bg-teak-gold rounded-lg text-base items-center font-medium py-4 px-6 my-4 checkout justify-center text-center w-full
+            shadow-[0_1px_0_rgba(0,0,0,0.04),0_2px_12px_-3px_rgba(30,77,43,0.35)] hover:shadow-[0_4px_18px_-4px_rgba(30,77,43,0.45)]">
+    <?= $escaper->escapeHtml(__('Submit Quote')) ?>
+</button>
+
+<script>
+    function initAmQuoteSubmitButton() {
+        return {
+            selectors: {
+                updateForm: '#amasty-quote-update',
+                loginForm: '.amquote-cart-form .form.form-login',
+            },
+
+            /**
+             * @param {Object} $el
+             * @returns {void}
+             */
+            processSubmitQuote: function($el) {
+                window.dispatchEvent(new CustomEvent('validateRequestQuoteForm')); //deprecated
+                window.dispatchEvent(new CustomEvent('before-quote-form-submit'));
+
+                const updateFormNode = document.querySelector(this.selectors.updateForm);
+                const loginFormNode = document.querySelector(this.selectors.loginForm);
+                if (!updateFormNode.reportValidity() || !loginFormNode) {
+                    return;
+                }
+
+                const formValidation = hyva.formValidation(loginFormNode);
+                formValidation.validate().then(() => {
+                    Array.from(loginFormNode.elements).forEach((element) => {
+                        updateFormNode.appendChild(this.getClonedElement(element));
+                    });
+
+                    updateFormNode.querySelector('input[name="update_cart_action"]').value = 'submit';
+
+                    $el.setAttribute('disabled', '');
+
+                    updateFormNode.submit();
+                }).catch((invalid) => {
+                    if (invalid.length > 0) {
+                        invalid[0].focus();
+                    }
+                });
+            },
+
+            /**
+             * @param {Object} element
+             * @returns {Node}
+             */
+            getClonedElement: function(element) {
+                const clonedElement = element.cloneNode();
+                clonedElement.hidden = true;
+                if (clonedElement.type !== 'file') {
+                    clonedElement.value = element.value;
+                }
+
+                if (clonedElement.tagName === 'SELECT') {
+                    Array.from(element.selectedOptions).forEach((option) => {
+                        const clonedOption = option.cloneNode();
+
+                        clonedOption.setAttribute("selected", "selected");
+                        clonedElement.append(clonedOption);
+                    });
+                }
+
+                return clonedElement;
+            },
+
+            processSubmitQuoteClick() {
+                console.log("begin_checkout firing");
+
+                if (!window.gtmTrackedEvents) window.gtmTrackedEvents = {};
+
+                if (!window.gtmTrackedEvents['begin_checkout']) {
+                    window.gtmTrackedEvents['begin_checkout'] = true;
+
+                    let total = 0;
+
+                    try {
+                        const subtotalEl = document.querySelector('[x-html="quotecart.subtotal"]');
+                        if (subtotalEl) {
+                            total = parseFloat(subtotalEl.innerText.replace(/[^\d.]/g, '')) || 0;
+                        }
+                    } catch (e) {
+                        total = 0;
+                    }
+
+                    window.dataLayer = window.dataLayer || [];
+
+                    window.dataLayer.push({
+                        event: "begin_checkout",
+                        ecommerce: {
+                            currency: "EUR",
+                            value: total
+                        }
+                    });
+                }
+                return this.processSubmitQuote(this.$el)
+            }
+        };
+    }
+
+    window.addEventListener(
+        'alpine:init',
+        () => Alpine.data(
+            'initAmQuoteSubmitButton',
+            initAmQuoteSubmitButton
+        ), {
+            once: true
+        }
+    );
+</script>
+<?php isset($hyvaCsp) && $hyvaCsp->registerInlineScript() ?>

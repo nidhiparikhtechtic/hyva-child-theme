@@ -1,0 +1,125 @@
+<?php
+
+use Magento\Framework\App\ObjectManager;
+use Magento\Catalog\Model\CategoryRepository;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
+use Hyva\Theme\ViewModel\Slider;
+
+/** @var \Magento\Framework\Escaper $escaper */
+/** @var \Magento\Catalog\Api\CategoryRepositoryInterface $categoryRepository */
+/** @var \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory */
+/** @var \Techtic\Customization\ViewModel\Category $categoryViewModel */
+
+
+$sliderViewModel      = $viewModels->require(Slider::class);
+
+$categoryViewModel = $viewModels->require(\Techtic\Customization\ViewModel\ArProducts::class);
+$mainCategoryId = $categoryViewModel->getBestSellerCategory();
+
+if ($mainCategoryId != null) {
+
+    $objectManager = ObjectManager::getInstance();
+    $categoryRepository = $objectManager->get(CategoryRepository::class);
+    $productCollectionFactory = $objectManager->get(CollectionFactory::class);
+
+    $mainCategory   = $categoryRepository->get($mainCategoryId);
+
+    /**
+     * Load ALL products under main category
+     */
+    $productCollection = $productCollectionFactory->create();
+    $productCollection->addAttributeToSelect(['name', 'price', 'small_image'])
+        ->addCategoriesFilter(['in' => $mainCategory->getAllChildren(true)])
+        ->addAttributeToFilter('status', 1)
+        ->addAttributeToFilter('visibility', ['in' => [2, 3, 4]]);
+
+    /**
+     * Group products by Level-2 categories
+     */
+    $groupedProducts   = [];
+    $level1Categories  = [];
+
+    foreach ($productCollection as $product) {
+        $categoryCollection = $product->getCategoryCollection()
+            ->addAttributeToSelect(['name', 'level', 'is_active', 'include_in_menu']);
+
+        foreach ($categoryCollection as $category) {
+            if (
+                (int)$category->getLevel() === 2 &&
+                (int)$category->getIsActive() === 1 &&
+                (int)$category->getIncludeInMenu() === 1
+            ) {
+                $catId = (int)$category->getId();
+                $level1Categories[$catId] = $category;
+                $groupedProducts[$catId][$product->getId()] = $product;
+            }
+        }
+    }
+
+    // Safety check
+    if (empty($level1Categories)) {
+        return;
+    }
+
+    $activeCategoryId = array_key_first($level1Categories);
+    ?>
+
+    <div class="mt-6 lg:mt-7" 
+        x-data="{
+            active: <?= (int)$activeCategoryId ?>,
+            scrollLeft(ref) {
+                this.$refs[ref].scrollBy({ left: -400, behavior: 'smooth' })
+            },
+            scrollRight(ref) {
+                this.$refs[ref].scrollBy({ left: 400, behavior: 'smooth' })
+            }
+        }" >
+
+        <!-- SUB CATEGORYS -->
+        <div class="flex justify-center gap-3 flex-wrap">
+            <?php foreach ($level1Categories as $catId => $category): ?>
+                <button @click="active = <?= (int)$catId ?>" :class="active === <?= (int)$catId ?>
+                        ? 'border-teakea-brown text-[#A5813B]' : 'border-[#CCCCCC] text-teakea-gray'"
+                    class="p-[10px] sm:p-3 border border-lg text-xs sm:text-base font-light uppercase transition">
+                    <?= $escaper->escapeHtml($category->getName()) ?>
+                </button>
+            <?php endforeach; ?>
+        </div>
+
+        <!-- PRODUCTS PER CATEGORY -->
+        <div class="mt-10">
+
+        <?php foreach ($groupedProducts as $catId => $products): ?>
+            <div 
+                x-show="active === <?= (int)$catId ?>" 
+                x-transition.opacity
+                x-cloak >
+                <div x-ref="slider<?= (int)$catId ?>"
+                    class="flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth scrollbar-custom">
+
+                    <?php
+                    echo $sliderViewModel
+                        ->getSliderForItems(
+                            'Magento_Catalog::product/list/home-page-item.phtml',
+                            $products,
+                            'Magento_Catalog::product/slider/homepage-product-slider-container.phtml'
+                        )
+                        ->setData('name', 'slider-' . $catId)
+                        ->toHtml();
+                    ?>
+
+                </div>
+
+            </div>
+
+        <?php endforeach; ?>
+
+
+        </div>
+    </div>
+
+    <a href="<?= $escaper->escapeUrl($mainCategory->getUrl()) ?>" class="mt-5 lg:mt:7 block w-full text-center border border-teakea-light-gray py-4 text:base font-light
+            hover:bg-[#A01937] hover:text-white transition uppercase">
+        <?= $escaper->escapeHtml(__('View All')) ?>
+    </a>
+<?php } ?>

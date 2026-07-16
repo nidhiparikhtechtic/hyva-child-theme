@@ -1,0 +1,128 @@
+<?php
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\CurrentProduct;
+use Hyva\Theme\ViewModel\ProductPrice;
+use Magento\Catalog\Model\Product;
+use Magento\Catalog\Pricing\Price\FinalPrice;
+use Magento\Framework\Escaper;
+
+/** @var \Magento\Framework\View\Element\Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+/** @var CurrentProduct $currentProduct */
+
+$currentProduct = $viewModels->require(CurrentProduct::class);
+/** @var Product $product */
+$product = $block->getData('product') ?: $currentProduct->get();
+
+if (!$product || !$product->getId()) {
+    return;
+}
+
+/** @var ProductPrice $productPriceViewModel */
+$productPriceViewModel = $viewModels->require(ProductPrice::class);
+
+// Get the final price
+$finalPrice = $productPriceViewModel->getPriceValue(FinalPrice::PRICE_CODE, $product);
+
+$paymentMethods = [
+    'enable_ideal' => ['file' => 'images/payment/ideal.png', 'alt' => 'iDEAL'],
+    'enable_klarna' => ['file' => 'images/payment/klarna.png', 'alt' => 'Klarna'],
+    'enable_in3' => ['file' => 'images/payment/in3.png', 'alt' => 'in3'],
+    'enable_gpay' => ['file' => 'images/payment/gpay.png', 'alt' => 'Gpay'],
+    'enable_visa' => ['file' => 'images/payment/visa.png', 'alt' => 'Visa'],
+    'enable_maestro' => ['file' => 'images/payment/maestro.png', 'alt' => 'Maestro'],
+];
+
+// Check if any payment method is enabled for this product
+$hasPaymentEnabled = false;
+foreach ($paymentMethods as $attrCode => $data) {
+    if ($product->getData($attrCode)) {
+        $hasPaymentEnabled = true;
+        break;
+    }
+}
+
+// Check if Klarna is enabled
+$klarnaEnabled = $product->getData('enable_klarna');
+
+?>
+
+<?php if ($hasPaymentEnabled): ?>
+    <script>
+        function initPaymentMethods<?= (int)$product->getId() ?>() {
+            return {
+                initialFinalPrice: <?= (float)$finalPrice ?>,
+                calculatedFinalPrice: false,
+                calculatedFinalPriceWithCustomOptions: false,
+
+                getKlarnaInstallmentPrice() {
+                    const price = this.calculatedFinalPriceWithCustomOptions ||
+                        this.calculatedFinalPrice ||
+                        this.initialFinalPrice;
+
+                    const exact = price / 3;
+                    return '€' + exact.toFixed(2).replace('.', ',');
+                },
+                eventListeners: {
+
+                    ['@update-prices-<?= (int)$product->getId() ?>.window'](event) {
+                        if (event.detail?.finalPrice?.amount) {
+                            this.calculatedFinalPrice = event.detail.finalPrice.amount;
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <div class="border-y border-[#D8D8D8] py-5 hidden" x-data="initPaymentMethods<?= (int)$product->getId() ?>()" x-bind="eventListeners">
+        <?php if ($klarnaEnabled): ?>
+            <div class="flex flex-wrap justify-start items-center gap-1 mb-1">
+                <span class="text-xs md:text-sm text-[#646464] font-medium">
+                    <?= $escaper->escapeHtml(__('3 payments of')) ?>
+                    <span class="font-semibold" x-html="getKlarnaInstallmentPrice()"></span>
+                    <?= $escaper->escapeHtml(__('at 0% interest with Klarna')) ?>
+                </span>
+                <svg width="45" height="10" viewBox="0 0 45 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7.88925 0H5.68189C5.68189 1.81009 4.85042 3.46191 3.40524 4.54994L2.53418 5.20276L5.91945 9.81205H8.70092L5.5829 5.56873C7.05778 4.10484 7.88925 2.1266 7.88925 0Z" fill="#0A0B09" />
+                    <path d="M2.25685 0H0V9.81205H2.25685V0Z" fill="#0A0B09" />
+                    <path d="M11.4827 0H9.35449V9.81205H11.4827V0Z" fill="#0A0B09" />
+                    <path d="M30.1519 2.83887C29.3403 2.83887 28.5682 3.08615 28.0535 3.78842V3.0268H26.0342V9.81215H28.0832V6.25132C28.0832 5.22264 28.7761 4.71819 29.6075 4.71819C30.4984 4.71819 31.0131 5.25231 31.0131 6.24143V9.82204H33.0423V5.49959C33.0423 3.91701 31.7852 2.83887 30.1519 2.83887Z" fill="#0A0B09" />
+                    <path d="M17.915 3.0268V3.46201C17.3409 3.06636 16.648 2.83887 15.8957 2.83887C13.916 2.83887 12.3125 4.44124 12.3125 6.41947C12.3125 8.39771 13.916 10.0001 15.8957 10.0001C16.648 10.0001 17.3409 9.77258 17.915 9.37694V9.81215H19.9442V3.0268H17.915ZM16.064 8.16032C15.0445 8.16032 14.2229 7.37892 14.2229 6.41947C14.2229 5.46003 15.0445 4.67863 16.064 4.67863C17.0836 4.67863 17.9051 5.46003 17.9051 6.41947C17.9051 7.37892 17.0836 8.16032 16.064 8.16032Z" fill="#0A0B09" />
+                    <path d="M23.0933 3.90705V3.02673H21.0146V9.81208H23.1032V6.64691C23.1032 5.57866 24.2613 5.00497 25.0631 5.00497C25.073 5.00497 25.0829 5.00497 25.0829 5.00497V3.02673C24.2613 3.02673 23.4992 3.38282 23.0933 3.90705Z" fill="#0A0B09" />
+                    <path d="M39.3564 3.0268V3.46201C38.7823 3.06636 38.0894 2.83887 37.3371 2.83887C35.3575 2.83887 33.7539 4.44124 33.7539 6.41947C33.7539 8.39771 35.3575 10.0001 37.3371 10.0001C38.0894 10.0001 38.7823 9.77258 39.3564 9.37694V9.81215H41.3856V3.0268H39.3564ZM37.5054 8.16032C36.4859 8.16032 35.6643 7.37892 35.6643 6.41947C35.6643 5.46003 36.4859 4.67863 37.5054 4.67863C38.525 4.67863 39.3465 5.46003 39.3465 6.41947C39.3564 7.37892 38.525 8.16032 37.5054 8.16032Z" fill="#0A0B09" />
+                    <path d="M42.959 3.22466C42.959 3.12567 42.8897 3.06628 42.7808 3.06628H42.5928V3.581H42.6819V3.39293H42.7808L42.86 3.581H42.959L42.8699 3.37314C42.9293 3.34344 42.959 3.29395 42.959 3.22466ZM42.7808 3.30385H42.6819V3.14547H42.7808C42.8402 3.14547 42.8699 3.17517 42.8699 3.22466C42.8699 3.27415 42.8501 3.30385 42.7808 3.30385Z" fill="#0A0B09" />
+                    <path d="M42.7516 2.84875C42.4844 2.84875 42.2666 3.06636 42.2666 3.33342C42.2765 3.60048 42.4844 3.81809 42.7516 3.81809C43.0189 3.81809 43.2367 3.60048 43.2367 3.33342C43.2367 3.06636 43.0189 2.84875 42.7516 2.84875ZM42.7516 3.72907C42.5339 3.72907 42.3656 3.55103 42.3656 3.33342C42.3656 3.11582 42.5438 2.93778 42.7516 2.93778C42.9694 2.93778 43.1377 3.11582 43.1377 3.33342C43.1377 3.55103 42.9595 3.72907 42.7516 3.72907Z" fill="#0A0B09" />
+                    <path d="M43.5513 7.40857C42.8485 7.40857 42.2744 7.98226 42.2744 8.68453C42.2744 9.38681 42.8485 9.96049 43.5513 9.96049C44.2541 9.96049 44.8282 9.38681 44.8282 8.68453C44.8282 7.97237 44.2541 7.40857 43.5513 7.40857Z" fill="#0A0B09" />
+                </svg>
+                <span class="text-xs md:text-sm font-medium">
+                    <a href="https://www.klarna.com/nl/betaalmethodes/betaal-in-3-delen/" target="_blank" class="text-text-[#646464] underline">
+                        <?= $escaper->escapeHtml(__('More information')) ?>
+                    </a>
+                </span>
+            </div>
+        <?php endif; ?>
+        <div class="flex flex-wrap justify-start items-center gap-5">
+            <?php foreach ($paymentMethods as $attrCode => $data): ?>
+                <?php if ($product->getData($attrCode)): ?>
+                    <?php
+                    $label = $data['alt'] ?: 'Payment method';
+                    $seoText = $label . ' payment method - Teakea';
+                    ?>
+                    <div class="flex items-center">
+                        <img class="h-[30px] w-auto"
+                            src="<?= $escaper->escapeUrl($block->getViewFileUrl($data['file'])); ?>"
+                            alt="<?= $escaper->escapeHtmlAttr($seoText); ?>"
+                            title="<?= $escaper->escapeHtmlAttr($seoText); ?>"
+                            loading="lazy" />
+                    </div>
+                <?php endif; ?>
+            <?php endforeach; ?>
+            <?= $this->getLayout()->renderElement('product.info.fsc.icon'); ?>
+        </div>
+    </div>
+<?php endif; ?>

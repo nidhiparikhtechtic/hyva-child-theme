@@ -1,0 +1,255 @@
+<?php
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\CurrentProduct;
+
+/** @var \Magento\Framework\View\Element\Template $block */
+/** @var ViewModelRegistry $viewModels */
+
+$currentProduct = $viewModels->require(CurrentProduct::class);
+$product = $block->getData('product') ?: $currentProduct->get();
+
+if (!$product || !$product->getId()) {
+    return;
+}
+
+$attributeText = $product->getAttributeText('features_icons');
+
+if (empty($attributeText)) {
+    return;
+}
+
+$selectedOptions = is_array($attributeText) ? $attributeText : explode(',', $attributeText);
+
+$features = [
+    'Sustainable Certified Wood' => [
+        'icon'     => 'features/certified.svg',
+        'class'    => 'sustainable_wood',
+        'title'    => 'Solid wood & certified',
+        'subtitle' => 'FSC®-C220387',
+        'desc'     => 'Your furniture is crafted from premium solid wood sourced from responsibly managed forests (FSC-C220387). Our workshop is powered by an energy-positive building with 140 solar panels. A beautiful, responsible choice.',
+        'chips'    => ['Solid oak & teak', 'FSC®-C220387', 'Energy-positive'],
+    ],
+    'Made for Generations' => [
+        'icon'     => 'features/sparkles.svg',
+        'class'    => 'made_for_generations',
+        'title'    => 'True craftsmanship, custom-made',
+        'subtitle' => 'Accurate to the millimeter',
+        'desc'     => 'No mass production, but pure craftsmanship. Your furniture is custom-made and finished to the millimeter by our own skilled craftsmen. Extremely strong, timeless, and delivered with a standard 2-year full warranty.',
+        'chips'    => ['Timeless design', 'Sustainable materials', '2 year warranty'],
+    ],
+    'Craftsmanship from our own workshop' => [
+        'icon'     => 'features/Workshop.svg',
+        'class'    => 'craftsmanship',
+        'title'    => 'From our own furniture workshop',
+        'subtitle' => 'Tolbert, since 2002',
+        'desc'     => 'Our in-house furniture workshop has been the beating heart of Teakea since 2002. Here, we design and make every piece of furniture with pure passion. Would you like to feel the wood in real life and compare colors? Then come visit our 1,500m² showroom in Tolbert.',
+        'chips'    => ['Tolbert Furniture Makers', 'Since 2002', '1500m² showroom'],
+    ],
+    'Fast & Careful Delivery' => [
+        'icon'     => 'features/delivery_truck.svg',
+        'class'    => 'fast_delivery',
+        'title'    => 'Hassle-free & fast delivery',
+        'subtitle' => 'Safely packaged, delivered quickly',
+        'desc'     => 'As soon as your order is perfectly finished, we pack it with the utmost care and deliver quickly and safely throughout Europe. Not 100% to your liking? You have 30 days to change your mind. For personal advice, call the furniture makers directly: 085 130 2543',
+        'chips'    => ['Carefully packaged', '30-day cooling-off period', 'Personal advice'],
+    ],
+];
+?>
+
+<div
+    x-data="{
+    active: '<?= $escaper->escapeJs($selectedOptions[0] ?? '') ?>',
+    view: window.innerWidth >= 1024 ? 'desktop' : 'mobile'
+    }"
+    x-init="
+    view = window.innerWidth >= 1024 ? 'desktop' : 'mobile';
+
+    window.addEventListener('resize', () => {
+        view = window.innerWidth >= 1024 ? 'desktop' : 'mobile';
+    });"
+    class="border border-teakea-light-gray rounded-lg overflow-hidden mt-12">
+
+    <div class="grid grid-cols-1 lg:grid-cols-3">
+
+        <!-- Left Side: Tab List + Mobile Accordion -->
+        <div class="lg:col-span-1">
+            <?php foreach ($selectedOptions as $option): ?>
+                <?php if (!isset($features[$option])) continue; ?>
+                <?php $feature = $features[$option]; ?>
+
+                <div class="border-b border-teakea-white last:border-b-0">
+
+                    <!-- Tab Button (shared mobile + desktop) -->
+                    <button
+                        class="w-full flex items-center gap-4 px-5 py-4 text-left border-r border-l-4 transition-colors duration-200 group"
+                        :class="active === '<?= $escaper->escapeJs($option) ?>'
+                            ? 'bg-teakea-cream border-l-teakea-deep-green lg:border-r-0'
+                            : 'bg-white border-l-0 hover:bg-teakea-lighter-gray'"
+                        @click="
+                            view === 'mobile'
+                                ? active = active === '<?= $escaper->escapeJs($option) ?>' ? '' : '<?= $escaper->escapeJs($option) ?>'
+                                : active = '<?= $escaper->escapeJs($option) ?>'
+                        ">
+
+                        <!-- Icon -->
+                        <div
+                            class="w-11 h-11 border border-[#0000004D] rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-200"
+                            :class="active === '<?= $escaper->escapeJs($option) ?>'
+                                ? 'bg-white'
+                                : 'bg-teakea-lighter-gray'">
+                            <img
+                                src="<?= $block->getViewFileUrl('images/' . $feature['icon']) ?>"
+                                alt="<?= $escaper->escapeHtmlAttr(__($feature['title'])) ?>"
+                                class="w-6 h-6 transition-all duration-200"
+                                :class="active === '<?= $escaper->escapeJs($option) ?>'
+                                    ? 'opacity-100'
+                                    : 'opacity-60'">
+                        </div>
+
+                        <!-- Title + Subtitle -->
+                        <span class="flex flex-col flex-grow">
+                            <span
+                                class="text-base leading-tight"
+                                :class="active === '<?= $escaper->escapeJs($option) ?>'
+                                    ? 'font-semibold text-teakea-deep-green'
+                                    : 'font-medium text-teakea-dark-gray'">
+                                <?= $escaper->escapeHtml(__($feature['title'])) ?>
+                            </span>
+                            <?php if (!empty($feature['subtitle'])): ?>
+                                <span
+                                    class="text-xs mt-0.5 font-medium"
+                                    :class="active === '<?= $escaper->escapeJs($option) ?>'
+                                        ? 'text-teakea-deep-green'
+                                        : 'text-teak-muted'">
+                                    <?= $escaper->escapeHtml(__($feature['subtitle'])) ?>
+                                </span>
+                            <?php endif; ?>
+                        </span>
+
+                        <!-- Chevron mobile only -->
+                        <span
+                            x-show="view === 'mobile'"
+                            class="shrink-0 text-gray-400 transition-transform duration-200"
+                            :class="active === '<?= $escaper->escapeJs($option) ?>' ? 'rotate-180 text-teakea-deep-green' : ''">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </span>
+                    </button>
+
+                    <!-- Mobile: Inline accordion panel -->
+                    <div
+                        x-cloak
+                        x-show="view === 'mobile' && active === '<?= $escaper->escapeJs($option) ?>'"
+                        x-collapse
+                        class="<?= $feature['class'] ?> bg-teakea-warm-white block lg:hidden">
+                        <div class="border-b border-dashed border-teakea-deep-green">
+                            <img class="w-full h-full" src="">
+                        </div>
+                        <div class="p-5">
+                            <h3 class="text-lg font-bold text-teakea-neutral-dark mb-3">
+                                <?= $escaper->escapeHtml(__($feature['title'])) ?>
+                            </h3>
+                            <p class="text-base text-[#666] mb-4">
+                                <?= $escaper->escapeHtml(__($feature['desc'])) ?>
+                            </p>
+
+                            <!-- Chips -->
+                            <?php if (!empty($feature['chips'])): ?>
+                                <div class="flex flex-wrap gap-2 mb-4">
+                                    <?php foreach ($feature['chips'] as $chip): ?>
+                                        <span class="inline-flex items-center gap-1.5 bg-white border border-teakea-deep-green/20 text-teakea-deep-green text-[12px] font-semibold px-2.5 py-1.5 rounded-md shadow-sm">
+                                            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            <?= $escaper->escapeHtml(__($chip)) ?>
+                                        </span>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- FSC Badge -->
+                            <?php if ($option === 'Sustainable Certified Wood'): ?>
+                                <?= $this->getLayout()->renderElement('product.info.fsc.badge') ?>
+                            <?php endif; ?>
+
+                            <!-- Footer -->
+                            <div class="flex flex-col md:flex-row items-center justify-between gap-4 pt-4 border-t border-gray-200">
+                                <valued-widget layout="rating" size="small" align="left" star-color="yellow" theme="dark"></valued-widget>
+                                <a href="#" class="text-xs font-bold text-teakea-deep-green hover:text-black hover:underline flex items-center gap-1 whitespace-nowrap">
+                                    <?= __('View the joinery workshop') ?>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            <?php endforeach; ?>
+        </div>
+
+        <!-- Right Side: Desktop panel only -->
+        <div class="hidden lg:block lg:col-span-2 bg-teakea-cream rounded-tr-lg min-h-[400px]">
+            <?php foreach ($selectedOptions as $option): ?>
+                <?php if (!isset($features[$option])) continue; ?>
+                <?php $feature = $features[$option]; ?>
+
+                <div
+                    class="<?= $feature['class'] ?> h-full"
+                    x-cloak
+                    x-show="view === 'desktop' && active === '<?= $escaper->escapeJs($option) ?>'"
+                    x-transition>
+                    <div class="border-b border-dashed border-teakea-deep-green">
+                        <img class="w-full h-full" src="">
+                    </div>
+                    <div class="p-7 flex flex-col">
+                        <h3 class="text-xl font-bold text-teakea-neutral-dark mb-3">
+                            <?= $escaper->escapeHtml(__($feature['title'])) ?>
+                        </h3>
+                        <p class="text-base text-[#666] mb-5">
+                            <?= $escaper->escapeHtml(__($feature['desc'])) ?>
+                        </p>
+
+                        <!-- Chips -->
+                        <?php if (!empty($feature['chips'])): ?>
+                            <div class="flex flex-wrap gap-2 mb-5">
+                                <?php foreach ($feature['chips'] as $chip): ?>
+                                    <span class="inline-flex items-center gap-1.5 bg-white border border-teakea-deep-green/20 text-teakea-deep-green text-[12px] font-semibold px-2.5 py-1.5 rounded-md shadow-sm">
+                                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        <?= $escaper->escapeHtml(__($chip)) ?>
+                                    </span>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <!-- FSC Badge -->
+                        <?php if ($option === 'Sustainable Certified Wood'): ?>
+                            <?= $this->getLayout()->renderElement('product.info.fsc.badge') ?>
+                        <?php endif; ?>
+
+                        <!-- Footer -->
+                        <div class="flex items-center justify-between gap-4 pt-4 border-t border-gray-200 mt-auto">
+                            <valued-widget layout="rating" size="small" align="left" star-color="yellow" theme="dark"></valued-widget>
+                            <a href="#" class="text-sm font-bold text-teakea-deep-green hover:text-black hover:underline group flex items-center gap-1 whitespace-nowrap">
+                                <?= __('View the joinery workshop') ?>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path>
+                                </svg>
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+
+            <?php endforeach; ?>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,112 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes. All rights reserved.
+ * See COPYING.txt for license details.
+ *
+ * Redesigned sidebar: avatar initial + name header, icon nav items,
+ * active state with left accent bar, mobile collapsible.
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var HeroiconsOutline $heroicons */
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+
+$blockId    = $block->getBlockId() ?: 'collapsible';
+$blockClass = $block->getBlockCss();
+$blockTitle = $block->getBlockTitle() ?: __('My account');
+$isNav      = $block->getIsNav() !== null ? $block->getIsNav() : false;
+
+// Pull customer name from session for the avatar
+$objectManager   = \Magento\Framework\App\ObjectManager::getInstance();
+$customerSession = $objectManager->get(\Magento\Customer\Model\Session::class);
+$customerName    = '';
+$avatarLetter    = 'A';
+if ($customerSession->isLoggedIn()) {
+    $customerName  = $escaper->escapeHtml($customerSession->getCustomer()->getFirstname());
+    $avatarLetter  = strtoupper(mb_substr($customerName, 0, 1));
+}
+?>
+
+<div class="mb-6 <?= $escaper->escapeHtmlAttr($blockClass) ?>"
+     x-data="initAccountNavigation()"
+     x-init="checkIsMobileResolution()"
+     @resize.window.debounce="checkIsMobileResolution()"
+     @visibilitychange.window.debounce="checkIsMobileResolution()">
+
+    <div class="flex flex-col items-start gap-1 px-4 pb-4 border-b border-teakea-light-gray">
+        <div class="w-12 h-12 rounded-full bg-teakea-deep-green flex items-center justify-center text-white text-xl font-bold select-none mb-2">
+            <?= $escaper->escapeHtml($avatarLetter) ?>
+        </div>
+        <span class="text-xs italic text-teakea-deep-green font-medium leading-none">
+            <?= $escaper->escapeHtml($blockTitle) ?>
+        </span>
+        <?php if ($customerName): ?>
+        <b class="text-base font-bold text-teakea-black leading-tight">
+            <?= $escaper->escapeHtml($customerName) ?>
+        </b>
+        <?php endif; ?>
+    </div>
+
+    <!-- ── Mobile toggle button ── -->
+    <button
+        type="button"
+        id="<?= $escaper->escapeHtmlAttr($blockId) ?>-title"
+        class="md:hidden flex justify-between items-center w-full px-4 py-3 text-sm font-semibold text-teakea-black"
+        @click="blockOpen = !blockOpen"
+        :aria-expanded="blockOpen">
+        <span><?= $escaper->escapeHtml(__('Menu')) ?></span>
+        <span x-ref="AccountNavigationMobileToggleIcon">
+            <?= $heroicons->chevronDownHtml(
+                'transition-transform duration-300 ease-in-out transform group-aria-expanded:rotate-180',
+                18,
+                18,
+                ['aria-hidden' => 'true']
+            ); ?>
+        </span>
+    </button>
+
+    <!-- ── Nav / content ── -->
+    <?php if ($isNav): ?>
+        <nav
+            id="<?= $escaper->escapeHtmlAttr($blockId) ?>"
+            aria-labelledby="<?= $escaper->escapeHtmlAttr($blockId) ?>-title"
+            class="hidden md:block mt-1"
+            :class="{ 'hidden': !blockOpen }">
+            <?= $block->getChildHtml() ?>
+        </nav>
+    <?php else: ?>
+        <div
+            id="<?= $escaper->escapeHtmlAttr($blockId) ?>"
+            class="hidden md:block mt-1"
+            :class="{ 'hidden': !blockOpen }">
+            <?= $block->getChildHtml() ?>
+        </div>
+    <?php endif; ?>
+
+</div>
+
+<script>
+    function initAccountNavigation() {
+        return {
+            isMobile: false,
+            blockOpen: false,
+            checkIsMobileResolution() {
+                const mobileElement = this.$refs.AccountNavigationMobileToggleIcon;
+                this.isMobile = mobileElement
+                    ? getComputedStyle(mobileElement).display !== 'none'
+                    : window.matchMedia('(max-width: 767px)').matches;
+            }
+        }
+    }
+</script>

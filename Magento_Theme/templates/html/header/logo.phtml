@@ -1,0 +1,57 @@
+<?php
+
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+use Magento\Theme\Block\Html\Header\Logo;
+use Hyva\Theme\ViewModel\Logo\LogoSizeResolver;
+
+/** @var Logo $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+/** @var LogoSizeResolver $logoSizeResolver */
+
+$storeName = $block->getThemeName();
+
+$logoSizeResolver = $viewModels->require(LogoSizeResolver::class);
+$logoWidth = $logoSizeResolver && $logoSizeResolver->getWidth()
+    ? $logoSizeResolver->getWidth()
+    : $block->getLogoWidth();
+$logoHeight = $logoSizeResolver && $logoSizeResolver->getHeight()
+    ? $logoSizeResolver->getHeight()
+    : $block->getLogoHeight();
+
+/** @var \Hyva\Theme\ViewModel\Logo\LogoPathResolver $logoPathResolver */
+$logoPathResolver = $block->getData('logoPathResolver');
+$logoSrc = $logoPathResolver && method_exists($logoPathResolver, 'getLogoSrc')
+    ? $logoPathResolver->getLogoSrc($block->getData('logo_file'))
+    : $block->getLogoSrc();
+
+$logoAlt = $escaper->escapeHtmlAttr($storeName ?: 'Teakea');
+$logoTitle = $logoAlt . ' - Home';
+?>
+<div class="lg:order-1 md:order-2 order-2">
+    <a
+        class="flex items-center justify-center text-xl font-medium tracking-wide text-gray-800
+            no-underline hover:no-underline font-title p-0 h-auto w-[120px] sm:w-[150px] xl:w-[177px]"
+        href="<?= $escaper->escapeUrl($block->getUrl('')) ?>"
+        aria-label="<?= $escaper->escapeHtmlAttr(__('Go to Home page')) ?>">
+        <img loading="eager"
+            src="<?= $block->getViewFileUrl('images/logo.svg') ?>"
+            height="25"
+            width="177"
+            alt="<?= $logoAlt ?>"
+            title="<?= $logoTitle ?>" />
+        <?php if (!$logoSrc): ?>
+            <?= $escaper->escapeHtml($storeName) ?>
+        <?php endif; ?>
+    </a>
+</div>

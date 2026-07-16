@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+      <head>
+            <meta name="viewport"
+                  content="width=device-width, initial-scale=1" />
+            <meta name="theme-color" content="#ffffff" />
+            <css src="css/styles.css" />
+
+            <link rel="preload" as="font" type="font/woff2"
+                  src="fonts/Mulish/Mulish-Regular.woff2"
+                  crossorigin="anonymous" />
+
+            <link rel="preload" as="font" type="font/woff2"
+                  src="fonts/Mulish/Mulish-Medium.woff2"
+                  crossorigin="anonymous" />
+
+            <link rel="preload" as="font" type="font/woff2"
+                  src="fonts/Mulish/Mulish-SemiBold.woff2"
+                  crossorigin="anonymous" />
+
+            <link rel="preload" as="font" type="font/woff2"
+                  src="fonts/Mulish/Mulish-Bold.woff2"
+                  crossorigin="anonymous" />
+
+            <link rel="preload" as="font" type="font/woff2"
+                  src="fonts/Mulish/Mulish-ExtraBold.woff2"
+                  crossorigin="anonymous" />
+
+            <script src="js/auth-modal-store.js" />
+      </head>
+
+      <body>
+            <referenceBlock name="head.additional">
+                  <block class="Techtic\Customization\Block\Hreflang"
+                        name="techtic.hreflang" />
+            </referenceBlock>
+      </body>
+
+</page>

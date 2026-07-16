@@ -1,0 +1,165 @@
+<?php
+
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\SwatchRenderer;
+use Magento\Framework\Escaper;
+use Magento\Swatches\Block\Product\Renderer\Configurable;
+use Magento\Swatches\ViewModel\Product\Renderer\Configurable as ConfigurableViewModel;
+
+// phpcs:disable Generic.Files.LineLength.TooLong
+
+/** @var Configurable $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var ConfigurableViewModel $configurableViewModel */
+$configurableViewModel = $viewModels->require(ConfigurableViewModel::class);
+
+/** @var SwatchRenderer $swatchRendererViewModel */
+$swatchRendererViewModel = $viewModels->require(SwatchRenderer::class);
+
+$product = $block->getProduct();
+$productId = $product->getId();
+
+$attributes = $block->decorateArray($block->getAllowAttributes());
+
+$layout = $block->getLayout();
+$swatchItemBlock = $layout->getBlock('product.swatch.item');
+$swatchItemBlock->setData('product_id', $productId);
+
+$tooltipBlockHtml = $block->getBlockHtml('product.swatch.tooltip');
+?>
+<?php if ($product->isSaleable() && count($attributes)): ?>
+    <script>
+        function initConfigurableSwatchOptions_<?= (int) $productId ?>() {
+            const configurableOptionsComponent = initConfigurableOptions(
+                '<?= (int) $productId ?>',
+                <?= /* @noEscape */ $block->getJsonConfig() ?>
+            );
+            const swatchOptionsComponent = initSwatchOptions(
+                <?= /* @noEscape */ $block->getJsonSwatchConfig() ?>
+            );
+
+            return Object.assign(
+                configurableOptionsComponent,
+                swatchOptionsComponent
+            );
+        }
+    </script>
+
+    <div x-data="initConfigurableSwatchOptions_<?= (int) $productId ?>()"
+        x-init="initShowSwatchesIntersect();"
+        @private-content-loaded.window="onGetCartData($event.detail.data)"
+        class="relative mt-5"
+        x-defer="intersect">
+        <!-- <h2 class="mb-4 text-xl font-medium text-gray-900 title-font">
+            <? //= $escaper->escapeHtml(__('Product Options:')) 
+            ?>
+        </h2> -->
+        <div>
+            <?php foreach ($attributes as $attribute): ?>
+                <?php $attributeId = $attribute->getAttributeId(); ?>
+                <?php $productAttribute = $attribute->getProductAttribute();  ?>
+                <?php if ($swatchRendererViewModel->isSwatchAttribute($productAttribute)): ?>
+                    <div class="swatch-attribute min-h-14
+                            <?= $escaper->escapeHtmlAttr($productAttribute->getAttributeCode()) ?>">
+                        <template x-if="showSwatches">
+                            <div class="flex flex-col items-center w-full gap-y-2.5">
+
+                                <label
+                                    class="w-full text-left text-black text-lg font-semibold label product-option-label"
+                                    id="attribute-label-<?= $escaper->escapeHtmlAttr($productId . '-' . $attributeId) ?>"
+                                    aria-hidden="true">
+                                    <span><?= $escaper->escapeHtml($productAttribute->getStoreLabel()) . ":" ?></span>
+                                    <span
+                                        class="text-gray-900 ml-2 text-black text-lg font-semibold"
+                                        x-text="getSwatchText(<?= (int) $attributeId ?>, selectedValues[<?= (int) $attributeId ?>])"></span>
+                                </label>
+                                <div class="w-full text-left text-gray-900 product-option-values">
+                                    <div x-data="{
+                                            scrollLeft() { $refs.swatch.scrollLeft -= 120 },
+                                            scrollRight() { $refs.swatch.scrollLeft += 120 }
+                                        }"
+                                        class="relative w-full">
+                                        <!-- Left Arrow -->
+                                        <button type="button"
+                                            @click="scrollLeft"
+                                            class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white border border-gray-300 shadow p-1 rounded-full"
+                                            aria-label="Scroll Left">
+                                            <svg class="w-4 h-4" viewBox="0 0 24 24">
+                                                <path d="M15 18l-6-6 6-6" stroke="black" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg>
+                                        </button>
+
+                                        <!-- Swatches -->
+                                        <div
+                                            x-ref="swatch"
+                                            class="flex items-center gap-x-2.5 overflow-x-auto scroll-smooth px-8 w-full whitespace-nowrap !flex-nowrap swatch-attribute-options scrollbar-custom"
+                                            role="radiogroup"
+                                            aria-label="<?= $escaper->escapeHtmlAttr($productAttribute->getStoreLabel()) ?>">
+                                            <template
+                                                x-for="(item, index) in optionConfig.attributes[<?= (int) $attributeId ?>].options"
+                                                :key="item.id">
+                                                <?= /* @noEscape */ $swatchItemBlock->setData('attribute_id', $attributeId)->toHtml(); ?>
+                                            </template>
+                                        </div>
+
+                                        <!-- Right Arrow -->
+                                        <button type="button"
+                                            @click="scrollRight"
+                                            class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white border border-gray-300 shadow p-1 rounded-full"
+                                            aria-label="Scroll Right">
+                                            <svg class="w-4 h-4" viewBox="0 0 24 24">
+                                                <path d="M9 18l6-6-6-6" stroke="black" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                <?php else: ?>
+                    <div class="flex flex-col sm:flex-row items-center py-2 w-full border-t border-gray-300 last:border-b">
+                        <label class="w-full sm:w-1/2 text-left text-gray-700 label"
+                            for="attribute<?= $escaper->escapeHtmlAttr($attributeId) ?>">
+                            <span>
+                                <?= $escaper->escapeHtml($attribute->getProductAttribute()->getStoreLabel()) ?>
+                            </span>
+                        </label>
+                        <div class="w-full sm:ml-2 sm:w-1/2 text-left text-gray-900">
+                            <select name="super_attribute[<?= $escaper->escapeHtmlAttr($attribute->getAttributeId()) ?>]"
+                                id="attribute<?= $escaper->escapeHtmlAttr($attributeId) ?>"
+                                class="form-select super-attribute-select max-w-full"
+                                x-on:change="changeOption(<?= (int) $attributeId ?>, event.target.value)"
+                                required>
+                                <option value="">
+                                    <?= $escaper->escapeHtml(__('Choose an Option...')) ?>
+                                </option>
+                                <template
+                                    x-for="(item, index) in getAllAttributeOptions(<?= (int) $attributeId ?>)"
+                                    :key="item.id">
+                                    <option
+                                        :value="item.id"
+                                        x-html="item.label"
+                                        :disabled="!optionIsActive(<?= (int) $attributeId ?>, item.id)"
+                                        :selected="selectedValues[<?= $escaper->escapeHtmlAttr($attributeId) ?>] === item.id">
+                                    </option>
+                                </template>
+                            </select>
+                        </div>
+                    </div>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </div>
+        <?= /* @noEscape */ $tooltipBlockHtml ?>
+    </div>
+
+<?php endif; ?>

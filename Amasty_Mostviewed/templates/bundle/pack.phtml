@@ -1,0 +1,1013 @@
+<?php
+
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Most Viewed or Automatic Related Products Hyva Compatibility by Amasty
+ */
+
+use Magento\Framework\Escaper;
+use Hyva\GraphqlViewModel\ViewModel\GraphqlViewModel;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Store as StoreViewModel;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Hyva\Theme\ViewModel\ProductPrice;
+use Amasty\Mostviewed\Block\Product\BundlePack;
+use Amasty\MostviewedHyva\ViewModel\BundlePackQuery;
+use Amasty\MostviewedHyva\ViewModel\BundlePack as BundlePackViewModel;
+use Hyva\Theme\ViewModel\Modal;
+
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+/** @var HeroiconsOutline $heroicons */
+/** @var BundlePack $block */
+
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+
+/** @var StoreViewModel $viewModelStore */
+$viewModelStore = $viewModels->require(StoreViewModel::class);
+
+/** @var GraphqlViewModel $viewModelGraphQl */
+$viewModelGraphQl = $viewModels->require(GraphqlViewModel::class);
+
+/** @var ProductPrice $productPrice */
+$productPrice = $viewModels->require(ProductPrice::class);
+
+/** @var BundlePackQuery $viewModelBundlePackQuery */
+$viewModelBundlePackQuery = $viewModels->require(BundlePackQuery::class);
+
+/** @var Modal $modalViewModel */
+$modalViewModel = $viewModels->require(Modal::class);
+
+/** @var BundlePackViewModel $bundlePackViewModel */
+$bundlePackViewModel = $viewModels->require(BundlePackViewModel::class);
+
+$uniqueId = uniqid();
+$productUniqId = base64_encode($block->getProduct()->getId());
+$productLayout = $block->getParentBlock() ? $block->getParentBlock()->getNameInLayout() : false;
+$productTabLayout = $productLayout === "product.info.details";
+
+$bundles = $block->getBundles();
+$packIdsConfig = $bundlePackViewModel->getAllowedPackIds($bundles);
+// phpcs:disable Generic.Files.LineLength.TooLong
+?>
+
+<div
+    x-data="amBundlePackComponent_<?= $escaper->escapeHtml($uniqueId); ?>()"
+    x-init="getProducts('<?= $escaper->escapeHtml($productUniqId) ?>')">
+    <template x-for="(pack, packIndex) in  packs" :key="packIndex">
+        <div
+            class="amrelated-content-container"
+            :class="{'details-tab-wrapper': '<?= $escaper->escapeHtml($productTabLayout) ?>'}"
+            data-amrelated-js="pack-wrapper"
+            :data-pack-id="pack.bundle.pack_id">
+            <div
+                class="flex flex-col gap-y-2 md:gap-y-0 items-center justify-between border-b border-gray-100 md:flex-row pb-5 mb-5 md:mb-10"
+                data-id="pack-title">
+                <h3
+                    class="text-2xl font-semibold text-black capitalize"
+                    x-html="pack.bundle.block_title"></h3>
+                <div
+                    x-show="pack.bundle.bundleProducts.length >= 3"
+                    class="flex items-center gap-2">
+                    <button
+                        @click="$dispatch('bundle-slider-prev')"
+                        :disabled="pack.sliderCurrent === 0"
+                        :class="{ 'opacity-25 cursor-not-allowed' : pack.sliderCurrent === 0 }"
+                        class="text-black flex-none p-2 lg:p-3 rounded-3xl border border-[#EDEDED]">
+                        <svg class="w-6 h-6" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 12.0291H20M4 12.0291L8 8.02905M4 12.0291L8 16.0291" stroke="black" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
+
+                    <button
+                        @click="$dispatch('bundle-slider-next')"
+                        :disabled="pack.sliderCurrent >= pack.sliderMax"
+                        :class="{ 'opacity-25 cursor-not-allowed' : pack.sliderCurrent >= pack.sliderMax }"
+                        class="text-black flex-none p-2 lg:p-3 rounded-3xl border border-[#EDEDED]">
+                        <svg class="w-6 h-6" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 12.0291H20M20 12.0291L16 8.02905M20 12.0291L16 16.0291" stroke="black" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
+
+                </div>
+            </div>
+            <div
+                class="amrelated-content-wrapper relative flex flex-col w-full">
+                <div
+                    x-data="{
+    current: 0,
+    visible: 4,
+    itemWidth: 220,
+    get total() {
+        return $el.querySelectorAll('.amrelated-pack-item-wrapper').length
+    },
+    get maxSlide() {
+        return Math.max(0, this.total - this.visible)
+    },
+    next() {
+        if (this.current < this.maxSlide) this.current++
+        this.syncToPack()
+    },
+    prev() {
+        if (this.current > 0) this.current--
+        this.syncToPack()
+    },
+    syncToPack() {
+        const packEl = $el.closest('[data-amrelated-js=\'pack-wrapper\']')
+        if (packEl) {
+            const outerScope = Alpine.$data(packEl.closest('[x-data]'))
+            if (outerScope && outerScope.packs) {
+                const packId = packEl.dataset.packId
+                const pack = outerScope.packs.find(p => String(p.bundle.pack_id) === String(packId))
+                if (pack) {
+                    pack.sliderCurrent = this.current
+                    pack.sliderMax = this.maxSlide
+                }
+            }
+        }
+    },
+    init() {
+        this.$nextTick(() => {
+            this.syncToPack()
+        })
+        window.addEventListener('bundle-slider-prev', () => this.prev())
+        window.addEventListener('bundle-slider-next', () => this.next())
+    }
+}"
+                    class="amrelated-pack-list relative w-full max-w-full overflow-hidden"
+                    :class="{
+                        '-second-row': !pack.getAdditionalClasses(5),
+                        'lg:justify-between': !pack.getAdditionalClasses(3) && pack.getAdditionalClasses(5)
+                    }">
+                    <div
+                        x-ref="slider"
+                        class="flex flex-nowrap gap-8 transition-transform duration-300"
+                        :style="'transform: translateX(-' + (current * (itemWidth + 24)) + 'px)'">
+                        <div
+                            class="amrelated-pack-item-wrapper -main-product flex sm:py-5 w-full transition duration-300"
+                            :class="{
+                            'amrelated-pack-item-tab-wrapper': '<?= $escaper->escapeHtml($productTabLayout) ?>'
+                                && pack.getAdditionalClasses(3),
+                            'lg:flex-auto': !pack.getAdditionalClasses(3) && pack.getAdditionalClasses(5),
+                            'lg:w-[320px]': pack.getAdditionalClasses(3),
+                            'lg:w-[220px]': !pack.getAdditionalClasses(3)
+                        }"
+                            :data-class="pack.getAdditionalClasses(3) ? '-wide-wrapper' : '-narrow-wrapper'">
+                            <div
+                                class="flex-row lg:flex-col amrelated-pack-item -main-product main-product-inner relative h-full ml-3 lg:ml-5 opacity-100
+                                opacity-100 flex flex-row transition w-auto py-4 px-0 md:min-w-[120px] text-center"
+                                :data-product-id="decodeBase64(mainProduct.uid)"
+                                :class="pack.getAdditionalClasses(3) ? '-wide' : '-narrow text-left lg:flex-col lg:text-center'">
+                                <div
+                                    class="amrelated-info relative flex md:block box-border"
+                                    :class="pack.getAdditionalClasses(3) ? 'xl:flex xl:text-left' : 'md:block'">
+                                    <div
+                                        class="amrelated-photo-container relative w-[100px] min-w-[100px] h-[100px] m-0
+                                        text-center bg-white border border-amrel-grey-border-light md:mx-auto md:mb-2.5"
+                                        :class="pack.getAdditionalClasses(3) ? 'xl:m-0' : ''">
+                                        <a
+                                            class="amrelated-link w-full h-full block"
+                                            :href="BASE_URL + mainProduct.product_url">
+                                            <img
+                                                :src="mainProduct.image.url"
+                                                class="amrelated-photo ml-auto mr-auto max-w-full max-h-full"
+                                                loading="lazy"
+                                                alt="mainProduct.image.label" />
+                                        </a>
+                                    </div>
+                                    <div
+                                        class="amrelated-discount -main-product -product block -top-2.5
+                                        -right-2.5 transition duration-300 text-xs absolute z-10 flex
+                                        justify-center items-center box-border p-[5px] text-white
+                                        bg-teakea-terracotta rounded"
+                                        x-show="pack.appliedForParent && pack.checkedItemsNumber !== 0 && pack.discountPercentage"
+                                        x-text="pack.productsBundleDiscountType ? pack.mainDiscount + '%' : '-'
+                                        + hyva.formatPrice(pack.mainDiscount)"></div>
+                                </div>
+                                <div
+                                    class="amrelated-details flex-col flex flex-wrap ml-5"
+                                    :class="pack.getAdditionalClasses(3) ? 'md:ml-5' : 'ml-5 lg:items-center lg:ml-0'">
+                                    <div
+                                        class="amrelated-name w-full break-words text-left"
+                                        :class="pack.getAdditionalClasses(3) ? '' : 'lg:text-center'">
+                                        <a
+                                            class="amrelated-link"
+                                            :href="BASE_URL + mainProduct.product_url"
+                                            :title="mainProduct.name"
+                                            x-html="mainProduct.name"></a>
+                                    </div>
+                                    <div class="rating-summary" :class="pack.getAdditionalClasses(3) ? 'text-left' : ''">
+                                        <span class="stars-outer flex relative text-amrel-grey-blue">
+                                            <?= $heroicons->starHtml('stars-outer-item fill-amrel-grey-blue', 20, 20) ?>
+                                            <?= $heroicons->starHtml('stars-outer-item fill-amrel-grey-blue', 20, 20) ?>
+                                            <?= $heroicons->starHtml('stars-outer-item fill-amrel-grey-blue', 20, 20) ?>
+                                            <?= $heroicons->starHtml('stars-outer-item fill-amrel-grey-blue', 20, 20) ?>
+                                            <?= $heroicons->starHtml('stars-outer-item fill-amrel-grey-blue', 20, 20) ?>
+                                            <span
+                                                class="stars-inner-wrapper absolute top-0 left-0 h-6 whitespace-nowrap overflow-hidden"
+                                                :style="'width:' + mainProduct.rating_summary + '%'">
+                                                <span class="stars-inner flex absolute top-0 left-0 text-amrel-star-yellow">
+                                                    <?= $heroicons->starHtml('stars-inner-item fill-amrel-star-yellow', 20, 20) ?>
+                                                    <?= $heroicons->starHtml('stars-inner-item fill-amrel-star-yellow', 20, 20) ?>
+                                                    <?= $heroicons->starHtml('stars-inner-item fill-amrel-star-yellow', 20, 20) ?>
+                                                    <?= $heroicons->starHtml('stars-inner-item fill-amrel-star-yellow', 20, 20) ?>
+                                                    <?= $heroicons->starHtml('stars-inner-item fill-amrel-star-yellow', 20, 20) ?>
+                                                </span>
+                                            </span>
+                                        </span>
+                                    </div>
+                                    <div
+                                        class="price-box price-final_price w-full m-0 mt-[3px]"
+                                        :class="pack.getAdditionalClasses(3) ? 'text-left' : 'text-left lg:text-center'">
+                                        <div class="price-container flex flex-col">
+                                            <div class="final-price">
+                                                <span class="price-wrapper font-semibold text-base">
+                                                    <span
+                                                        class="price price-value"
+                                                        x-html="hyva.formatPrice(mainProduct.price_range.minimum_price.final_price.value)"></span>
+                                                </span>
+
+                                                <template
+                                                    x-if="mainProduct.price_range.minimum_price.final_price.value !==
+                                                mainProduct.price_range.minimum_price.regular_price.value">
+                                                    <div class="text-gray-600 text-sm">
+                                                        <span><?= $escaper->escapeHtml(__('Regular Price')) ?></span>
+                                                        <span x-html="hyva.formatPrice(
+                                                        mainProduct.price_range.minimum_price.regular_price.value
+                                                    )"></span>
+                                                    </div>
+                                                </template>
+                                            </div>
+
+                                            <?php if ($productPrice->displayPriceInclAndExclTax()): ?>
+                                                <template x-if="mainProduct.price_range.minimum_price.base_price">
+                                                    <div class="final-price-excl-tax">
+                                                        <span class="font-regular text-gray-900">
+                                                            <span><?= $escaper->escapeHtml(__('Excl. Tax')) ?>:</span>
+                                                            <span
+                                                                class="price"
+                                                                x-html="hyva.formatPrice(mainProduct.price_range.minimum_price.base_price.value)"></span>
+                                                        </span>
+                                                    </div>
+                                                </template>
+                                            <?php endif ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <template
+                            x-for="(packProduct, packProductIndex) in pack.bundle.bundleProducts"
+                            :key="packProductIndex">
+                            <div
+                                class="amrelated-pack-item-wrapper w-full transition duration-300 -bundle-product
+                                flex py-5 lg:px-5 border-t-2 border-gray-300 lg:border-0 selected"
+                                :class="{
+                                'amrelated-pack-item-tab-wrapper': '<?= $escaper->escapeHtml($productTabLayout) ?>'
+                                        && pack.getAdditionalClasses(3),
+                                'lg:flex-auto': !pack.getAdditionalClasses(3) && pack.getAdditionalClasses(5),
+                                'lg:w-[320px]': pack.getAdditionalClasses(3),
+                                'lg:w-[220px]': !pack.getAdditionalClasses(3)
+                            }"
+                                :data-class="pack.getAdditionalClasses(3) ? '-wide-wrapper' : '-narrow-wrapper'">
+                                <div
+                                    class="flex-row lg:flex-col amrelated-pack-item h-full opacity-100 ml-3 lg:ml-0 flex w-auto relative
+                                    py-4 px-0 transition md:min-w-[120px] text-center"
+                                    :class="pack.getAdditionalClasses(3) ? '-wide' : '-narrow text-left lg:flex-col lg:text-center'">
+                                    <div
+                                        class="amrelated-info relative flex box-border"
+                                        :class="pack.getAdditionalClasses(3) ? 'xl:flex xl:text-left' : 'md:block'">
+                                        <div
+                                            class="amrelated-photo-container relative w-[100px] min-w-[100px] h-[100px]
+                                            m-0 text-center bg-white border border-amrel-grey-border-light md:mx-auto md:mb-2.5"
+                                            :class="pack.getAdditionalClasses(3) ? 'xl:m-0' : ''">
+                                            <input
+                                                type="checkbox"
+                                                class="amrelated-checkbox amrelated-label absolute z-10 box-border
+                                            w-5 h-5 bg-white border-0 rounded-sm cursor-pointer"
+                                                x-model="pack.checkboxes[packProduct.product.uid]"
+                                                :id="'id' + packIndex + mainProduct.uid + packProduct.product.uid"
+                                                :name="'amrelated_products' + '[' + decodeBase64(packProduct.product.uid) + ']'"
+                                                x-on:change="pack.recalculateDiscount($event.target)"
+                                                :data-type="packProduct.product.__typename.toLowerCase()"
+                                                :value="packProduct.qty"
+                                                :data-id="decodeBase64(packProduct.product.uid)" />
+                                            <!-- <label
+                                                :for="'id' + packIndex + mainProduct.uid + packProduct.product.uid"
+                                                class="amrelated-label absolute z-10 box-border
+                                            w-5 h-5 bg-white border border-amrel-blue-border rounded-sm cursor-pointer none"></label> -->
+                                            <a
+                                                class="amrelated-link w-full h-full block"
+                                                :href="BASE_URL + packProduct.product.product_url">
+                                                <img
+                                                    :src="packProduct.product.small_image.url"
+                                                    class="amrelated-photo ml-auto mr-auto max-w-full max-h-full"
+                                                    loading="lazy"
+                                                    alt="packProduct.product.image.label" />
+                                                <span
+                                                    x-text="packProduct.qty > 1 ? packProduct.qty  : ''"
+                                                    :class="packProduct.qty > 1 ? 'amrelated-qty flex justify-center items-center absolute right-0 bottom-0 min-w-[30px] h-[30px] py-0 px-0.5 border border-amrel-blue-border rounded-full bg-amrel-grey-border shadow-[0_2px_4px_0_rgba(16,31,48,0.2)] text-black font-bold before:content-[\'x\'] before:text-[11px] before:font-normal' : ''"></span>
+                                            </a>
+                                        </div>
+                                        <div
+                                            class="amrelated-discount -product -top-2.5 -right-2.5 transition duration-300
+                                            opacity-100 text-xs absolute z-10 flex justify-center items-center
+                                            box-border p-[5px] text-white bg-teakea-terracotta rounded">
+                                            <template x-if="packProduct.discount_amount">
+                                                <span
+                                                    x-text="pack.productsBundleDiscountType ?
+                                                    packProduct.discount_amount + '%' :
+                                                        '-' + hyva.formatPrice(packProduct.discount_amount)"></span>
+                                            </template>
+                                            <template
+                                                x-if="!packProduct.discount_amount
+                                                && pack.productsBundleDiscountType === 2">
+                                                <span
+                                                    x-text="pack.productsBundleDiscountType ? pack.discount + '%'
+                                                    : '-' + hyva.formatPrice(pack.discount)"></span>
+                                            </template>
+                                            <template
+                                                x-if="!packProduct.discount_amount
+                                                && pack.productsBundleDiscountType !== 2">
+                                                <span
+                                                    x-text="pack.productsBundleDiscountType ? pack.bundle.discount_amount + '%'
+                                                    : '-' + hyva.formatPrice(pack.bundle.discount_amount)"></span>
+                                            </template>
+                                            <span
+                                                class="amrelated-text ml-0.5"
+                                                x-text="packProduct.qty > 1 ? pack.discountEachText : ''"></span>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="h-full amrelated-details flex flex-wrap ml-5 flex-col lg:ml-0 flex-col lg:items-center"
+                                        :class="pack.getAdditionalClasses(3) ? 'md:ml-5' : 'ml-5 lg:items-center lg:ml-0'">
+                                        <div
+                                            class="amrelated-name w-full break-words text-left"
+                                            :class="pack.getAdditionalClasses(3) ? '' : 'lg:text-center'">
+                                            <a
+                                                class="amrelated-link"
+                                                :href="BASE_URL + packProduct.product.product_url"
+                                                :title="packProduct.product.name"
+                                                x-html="packProduct.product.name"></a>
+                                        </div>
+                                        <div class="rating-summary">
+                                            <span class="stars-outer flex relative text-amrel-grey-blue">
+                                                <?= $heroicons->starHtml('stars-outer-item fill-amrel-grey-blue', 20, 20) ?>
+                                                <?= $heroicons->starHtml('stars-outer-item fill-amrel-grey-blue', 20, 20) ?>
+                                                <?= $heroicons->starHtml('stars-outer-item fill-amrel-grey-blue', 20, 20) ?>
+                                                <?= $heroicons->starHtml('stars-outer-item fill-amrel-grey-blue', 20, 20) ?>
+                                                <?= $heroicons->starHtml('stars-outer-item fill-amrel-grey-blue', 20, 20) ?>
+                                                <span
+                                                    class="stars-inner-wrapper absolute top-0 left-0 h-6 whitespace-nowrap overflow-hidden"
+                                                    :style="'width:' + packProduct.product.rating_summary + '%'">
+                                                    <span class="stars-inner flex absolute top-0 left-0 text-amrel-star-yellow">
+                                                        <?= $heroicons->starHtml('stars-inner-item fill-amrel-star-yellow', 20, 20) ?>
+                                                        <?= $heroicons->starHtml('stars-inner-item fill-amrel-star-yellow', 20, 20) ?>
+                                                        <?= $heroicons->starHtml('stars-inner-item fill-amrel-star-yellow', 20, 20) ?>
+                                                        <?= $heroicons->starHtml('stars-inner-item fill-amrel-star-yellow', 20, 20) ?>
+                                                        <?= $heroicons->starHtml('stars-inner-item fill-amrel-star-yellow', 20, 20) ?>
+                                                    </span>
+                                                </span>
+                                            </span>
+                                        </div>
+                                        <div
+                                            class="price-box price-final_price w-full m-0 mt-[3px] block"
+                                            :class="pack.getAdditionalClasses(3) ? 'text-left' : 'text-left lg:text-center'">
+                                            <div class="price-container flex flex-col">
+                                                <div class="final-price">
+                                                    <span class="price-wrapper font-semibold text-base">
+                                                        <span
+                                                            class="price price-value"
+                                                            x-html="hyva.formatPrice(packProduct.product.price_range.minimum_price.final_price.value)"></span>
+                                                    </span>
+                                                    <template
+                                                        x-if="packProduct.product.price_range.minimum_price.final_price.value !==
+        packProduct.product.price_range.minimum_price.regular_price.value">
+                                                        <div class="text-gray-600 text-sm line-through">
+                                                            <span x-html="hyva.formatPrice(packProduct.product.price_range.minimum_price.regular_price.value)"></span>
+                                                        </div>
+                                                    </template>
+                                                </div>
+
+                                                <?php if ($productPrice->displayPriceInclAndExclTax()): ?>
+                                                    <template x-if="packProduct.product.price_range.minimum_price.base_price">
+                                                        <div class="final-price-excl-tax">
+                                                            <span class="font-regular text-gray-900">
+                                                                <span><?= $escaper->escapeHtml(__('Excl. Tax')) ?>:</span>
+                                                                <span
+                                                                    class="price"
+                                                                    x-html="hyva.formatPrice(packProduct.product.price_range.minimum_price.base_price.value)"></span>
+                                                            </span>
+                                                        </div>
+                                                    </template>
+                                                <?php endif ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <div class="amrelated-summary-content-container flex justify-end w-full lg:w-auto">
+                    <!-- <span
+                        class="amrelated-equal leading-[100px] p-2.5 text-[90px] hidden lg:block text-[#639d02]"
+                        :class="{'-second-row': pack.getAdditionalClasses(5)}">=</span> -->
+                    <div
+                        class="amrelated-summary-content transition top-0 flex w-full justify-between items-center lg:justify-end md:block md:relative gap-2.5"
+                        :class="{'-second-row': pack.getAdditionalClasses(5)}">
+                        <div
+                            class="amrelated-price-wrapper flex items-center box-border max-w-full
+                                text-base md:p-[15px] md:h-[95px] md:w-full
+                                md:m-0 md:justify-center">
+                            <div
+                                class="amrelated-discount -summary 
+        relative md:absolute
+        md:left-1/2 md:-translate-x-1/2
+        md:-translate-y-1/2
+        transition duration-300 z-10 flex justify-center
+        items-center box-border text-white bg-teakea-terracotta rounded
+        max-w-full py-[5px] px-[15px] text-base mt-0">
+                                <?= $escaper->escapeHtml(__('Bespaar')) ?>
+                                <span class="amount ml-[5px] font-bold" x-text="hyva.formatPrice(pack.discountPercentage)"></span>
+                            </div>
+                            <div class="main price font-bold text-[20px] md:text-[30px] leading-[100px] text-center text-black md:mt-10 ml-5" x-text="hyva.formatPrice(pack.discountAmount)"></div>
+                        </div>
+                        <div class="amrelated-tocart-wrapper w-full flex justify-end md:justify-center">
+                            <button
+                                class="relative inline-flex flex bg-teakea-lime-green text-white text-sm font-semibold items-center py-3.5 px-7 gap-x-2.5 uppercase justify-center rounded-lg" type="button"
+                                @click="addToCart($event.target)"
+                                title="<?= $escaper->escapeHtml(__('Add to Cart')) ?>">
+                                <?= $heroicons->shoppingCartHtml('border-current') ?>
+                                <span class="hidden sm:block lg:block">
+                                    <?= $escaper->escapeHtml(__('Add to Cart')) ?>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <?= /* @noEscape */
+    $modalViewModel->createModal()
+        ->withDialogRefName('bundlePopup')
+        ->withTemplate('Amasty_MostviewedHyva::bundle/popup-wrapper.phtml')
+        ->positionCenter()
+        ->addDialogClass('w-10/12 md:w-3/4 lg:w-3/5 relative mt-4 mb-4 p-3 md:p-12 pt-0 overflow-hidden');
+    ?>
+    <?=
+    /** @noEscape */
+    $block->fetchView($block->getTemplateFile('Hyva_Theme::ui/loading.phtml')) ?>
+</div>
+<script>
+    function amBundlePackComponent_<?= $escaper->escapeHtml($uniqueId); ?>() {
+        return Object.assign({}, hyva.modal({
+            name: 'bundlePopup'
+        }), {
+            allowedPacks: <?= /* @noEscape */ json_encode($packIdsConfig); ?>,
+            mainProduct: [],
+            packs: [],
+            popupData: <?= /* @noEscape */ $block->getJsonConfig(); ?>,
+            isLoading: false,
+            addToCartContent: '',
+            productsInpopup: {},
+            selectors: {
+                popupContentWrappper: '.amrelated-popup-wrapper-content',
+                popupForms: '.amrelated-product-info form.info-container-form',
+                packItemWrapper: '.amrelated-pack-item-wrapper',
+                packItemCheckbox: '.amrelated-checkbox',
+                componentWrapper: '[x-data^="amBundlePackComponent"]',
+                form: '#product_addtocart_form',
+                productNameField: '[name="product"]',
+                productQtyField: '[name="qty"]',
+                parent: '[data-amrelated-js="pack-wrapper"]',
+                mainContainer: '[data-amrelated-js="bundle-popup"]',
+                closePopup: '[data-amrelated-js="close-popup"]',
+                productsWrapper: '[data-amrelated-js="products-wrapper"]',
+                mainProduct: '.main-product-inner',
+                body: 'body',
+                productPageClass: 'catalog-product-view',
+                cartPageClass: 'checkout-cart-index',
+                inputCheckbox: 'input[type=checkbox]',
+                bundlePopupWrapper: '.bundle-popup',
+                xnotifElements: '.amxnotif-block-wrapper'
+            },
+
+            getProducts(productId) {
+                let uidToFetch = productId;
+                let query = `<?=
+                                /** @noEscape */
+                                $viewModelBundlePackQuery->queryProducts() ?>`;
+                let variables = {
+                    uid: uidToFetch
+                };
+
+                this.fetchBundlePacks(productId, query, variables);
+            },
+
+            fetchBundlePacks(productId, query, variables = {}) {
+                fetch(BASE_URL + 'graphql', {
+                        method: 'POST',
+                        headers: {
+                            'Store': '<?= $escaper->escapeJs($viewModelStore->getStoreCode()) ?>',
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            query,
+                            variables
+                        }),
+                        mode: "cors",
+                        credentials: "include"
+                    })
+                    .then((response) => response.json())
+                    .then((result) => {
+                        const data = result?.data?.amMostviewedBundlePacks || {};
+
+                        if (!data.bundleItems) {
+                            return;
+                        }
+
+                        this.mainProduct = data.main_product;
+
+                        const packs = data.bundleItems.filter(this._getAllowedPacks());
+
+                        this.packs = packs.map(bundleItem => {
+                            const packComponent = amBundlePack();
+                            packComponent.init(bundleItem, this.mainProduct);
+
+                            return packComponent;
+                        })
+                    })
+                    .finally(() => {
+
+                        this.$nextTick(() => {
+                            let inputElements = document.querySelectorAll(this.selectors.packItemCheckbox);
+                            const event = new Event('change');
+
+                            inputElements.forEach((input) => {
+                                input.dispatchEvent(event);
+                            })
+                        })
+                    })
+            },
+
+            /**
+             * Filter packs from response to get allowed for current place
+             * @return {function(*): *}
+             * @private
+             */
+            _getAllowedPacks() {
+                return (pack) => {
+                    pack.bundleProducts = pack.bundleProducts.filter(product => product.product.visibility > 1);
+
+                    if (!pack.bundleProducts.length) {
+                        return false;
+                    }
+
+                    return this.allowedPacks ? this.allowedPacks.includes(parseInt(pack.pack_id)) : false
+                }
+            },
+
+            decodeBase64(string) {
+                return atob(string);
+            },
+
+            getIsProductPage() {
+                return !!document.querySelector(this.selectors.body)
+                    .classList.contains(this.selectors.productPageClass);
+            },
+
+            getIsCartPage() {
+                return !!document.querySelector(this.selectors.body)
+                    .classList.contains(this.selectors.cartPageClass);
+            },
+
+            /**
+             * @private
+             * @param {Number} mainProductId
+             * @returns {Number|null}
+             */
+            getMainProductForm: function(mainProductId) {
+                let form = this.qs(this.selectors.form),
+                    formProductInput = null,
+                    isMainProductForm = false;
+                if (form) {
+                    formProductInput = form.querySelector(this.selectors.productNameField);
+                    if (parseInt(formProductInput.value) === parseInt(mainProductId)) {
+                        isMainProductForm = true;
+                    }
+                }
+
+                return isMainProductForm ? form : null;
+            },
+
+            serializeForm(formElement) {
+                return new URLSearchParams(new FormData(formElement)).toString();
+            },
+
+            scrollToElement(el) {
+                el.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+            },
+
+            validateProductForm(form) {
+                let flag = false;
+                let isValid = form.reportValidity();
+                if (isValid) {
+                    flag = true;
+                } else {
+                    this.scrollToElement(form);
+                }
+                return flag;
+            },
+
+            resetGallery() {
+                window.dispatchEvent(new CustomEvent("reset-gallery"));
+            },
+
+            hidePopup() {
+                this.hide('bundlePopup');
+                this.resetGallery();
+            },
+
+            _removeElements(wrapper, elements) {
+                this.qs(wrapper).querySelectorAll(elements).forEach(el => {
+                    return el.remove();
+                })
+            },
+
+            prepareData(el) {
+                const configurableproduct = "configurableproduct";
+                let form = null;
+                let data = '';
+                let relatedData = '';
+                let packElement = el.closest(this.selectors.parent);
+                let itemsInputs = packElement.querySelectorAll(this.selectors.inputCheckbox);
+                let mainProduct = packElement.querySelector(this.selectors.mainProduct);
+
+                //data from selected products
+                itemsInputs.forEach((input) => {
+                    let currentValue = input.value;
+                    if (input.checked) {
+                        this.productsInpopup[input.dataset.id] = currentValue;
+                        if (input.dataset.type === configurableproduct) {
+                            currentValue = 1;
+                        }
+                        relatedData += input.getAttribute('name') + "=" + currentValue + "&";
+                    }
+                });
+
+                //data from main product
+                form = this.getMainProductForm(mainProduct.dataset.productId);
+
+                if (!!form) {
+                    if (this.validateProductForm(form)) {
+                        data = this.serializeForm(form);
+                    } else {
+                        return false;
+                    }
+                } else {
+                    data += '&form_key=' + hyva.getFormKey();
+                    if (mainProduct) {
+                        data += '&' + 'amrelated_products[' + mainProduct.dataset.productId + ']=' + 1;
+                    }
+                }
+                data += '&' + relatedData;
+                data += '&ajax_cart=' + this.popupData.isAjaxCartEnabled;
+                data += '&product_page=' + this.getIsProductPage();
+                data += '&pack_id=' + packElement.dataset.packId;
+
+                return data;
+            },
+
+            addToCart(el) {
+                const data = this.prepareData(el);
+                if (!data) {
+                    return;
+                }
+                this.isLoading = true;
+                fetch(this.popupData.url, {
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                    },
+                    body: new URLSearchParams(data),
+                    method: "POST",
+                    mode: "cors",
+                    credentials: "include"
+                }).then(
+                    response => response.json()
+                ).then((result) => {
+                    if (result.is_add_to_cart) {
+                        window.dispatchEvent(new CustomEvent("reload-customer-section-data"));
+                        this.scrollToElement(document.querySelector(this.selectors.body));
+                    } else {
+                        this.popupOnRespond(result.html, 'am_bundle_popup', el);
+                        if (!this.getIsCartPage()) {
+                            window.dispatchEvent(new CustomEvent("reload-customer-section-data"));
+                        }
+                    }
+                }).catch(error => {
+                    dispatchMessages([{
+                        type: "error",
+                        text: "<?= $escaper->escapeHtml(__("Something went wrong. Please try again later.")); ?>"
+                    }], 2000);
+                }).finally(() => {
+                    this.isLoading = false;
+                })
+            },
+
+            _udateQty(el) {
+                let popupInner = el.closest(this.selectors.componentWrapper).querySelector(this.selectors.popupContentWrappper);
+                let forms = popupInner.querySelectorAll(this.selectors.popupForms);
+                forms.forEach((form) => {
+                    let productId = form.querySelector(this.selectors.productNameField).value;
+                    let productQtyField = form.querySelector(this.selectors.productQtyField);
+                    if (productQtyField) {
+                        for (let product in this.productsInpopup) {
+                            if (parseInt(productId) === parseInt(product)) {
+                                productQtyField.value = this.productsInpopup[product]
+                            }
+                        }
+                    }
+                })
+            },
+
+            qs(selector) {
+                return document.querySelector(selector);
+            },
+
+            /**
+             *
+             * @param content
+             * @param className
+             * @param el
+             */
+            popupOnRespond(content, className, el) {
+                if (content) {
+                    let componentWrapper = el.closest(this.selectors.componentWrapper);
+                    const regex = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+                        div = document.createElement('div');
+
+                    if (this.qs('.scripts-' + className)) {
+                        this.qs('.scripts-' + className).innerHTML = '';
+                    } else {
+                        let container = document.createElement('div');
+                        container.className = 'scripts-' + className;
+                        this.qs('body').appendChild(container);
+                    }
+
+                    div.innerHTML = content;
+
+                    const scripts = div.getElementsByTagName('script');
+
+                    for (let script of scripts) {
+                        if (!script.hasAttribute('type') &&
+                            script.getAttribute('type') !== 'text/x-magento-init') {
+
+                            let scriptTag = document.createElement('script');
+                            scriptTag.innerHTML = script.innerHTML;
+                            this.qs('.scripts-' + className).appendChild(scriptTag);
+                        }
+                    }
+
+                    content = content.replaceAll(regex, '');
+                    componentWrapper.querySelector(this.selectors.popupContentWrappper).innerHTML = content;
+                    this._removeElements(this.selectors.bundlePopupWrapper, this.selectors.xnotifElements);
+                    setTimeout(() => {
+                        this._udateQty(el);
+                    }, 0)
+                    this.show('bundlePopup');
+                }
+            }
+        })
+    }
+
+    function amBundlePack() {
+        return {
+            discountEachText: '<?= $escaper->escapeHtml(__('each')) ?>',
+            discountPercentage: 0,
+            discountAmount: 0,
+            checkboxes: {},
+            isChecked: true,
+            bundle: [],
+            productMain: [],
+            productsBundleDiscount: 0,
+            productsBundleDiscountType: 0,
+            appliedForParent: true,
+            conditionalDiscounts: {},
+            discount: 0,
+            mainDiscount: 0,
+            checkedItemsNumber: 0,
+            selectors: {
+                packItemWrapper: '.amrelated-pack-item-wrapper'
+            },
+
+            init(packData, productMain) {
+                this.bundle = packData;
+                this.productMain = productMain;
+                this.productsBundleDiscount = packData.discount_amount;
+                this.productsBundleDiscountType = packData.discount_type;
+                this.appliedForParent = packData.apply_for_parent;
+
+                this.rearrangeSimiliarProducts(productMain);
+                this.rearrangeCheckboxesState(true);
+            },
+
+            rearrangeSimiliarProducts(mainProduct) {
+                this.bundle.bundleProducts = this.bundle.bundleProducts.filter(function(el) {
+                    return el.product.uid !== mainProduct.uid;
+                });
+            },
+
+            rearrangeCheckboxesState(state) {
+                this.checkboxes = this.bundle.bundleProducts.reduce(
+                    (acc, product) => ({
+                        ...acc,
+                        [product.product.uid]: state
+                    }), {});
+            },
+
+            removeClass(element, parent, child, selector) {
+                element.closest(parent).querySelectorAll(child).forEach(
+                    (el) => {
+                        el.classList.remove(selector)
+                    })
+            },
+
+            addClass(element, parent, child, selector) {
+                element.closest(parent).querySelectorAll(child).forEach(
+                    (el) => {
+                        el.classList.add(selector)
+                    })
+            },
+
+            getPageHandle() {
+                return document.querySelector('body').classList.contains('checkout-cart-index');
+            },
+
+            getAdditionalClasses(count) {
+                return this.bundle.bundleProducts.length < count && !this.getPageHandle();
+            },
+
+
+            recalculateDiscount(element) {
+                const itemWrapper = element.closest(this.selectors.packItemWrapper);
+
+                if (element.checked) {
+                    this.isChecked = true;
+
+                    itemWrapper.classList.remove('opacity-75');
+                    itemWrapper.classList.add('selected', 'opacity-100');
+
+                    if (this.getAdditionalClasses(3)) {
+                        itemWrapper.classList.add('selected-bg', 'bg-amrel-grey-border');
+                    }
+
+                    if (this.bundle.apply_condition) {
+                        this.removeClass(element, '.amrelated-pack-list', '.-bundle-product', 'selected-bg', 'bg-amrel-grey-border');
+
+                        if (this.productsBundleDiscountType !== 2) {
+                            this.removeClass(element, '.amrelated-pack-list', '.amrelated-discount.-product', 'nonselected-discount', 'opacity-0')
+                        }
+                    }
+                } else {
+                    this.isChecked = false;
+
+                    itemWrapper.classList.remove('selected', 'opacity-100');
+                    itemWrapper.classList.add('opacity-75');
+
+                    if (this.getAdditionalClasses(3)) {
+                        itemWrapper.classList.remove('selected-bg', 'bg-amrel-grey-border');
+                    }
+
+                    if (this.bundle.apply_condition) {
+                        this.addClass(element, '.amrelated-pack-list', '.-main-product', 'nonselected-discount', 'opacity-0');
+
+                        if (this.productsBundleDiscountType !== 2) {
+                            this.addClass(element, '.amrelated-pack-list', '.amrelated-discount.-product', 'nonselected-discount', 'opacity-0')
+                        }
+                    }
+                }
+
+                let discountType;
+                let mainProductPrice = 0;
+                let price = 0;
+                let productQty = 0;
+                let totalPriceWithDiscount = 0;
+                let totalPriceWithoutDiscount = 0;
+                let totalDiscountValue = 0;
+
+                discountType = this.productsBundleDiscountType;
+
+                this.bundle.bundleProducts.forEach(item => {
+                    const checkboxId = item.product.uid;
+
+                    this.checkedItemsNumber = Object.values(this.checkboxes).filter(value => value === true).length;
+
+                    if (this.checkboxes[checkboxId] === true) {
+                        price = item.product.price_range.minimum_price.final_price.value;
+
+                        if (discountType === 2 &&
+                            this.bundle.conditional_discounts &&
+                            this.bundle.conditional_discounts.length > 0
+                        ) {
+                            this.conditionalDiscounts = this.bundle.conditional_discounts.reduce((obj, item) => {
+                                obj[item.number_items] = item.discount_amount
+                                return obj;
+                            }, {})
+
+                            let checkedItemsNumber = this.checkedItemsNumber
+
+                            if (this.appliedForParent || discountType === 2) {
+                                checkedItemsNumber = checkedItemsNumber + 1;
+                            }
+
+                            let value = Object.keys(this.conditionalDiscounts)
+                                .filter(conditionalItem => parseInt(conditionalItem) === checkedItemsNumber)
+
+                            if (value.length) {
+                                this.discount = this.conditionalDiscounts[value];
+                            } else {
+                                let maxValue = Math.max.apply(null, Object.keys(this.conditionalDiscounts));
+                                this.discount = this.conditionalDiscounts[maxValue]
+                            }
+                        } else {
+                            this.discount = item.discount_amount ? item.discount_amount : this.productsBundleDiscount;
+                        }
+
+                        productQty = item.qty;
+
+                        if (discountType === 0) {
+                            if (price > this.discount) {
+                                totalPriceWithDiscount += (price - this.discount) * productQty;
+                                totalDiscountValue += this.discount
+                            }
+                        } else {
+                            totalPriceWithDiscount += price * (100 - this.discount) / 100 * productQty;
+                        }
+
+                        totalPriceWithoutDiscount += price * productQty;
+                    }
+                })
+
+                mainProductPrice = this.productMain.price_range.minimum_price.final_price.value;
+
+                if (this.appliedForParent && discountType !== 2) {
+                    this.mainDiscount = this.productsBundleDiscount;
+                } else if (discountType === 2 &&
+                    this.bundle.conditional_discounts &&
+                    this.bundle.conditional_discounts.length > 0
+                ) {
+                    this.mainDiscount = this.discount;
+                }
+
+                if (discountType === 0) {
+                    if (mainProductPrice > this.mainDiscount) {
+                        this.discountAmount = mainProductPrice + totalPriceWithDiscount - this.mainDiscount;
+                    } else {
+                        this.discountAmount = totalPriceWithDiscount;
+                    }
+
+                    if (mainProductPrice > this.mainDiscount && this.appliedForParent) {
+                        this.discountPercentage = totalPriceWithoutDiscount - totalPriceWithDiscount + this.mainDiscount;
+                    } else if (mainProductPrice > this.mainDiscount && !this.appliedForParent) {
+                        this.discountPercentage = totalPriceWithoutDiscount - totalPriceWithDiscount;
+                    } else if (mainProductPrice < this.mainDiscount && !this.appliedForParent) {
+                        this.discountPercentage = totalPriceWithoutDiscount - totalPriceWithDiscount;
+                    } else {
+                        this.discountPercentage = mainProductPrice + totalPriceWithoutDiscount - totalPriceWithDiscount;
+                    }
+
+                } else {
+                    this.discountAmount = (mainProductPrice * (100 - this.mainDiscount)) / 100 + totalPriceWithDiscount;
+                    this.discountPercentage = (mainProductPrice + totalPriceWithoutDiscount) - this.discountAmount;
+                }
+
+                this.bundle.bundleProducts.forEach(item => {
+                    const checkboxId = item.product.uid;
+
+                    if (this.checkboxes[checkboxId] === false && this.bundle.apply_condition && discountType !== 2) {
+                        this.discountPercentage = 0;
+                        this.discountAmount = mainProductPrice + totalPriceWithoutDiscount
+                    }
+                })
+
+                if (this.checkedItemsNumber < 1) {
+                    this.discountAmount = mainProductPrice;
+                    this.discountPercentage = 0;
+                }
+
+                if (this.discountAmount < 0) {
+                    element.closest(this.selectors.packItemWrapper).classList.remove('selected');
+                }
+            }
+        }
+    }
+</script>

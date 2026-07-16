@@ -1,0 +1,204 @@
+<?php
+
+/**
+ * Mageplaza
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Mageplaza.com license that is
+ * available through the world-wide-web at this URL:
+ * https://www.mageplaza.com/LICENSE.txt
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category    Mageplaza
+ * @package     Mageplaza_Lookbook
+ * @copyright   Copyright (c) Mageplaza (https://www.mageplaza.com/)
+ * @license     https://www.mageplaza.com/LICENSE.txt
+ */
+
+?>
+<?php
+/** @var $block \Mageplaza\Lookbook\Block\Widget */
+$collection = $block->getLookbookCollection();
+$check      = is_array($collection) ? !empty($collection) : $collection->getSize();
+if ($check): ?>
+    <?php
+    $slider        = $block->getSlider();
+    $sliderId      = $slider->getId() . uniqid('-', false);
+    $silderOptions = json_decode($block->getSliderOptions($slider), true);
+    $autoplay      = $silderOptions['autoplay'] ? $silderOptions['autoplaySpeed'] : false;
+    $hoverpause    = $silderOptions['autoplay'] ? $silderOptions['pauseOnHover'] : false;
+    ?>
+    <div class="mp-lookbook-slider-container">
+        <div class="mp-lookbook-slider glide visible block relative">
+            <?php $iterator = 1; ?>
+            <div id="lookbookslider-list-items-<?= /* @noEscape */
+                                                $sliderId ?>" class="glide__track" data-glide-el="track">
+                <ul class="glide__slides flex list-none p-0 m-0">
+                    <?php foreach ($collection as $item): ?>
+                        <li class="glide__slide shrink-0 text-center">
+                            <?= $block->getLayout()->createBlock('Mageplaza\Lookbook\Block\Lookbook')
+                                ->setLookbook($item)
+                                ->setData('isLazyLoad', $block->isLazyLoad($slider))
+                                ->toHtml() ?>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+            <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css">
+            <div class="glide__arrows flex justify-between absolute top-1/2 w-full -translate-y-1/2 z-10" data-glide-el="controls">
+                <button class="glide__arrow glide__arrow--prev w-9 h-9 bg-white border border-[#CCCCCC] rounded-lg flex items-center justify-center absolute top-1/2 hover:border-[#D1AD65] transition left-5" data-glide-dir="<"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 4.7998L7.2 9.5998L12 14.3998" stroke="black" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg></button>
+                <button class="glide__arrow glide__arrow--next w-9 h-9 bg-white border border-[#CCCCCC] rounded-lg flex items-center justify-center absolute top-1/2  hover:border-[#D1AD65] transition right-5" data-glide-dir=">"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7.2 4.7998L12 9.5998L7.2 14.3998" stroke="black" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg></button>
+            </div>
+            <div class="glide__bullets flex justify-center mt-[10px]" data-glide-el="controls[nav]">
+                <?php foreach ($collection->getItems() as $key => $item): ?>
+                    <button class="glide__bullet w-[6px] h-[6px] bg-black rounded-full mx-[5px] cursor-pointer opacity-30" data-glide-dir="=<?php /* @noEscape */ echo $key - 1; ?>"></button>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@glidejs/glide/dist/glide.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var sliders = document.querySelectorAll('.glide');
+            sliders.forEach(function(slider) {
+                var glide = new Glide(slider, {
+                    type: <?= /* @noEscape */ $silderOptions['infinite'] ? "'carousel'" : "'slider'" ?>,
+                    rewind: <?= /* @noEscape */ $silderOptions['infinite'] ? 'true' : 'false' ?>,
+                    bound: true,
+                    focusAt: 0,
+                    autoplay: <?= /* @noEscape */ $autoplay ?: 'false' ?>,
+                    hoverpause: <?= /* @noEscape */ $hoverpause ? 'true' : 'false' ?>,
+                    perView: 5,
+                    gap: 20,
+                    breakpoints: {
+                        2560: {
+                            perView: 5,
+                            gap: 20
+                        },
+                        1400: {
+                            perView: 4,
+                            gap: 15
+                        },
+                        1024: {
+                            perView: 3,
+                            gap: 12
+                        },
+                        768: {
+                            perView: 2,
+                            gap: 10
+                        },
+                        480: {
+                            perView: 1,
+                            gap: 0
+                        }
+                    }
+                });
+
+                glide.on('run', function() {
+                    var activeIndex = glide.index,
+                        bullets = document.querySelectorAll('.glide__bullet'),
+                        currentSlide = slider.querySelectorAll('.glide__slide')[activeIndex],
+                        images = currentSlide.querySelectorAll('img');
+                    bullets.forEach((bullet, index) => {
+                        if (index === activeIndex) {
+                            bullet.classList.add('opacity-100');
+                            bullet.classList.remove('opacity-30');
+                        } else {
+                            bullet.classList.remove('opacity-100');
+                            bullet.classList.add('opacity-30');
+                        }
+                    });
+
+                    images.forEach(function(img) {
+                        if (img.getAttribute('x-data') && !img.hasAttribute('src')) {
+                            img.setAttribute('src', img.getAttribute('data-src'));
+                            img.removeAttribute('data-src');
+                        }
+                    });
+                });
+
+
+                glide.mount();
+                // Set first bullet active on initial load
+                var bullets = slider.querySelectorAll('.glide__bullet');
+                if (bullets.length) {
+                    bullets[0].classList.add('opacity-100');
+                    bullets[0].classList.remove('opacity-30');
+                }
+                                /* ── Fix bullets: hide extras beyond scrollable range ── */
+                var allBullets = slider.querySelectorAll('.glide__bullet');
+                var totalSlides = slider.querySelectorAll('.glide__slide').length;
+                var perView = glide.settings.perView;
+                var visibleBulletCount = totalSlides - perView + 1;
+
+                allBullets.forEach(function(bullet, index) {
+                    if (index >= visibleBulletCount) {
+                        bullet.style.display = 'none';
+                    }
+                });
+
+                /* ── Fix arrows: disable on first/last ── */
+                function updateArrows() {
+                    var prevBtn = slider.querySelector('.glide__arrow--prev');
+                    var nextBtn = slider.querySelector('.glide__arrow--next');
+                    var current = glide.index;
+                    var total = slider.querySelectorAll('.glide__slide').length;
+                    var pv = glide.settings.perView;
+
+                    if (prevBtn) {
+                        if (current === 0) {
+                            prevBtn.setAttribute('disabled', 'disabled');
+                            prevBtn.classList.add('opacity-25', 'pointer-events-none');
+                        } else {
+                            prevBtn.removeAttribute('disabled');
+                            prevBtn.classList.remove('opacity-25', 'pointer-events-none');
+                        }
+                    }
+
+                    if (nextBtn) {
+                        if (current >= total - pv) {
+                            nextBtn.setAttribute('disabled', 'disabled');
+                            nextBtn.classList.add('opacity-25', 'pointer-events-none');
+                        } else {
+                            nextBtn.removeAttribute('disabled');
+                            nextBtn.classList.remove('opacity-25', 'pointer-events-none');
+                        }
+                    }
+                }
+
+                /* Set initial arrow state */
+                updateArrows();
+
+                /* Update on every slide */
+                glide.on('run.after', function() {
+                    updateArrows();
+                });
+
+            });
+        });
+    </script>
+
+    <style>
+        <?php if ($slider->getCustomCss()): ?><?= /* @noEscape */ $slider->getCustomCss() ?><?php endif; ?><?php if (!$silderOptions['arrows']) : ?>.glide__arrows {
+            display: none !important;
+        }
+
+        <?php endif; ?><?php if (!$silderOptions['dots']) : ?>.glide__bullets {
+            display: none !important;
+        }
+
+        <?php endif; ?>.glide__arrow:hover {
+            opacity: 0.65;
+        }
+    </style>
+<?php endif; ?>

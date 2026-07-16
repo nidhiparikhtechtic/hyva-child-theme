@@ -1,0 +1,6 @@
+.hyva_checkout-index-index :where(#hyva-checkout-main) {
+    & .form-checkbox,
+    & .form-radio {
+        @apply w-4 h-4 flex-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-60;
+    }
+}

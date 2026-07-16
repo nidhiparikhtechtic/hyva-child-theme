@@ -1,0 +1,182 @@
+<?php
+
+declare(strict_types=1);
+
+use Magento\Catalog\Block\Product\Image;
+use Magento\Framework\Escaper;
+
+/** @var Image $block */
+/** @var Escaper $escaper */
+
+$product = $block->getProduct();
+$galleryImages = $product->getMediaGalleryImages();
+
+$baseImageUrl = $block->getImageUrl();
+$hoverImageUrl = null;
+
+// Collect all gallery image URLs (original URLs from gallery)
+$galleryUrls = [];
+if ($galleryImages) {
+    foreach ($galleryImages as $image) {
+        $galleryUrls[] = $image->getUrl();
+    }
+}
+
+// Desktop hover image: use 2nd gallery image (index 1), regardless of URL comparison
+if (count($galleryUrls) > 1) {
+    $hoverImageUrl = $galleryUrls[1];
+}
+
+// Mobile images: use base image + remaining gallery images (skip index 0, already shown as base)
+// Cap at 4 total
+$imageUrls = [$baseImageUrl];
+$maxImages = 4;
+
+foreach ($galleryUrls as $index => $url) {
+    if (count($imageUrls) >= $maxImages) {
+        break;
+    }
+    // Skip first gallery image (index 0) — it's the same as the base image
+    if ($index === 0) {
+        continue;
+    }
+    $imageUrls[] = $url;
+}
+$label = $block->getLabel();
+$fallback = $product->getName() . ' - Teakea';
+$imageLabel = $escaper->escapeHtmlAttr($label ?: $fallback);
+$productUrl  = $product->getProductUrl();
+?>
+
+<!-- ================= DESKTOP: HOVER IMAGE ================= -->
+<div class="relative group hidden md:block w-full h-full">
+    <img
+        class="product-image-photo object-contain rounded-lg transition-opacity duration-300 <?= $hoverImageUrl ? 'group-hover:opacity-0' : '' ?>"
+        src="<?= $escaper->escapeUrl($baseImageUrl) ?>"
+        width="315"
+        height="360"
+        decoding="async"
+        loading="eager"
+        fetchpriority="high"
+        alt="<?= $imageLabel ?>"
+        title="<?= $imageLabel ?>" />
+
+    <?php if ($hoverImageUrl): ?>
+        <img
+            class="absolute inset-0 w-full h-full object-contain rounded-lg opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none"
+            src="<?= $escaper->escapeUrl($hoverImageUrl) ?>"
+            width="315"
+            height="360"
+            loading="lazy"
+            decoding="async"
+            alt="<?= $imageLabel ?> - alternate view"
+            title="<?= $imageLabel ?> - alternate view" />
+    <?php endif; ?>
+
+</div>
+
+<!-- ================= MOBILE: IMAGE SLIDER ================= -->
+<?php if (count($imageUrls) > 1): ?>
+    <div
+        class="w-full md:hidden"
+        x-data="{
+        active: 0,
+        startX: 0,
+        startY: 0,
+        moved: false,
+        itemCount: <?= count($imageUrls) ?>,
+
+        onStart(e) {
+            const t = e.touches[0];
+            this.startX = t.clientX;
+            this.startY = t.clientY;
+            this.moved = false;
+        },
+        onMove(e) {
+            const t = e.touches[0];
+            if (
+                Math.abs(t.clientX - this.startX) > 10 ||
+                Math.abs(t.clientY - this.startY) > 10
+            ) {
+                this.moved = true;
+            }
+        },
+        onEnd() {
+            if (!this.moved) {
+                window.location.href = '<?= $escaper->escapeUrl($productUrl) ?>';
+            }
+        },
+        scrollTo(idx) {
+            const slider = this.$refs.slider;
+            const slideWidth = slider.scrollWidth / this.itemCount;
+            slider.scrollLeft = slideWidth * idx;
+            this.active = idx;
+        },
+        onScroll() {
+            const slider = this.$refs.slider;
+            const slideWidth = slider.scrollWidth / this.itemCount;
+            this.active = Math.round(slider.scrollLeft / slideWidth);
+        }
+    }">
+
+        <!-- IMAGE AREA -->
+        <div
+            class="overflow-hidden rounded-lg bg-white aspect-[315/360]"
+            @touchstart="onStart"
+            @touchmove="onMove"
+            @touchend="onEnd">
+            <div
+                class="w-full h-full max-w-[315px] max-h-[360px] flex flex-nowrap overflow-x-auto snap-x snap-mandatory scrollbar-hide"
+                x-ref="slider"
+                @scroll.debounce="onScroll">
+                <?php foreach ($imageUrls as $index => $imageUrl): ?>
+                    <div class="w-full h-full shrink-0 snap-start flex items-center justify-center">
+                        <img
+                            src="<?= $escaper->escapeUrl($imageUrl) ?>"
+                            class="w-full h-full object-contain"
+                            width="315"
+                            height="360"
+                            <?= $index === 0 ? 'loading="eager" fetchpriority="high"' : 'loading="lazy"' ?>
+                            alt="<?= $imageLabel ?> - view <?= $index + 1 ?>"
+                            title="<?= $imageLabel ?> - view <?= $index + 1 ?>"
+                            draggable="false" />
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+
+        <!-- DOTS (BELOW IMAGE) -->
+        <div class="flex justify-center gap-1.5 mt-1 mb-2.5">
+            <?php foreach ($imageUrls as $index => $imageUrl): ?>
+                <button
+                    type="button"
+                    class="w-2 h-2 rounded-full transition-all"
+                    :class="active === <?= $index ?>
+                    ? 'bg-gray-900'
+                    : 'bg-gray-300'"
+                    @click="scrollTo(<?= $index ?>)"
+                    aria-label="View image <?= $index + 1 ?>"></button>
+            <?php endforeach; ?>
+        </div>
+    </div>
+
+<?php else: ?>
+    <!-- Mobile single image -->
+    <div class="md:hidden">
+        <img
+            src="<?= $escaper->escapeUrl($baseImageUrl) ?>"
+            class="w-full object-contain rounded-lg"
+            width="315"
+            height="360"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+            alt="<?= $imageLabel ?>"
+            title="<?= $imageLabel ?>" />
+    </div>
+<?php endif; ?>
+
+<?= $block->getLayout()->createBlock(\Magento\Framework\View\Element\Template::class)
+    ->setTemplate('Magento_Catalog::product/list/plp_badges.phtml')
+    ->setData('product', $product)
+    ->toHtml() ?>

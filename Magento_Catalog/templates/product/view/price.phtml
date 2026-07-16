@@ -1,0 +1,275 @@
+<?php
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\ProductPage;
+use Hyva\Theme\ViewModel\ProductPrice;
+use Magento\Catalog\Block\Product\AbstractProduct;
+use Magento\Catalog\Model\Product;
+use Magento\Catalog\Pricing\Price\FinalPrice;
+use Magento\Catalog\Pricing\Price\RegularPrice;
+use Magento\Catalog\Pricing\Price\TierPrice;
+use Magento\Framework\Escaper;
+use Magento\Framework\Pricing\Render;
+use Magento\Msrp\Pricing\Price\MsrpPrice;
+use Magento\Tax\Model\Config;
+
+/** @var AbstractProduct $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+/** @var Product $product */
+$product = $block->getProduct();
+
+/** @var ProductPrice $productPriceViewModel */
+$productPriceViewModel = $viewModels->require(ProductPrice::class);
+
+/** @var ProductPage $productViewModel */
+$productViewModel = $viewModels->require(ProductPage::class);
+
+$regularPrice = $productPriceViewModel->getPriceValue(RegularPrice::PRICE_CODE, $product);
+$finalPrice = $productPriceViewModel->getPriceValue(FinalPrice::PRICE_CODE, $product);
+$tierPrices = $productPriceViewModel->getTierPrices(TierPrice::PRICE_CODE, $product);
+
+if ($productPriceViewModel->displayPriceInclAndExclTax()) {
+    $regularPriceExclTax = $productPriceViewModel->getPriceValueExclTax(RegularPrice::PRICE_CODE, $product);
+    $finalPriceExclTax = $productPriceViewModel->getPriceValueExclTax(FinalPrice::PRICE_CODE, $product);
+}
+
+$displayTax = $productPriceViewModel->displayPriceIncludingTax();
+
+$specialToDate = $product->getSpecialToDate();
+$formatLong = $block->getDateFormat() ?: \IntlDateFormatter::LONG;
+
+// MSRP check (keep as is)
+if ($msrpPrice = iterator_to_array($product->getPriceInfo()->getPrices())[MsrpPrice::PRICE_CODE] ?? null) {
+    if ($msrpPrice->canApplyMsrp($product) && $msrpPrice->isMinimalPriceLessMsrp($product)) {
+        if (! ($priceRender = $block->getLayout()->getBlock('product.price.render.default'))) {
+            $priceRender = $block->getLayout()->createBlock(
+                Render::class,
+                'product.price.render.default',
+                ['data' => ['price_render_handle' => 'catalog_product_prices']]
+            );
+        }
+        echo $priceRender->render(FinalPrice::PRICE_CODE, $product);
+        return;
+    }
+}
+?>
+
+<!-- Override Hyvä formatPrice globally -->
+<script>
+    hyva.formatPrice = function(price) {
+        // Ensure price is a number with decimals
+        price = Number(price).toFixed(2);
+
+        // Replace decimal dot with comma (Dutch format)
+        price = price.replace('.', ',');
+
+        // Remove thousand separator completely
+        price = price.replace(/\B(?=(\d{3})+(?!\d))/g, '');
+
+        return '€' + price;
+    };
+</script>
+
+
+<script>
+    function initPrice<?= (int)$product->getId() ?>() {
+        const regularPriceInclTaxKey = 'oldPrice',
+            regularPriceExclTaxKey = 'baseOldPrice',
+            finalPriceInclTaxKey = 'finalPrice',
+            finalPriceExclTaxKey = 'basePrice';
+
+        function calculateCustomOptionPrices(activeCustomOptions, customOptionPrices) {
+            return activeCustomOptions.reduce((acc, id) => acc + (customOptionPrices[id] || 0), 0);
+        }
+
+        return {
+            regularPriceKey: <?= $displayTax ? 'regularPriceInclTaxKey' : 'regularPriceExclTaxKey' ?>,
+            finalPriceKey: <?= $displayTax ? 'finalPriceInclTaxKey' : 'finalPriceExclTaxKey' ?>,
+            activeProductsPriceData: false,
+            initialFinalPrice: <?= (float)$finalPrice ?>,
+            calculatedFinalPrice: false,
+            calculatedFinalPriceWithCustomOptions: false,
+            initialTierPrices: <?= json_encode($tierPrices) ?>,
+            showRegularPriceLabel: <?= ($finalPrice < $regularPrice) ? 'true' : 'false' ?>,
+            customOptionPrices: [],
+            <?php if ($productPriceViewModel->displayPriceInclAndExclTax()): ?>
+                initialBasePrice: <?= (float)$finalPriceExclTax ?>,
+                calculatedBasePrice: false,
+                customOptionBasePrices: [],
+                calculatedBasePriceWithCustomOptions: false,
+            <?php endif; ?>
+            activeCustomOptions: [],
+            qty: 1,
+            updateCustomOptionActive(data) {
+                const idx = this.activeCustomOptions.indexOf(data.customOptionId);
+                if (data.active && idx === -1) this.activeCustomOptions.push(data.customOptionId);
+                else if (!data.active && idx > -1) this.activeCustomOptions.splice(idx, 1);
+                this.calculateFinalPriceWithCustomOptions();
+            },
+            updateCustomOptionPrices(prices, basePrices) {
+                if (prices) this.customOptionPrices = prices;
+                <?php if ($productPriceViewModel->displayPriceInclAndExclTax()): ?>
+                    if (basePrices) this.customOptionBasePrices = basePrices;
+                <?php endif; ?>
+                this.calculateFinalPriceWithCustomOptions();
+            },
+            calculateFinalPrice() {
+                const getOptionTierPrice = (tierPrice, withTax) => {
+                    <?php if ($product->getTypeId() === 'configurable' && $productPriceViewModel->getPriceDisplayType() === Config::DISPLAY_TYPE_EXCLUDING_TAX): ?>
+                        return tierPrice['price'];
+                    <?php else: ?>
+                        return tierPrice[withTax ? 'price' : 'basePrice'];
+                    <?php endif; ?>
+                }
+
+                const findApplicableTierPrice = (initialPrice, withTax) => {
+                    if (this.activeProductsPriceData?.tierPrices) {
+                        return this.activeProductsPriceData.tierPrices.reduce((acc, tierPrice) => {
+                            const tier = getOptionTierPrice(tierPrice, withTax);
+                            return this.qty >= tierPrice.qty && tier < acc ? tier : acc;
+                        }, this.activeProductsPriceData[withTax ? finalPriceInclTaxKey : finalPriceExclTaxKey].amount);
+                    } else {
+                        const key = withTax ? 'price_incl_tax' : 'price_excl_tax';
+                        return Object.values(this.initialTierPrices).reduce((acc, tierPrice) => {
+                            return this.qty >= tierPrice.price_qty && tierPrice[key] < acc ? tierPrice[key] : acc;
+                        }, initialPrice);
+                    }
+                }
+
+                this.calculatedFinalPrice = findApplicableTierPrice(this.initialFinalPrice, <?= $displayTax ? 'true' : 'false' ?>);
+                <?php if ($productPriceViewModel->displayPriceInclAndExclTax()): ?>
+                    this.calculatedBasePrice = findApplicableTierPrice(<?= (float)$finalPriceExclTax ?>, false);
+                <?php endif; ?>
+            },
+            calculateFinalPriceWithCustomOptions() {
+                const finalPrice = this.calculatedFinalPrice || this.initialFinalPrice;
+                this.calculatedFinalPriceWithCustomOptions = finalPrice + this.getCustomOptionPrice();
+                <?php if ($productPriceViewModel->displayPriceInclAndExclTax()): ?>
+                    const basePrice = this.calculatedBasePrice || this.initialBasePrice;
+                    this.calculatedBasePriceWithCustomOptions = basePrice + this.getCustomOptionBasePrice();
+                <?php endif; ?>
+            },
+            getCustomOptionPrice() {
+                return calculateCustomOptionPrices(this.activeCustomOptions, this.customOptionPrices);
+            },
+            <?php if ($productPriceViewModel->displayPriceInclAndExclTax()): ?>
+                getCustomOptionBasePrice() {
+                    return calculateCustomOptionPrices(this.activeCustomOptions, this.customOptionBasePrices);
+                },
+            <?php endif; ?>
+            getFormattedFinalPrice() {
+                const price = this.calculatedFinalPriceWithCustomOptions || this.calculatedFinalPrice || this.initialFinalPrice;
+                return hyva.formatPrice(price);
+            },
+            <?php if ($productPriceViewModel->displayPriceInclAndExclTax()): ?>
+                getFormattedBasePrice() {
+                    const price = this.calculatedBasePriceWithCustomOptions || this.calculatedBasePrice || this.initialBasePrice;
+                    return hyva.formatPrice(price);
+                },
+            <?php endif; ?>
+            isPriceHidden() {
+                const price = this.calculatedFinalPriceWithCustomOptions || this.calculatedFinalPrice || this.initialFinalPrice;
+                return price === 0;
+            },
+            eventListeners: {
+                ['@update-prices-<?= (int)$product->getId() ?>.window'](event) {
+                    this.activeProductsPriceData = event.detail;
+                    this.calculateFinalPrice();
+                    this.calculateFinalPriceWithCustomOptions();
+                },
+                ['@update-qty-<?= (int)$product->getId() ?>.window'](event) {
+                    this.qty = event.detail;
+                    this.calculateFinalPrice();
+                    this.calculateFinalPriceWithCustomOptions();
+                },
+                ['@update-custom-option-active.window'](event) {
+                    this.updateCustomOptionActive(event.detail);
+                },
+                ['@update-custom-option-prices.window'](event) {
+                    this.updateCustomOptionPrices(event.detail);
+                },
+                <?php if ($productPriceViewModel->displayPriceInclAndExclTax()): ?>['@update-custom-option-base-prices.window'](event) {
+                        this.updateCustomOptionPrices(null, event.detail);
+                    }
+                <?php endif; ?>
+            }
+        }
+    }
+</script>
+
+<div x-data="initPrice<?= (int)$product->getId() ?>()"
+    x-bind="eventListeners"
+    class="price-box price-final_price">
+    <div x-show="!activeProductsPriceData && !isPriceHidden()" class="flex flex-col price-container gap-x-1.5">
+        <div class="flex gap-x-1.5 items-center">
+            <?php if ($finalPrice < $regularPrice): ?>
+                <div class="old-price flex items-center gap-x-1">
+                    <span class="price price-wrapper title-font font-normal text-sm sm:text-base line-through text-teakea-gray"><?= $escaper->escapeHtml(__('Van')) ?></span>
+                    <span class="price-wrapper title-font font-normal text-sm sm:text-base line-through text-teakea-gray">
+                        <span class="price" x-html="hyva.formatPrice(<?= (float)$regularPrice ?>)"><?= (float)$regularPrice ?></span>
+                    </span>
+                </div>
+                <?php if ($productPriceViewModel->displayPriceInclAndExclTax()): ?>
+                    <div class="old-price-excl-tax">
+                        <span class="price price-wrapper title-font font-normal text-sm sm:text-base line-through text-teakea-gray"><?= $escaper->escapeHtml(__('Van')) ?></span>
+                        <span class="font-regular font-normal text-sm sm:text-base line-through text-teakea-gray">
+                            <span><?= $escaper->escapeHtml(__('Excl. Tax')) ?>:</span>
+                            <span class="price" x-html="hyva.formatPrice(<?= (float)$regularPriceExclTax ?>)"><?= (float)$regularPriceExclTax ?></span>
+                        </span>
+                    </div>
+                <?php endif; ?>
+            <?php endif; ?>
+
+            <div class="final-price flex gap-x-1 min-h-7 lg:min-h-8" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                <span class="price price-wrapper title-font items-center font-extrabold hidden md:flex md:text-xl lg:text-2xl text-teakea-terracotta"><?= $escaper->escapeHtml(__('Voor')) ?></span>
+                <span id="product-price-<?= (int)$product->getId() ?>"
+                    class="price-wrapper title-font flex items-center font-extrabold text-xl lg:text-2xl text-teakea-terracotta">
+                    <span class="price" x-html="getFormattedFinalPrice()"><?= (float)$finalPrice ?></span>
+                </span>
+                <meta itemprop="price" content="<?= $escaper->escapeHtmlAttr($finalPrice) ?>">
+                <meta itemprop="priceCurrency" content="<?= $escaper->escapeHtmlAttr($productViewModel->getCurrencyData()['code']) ?>">
+            </div>
+
+            <?php if ($productPriceViewModel->displayPriceInclAndExclTax()): ?>
+                <div class="final-price-excl-tax">
+                    <span class="price price-wrapper title-font hidden md:flex items-center font-extrabold md:text-xl lg:text-2xl text-teakea-terracotta"><?= $escaper->escapeHtml(__('Voor')) ?></span>
+                    <span class="font-extrabold text-xl lg:text-2xl text-teakea-terracotta">
+                        <span><?= $escaper->escapeHtml(__('Excl. Tax')) ?>:</span>
+                        <span class="price" x-html="getFormattedBasePrice()"><?= (float)$finalPriceExclTax ?></span>
+                    </span>
+                </div>
+            <?php endif; ?>
+
+            <?php if ($finalPrice < $regularPrice): ?>
+                <?php
+                $discountPercent = round((($regularPrice - $finalPrice) / $regularPrice) * 100);
+                ?>
+                <div class="flex items-center px-2 sm:px-2.5 h-6 bg-teakea-terracotta text-white text-xs sm:text-sm rounded-lg">
+                    <?= $escaper->escapeHtml(__('-%1% Korting', $discountPercent)) ?>
+                </div>
+
+            <?php endif; ?>
+        </div>
+
+        <?php if ($finalPrice < $regularPrice && $specialToDate):
+            // Use Magento locale date format (LONG = "8 november 2025" in NL)
+            $formatLong = $block->getDateFormat() ?: \IntlDateFormatter::LONG;
+            $dateLocalized = $block->formatDate($specialToDate, $formatLong);
+
+            // Capitalize first character only (works for UTF-8/Dutch)
+            $dateLocalized = mb_strtoupper(mb_substr($dateLocalized, 0, 1, 'UTF-8'), 'UTF-8')
+                . mb_substr($dateLocalized, 1, null, 'UTF-8');
+
+        ?>
+            <div class="flex gap-x-1.5 items-center text-left">
+                <div class="flex flex-row text-sm text-teakea-gray capitalize">
+                    <?= $escaper->escapeHtml(__('Promotional price valid until %1', $dateLocalized)) ?>
+                </div>
+            </div>
+        <?php endif; ?>
+
+    </div>
+</div>

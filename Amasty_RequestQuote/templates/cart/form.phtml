@@ -1,0 +1,123 @@
+<?php
+
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Request a Quote Hyva Compatibility
+ */
+
+use Amasty\RequestQuote\Block\Cart\Grid;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Cart\ItemOutput;
+use Magento\Framework\Escaper;
+
+/**  @var Grid $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var Escaper $escaper */
+
+$cartItemOutputViewModel = $viewModels->require(ItemOutput::class);
+?>
+<?php $mergedCells = ($cartItemOutputViewModel->isItemPriceDisplayBoth() ? 2 : 1) ?>
+<?= $block->getChildHtml('form_before') ?>
+
+<form action="<?= $escaper->escapeUrl($block->getUrl('amasty_quote/cart/updatePost')) ?>"
+    x-data="requestQuoteCart"
+    @submit.prevent="quoteCartSubmit"
+    method="post"
+    id="amasty-quote-update"
+    class="form form-cart w-full float-left">
+    <?= $block->getBlockHtml('formkey') ?>
+    <div class="amasty-quote cart grid-wrapper<?= $mergedCells == 2 ? ' detailed' : '' ?>">
+        <?php if ($block->getPagerHtml()): ?>
+            <div class="cart-products-toolbar cart-products-toolbar-top toolbar">
+                <?= $block->getPagerHtml() ?>
+            </div>
+        <?php endif ?>
+
+        <!-- Amasty Quote Items -->
+        <div id="shopping-cart-table" class="cart items data grid w-full">
+            <div class="cart-body flex flex-col gap-3">
+                <?php foreach ($block->getItems() as $item): ?>
+                    <div class="card-wrap p-4 sm:p-5 rounded-lg bg-white shadow-[0_1px_0_rgba(30,77,43,0.04),0_2px_8px_-2px_rgba(30,77,43,0.06)]">
+                        <?= $block->getItemHtml($item) ?>
+                    </div>
+                <?php endforeach ?>
+            </div>
+        </div>
+
+        <?php if ($block->getPagerHtml()): ?>
+            <div class="cart-products-toolbar cart-products-toolbar-bottom toolbar">
+                <?= $block->getPagerHtml() ?>
+            </div>
+        <?php endif ?>
+    </div>
+    <div class="cart actions flex flex-col sm:flex-row justify-end gap-4 items-center my-4 lg:mt-4 lg:mb-0">
+        <button type="submit"
+            @click="clearQuote"
+            title="<?= $escaper->escapeHtmlAttr(__('Clear Quote')) ?>"
+            class="action clear-quote btn btn-secondary" id="empty_cart_button">
+            <span><?= $escaper->escapeHtml(__('Clear Quote')) ?></span>
+        </button>
+
+        <button type="submit"
+            @click="updateQuote"
+            title="<?= $escaper->escapeHtmlAttr(__('Update Quote')) ?>"
+            class="action update btn btn-secondary">
+            <?= $escaper->escapeHtml(__('Update Quote')) ?>
+        </button>
+
+        <input x-ref="updateCartAction" type="hidden" value="" id="update_cart_action" name="update_cart_action" />
+    </div>
+</form>
+
+<?= $block->getChildHtml('checkout.cart.order.actions') ?>
+<?= $block->getChildHtml('shopping.cart.table.after') ?>
+
+<script type="application/json" id="amasty-quote-checkout-config">
+    <?= /* @noEscape */ $block->getSerializedCheckoutConfig() ?>
+</script>
+<?php isset($hyvaCsp) && $hyvaCsp->registerInlineScript() ?>
+
+<script>
+    if (!window.checkoutConfig) {
+        try {
+            var config = JSON.parse(document.getElementById('amasty-quote-checkout-config').textContent);
+            window.checkoutConfig = config;
+            window.customerData = window.checkoutConfig.customerData;
+            window.isCustomerLoggedIn = window.checkoutConfig.isCustomerLoggedIn;
+        } catch (e) {
+            console.error('Error parsing checkout config', e);
+        }
+    }
+
+    function requestQuoteCart() {
+        return {
+            clearQuote() {
+                return this.$refs.updateCartAction.value = 'empty_cart'
+            },
+
+            updateQuote() {
+                return this.$refs.updateCartAction.value = 'update_qty'
+            },
+
+            quoteCartSubmit() {
+                return hyva.postQuote(this.$event.target)
+            },
+
+            removeItem() {
+                hyva.postForm(JSON.parse(this.$el.dataset.deletePostJson));
+            }
+        }
+    }
+
+    window.addEventListener(
+        'alpine:init',
+        () => Alpine.data(
+            'requestQuoteCart',
+            requestQuoteCart
+        ), {
+            once: true
+        }
+    );
+</script>
+<?php isset($hyvaCsp) && $hyvaCsp->registerInlineScript() ?>

@@ -1,0 +1,212 @@
+<?php
+
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Request a Quote Hyva Compatibility
+ */
+
+use Amasty\RequestQuoteHyva\ViewModel\Cart\Item;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Checkout\Block\Cart\Item\Renderer;
+use Magento\Framework\Escaper;
+
+/** @var Renderer $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var Escaper $escaper */
+
+$item = $block->getItem();
+$product = $item->getProduct();
+$isVisibleProduct = $product->isVisibleInSiteVisibility();
+$itemViewModel = $viewModels->require(Item::class);
+$sku = $product->getSku();
+?>
+<div class="cart item">
+    <div class="item-info text-left lg:text-right flex flex-col gap-2.5">
+        <div class="flex flex-row w-full gap-x-4">
+
+            <div data-th="<?= $escaper->escapeHtml(__('Item')) ?>" class="item flex text-left w-full">
+                <div class="flex sm:flex-row gap-x-2 md:gap-x-4 gap-y-4 w-full" x-cloak>
+                    <div class="flex flex-row gap-x-2 w-fit">
+
+                        <?php if ($block->hasProductUrl()): ?>
+                            <a href="<?= $escaper->escapeUrl($block->getProductUrl()) ?>"
+                                title="<?= $escaper->escapeHtmlAttr($block->getProductName()) ?>"
+                                tabindex="-1"
+                                class="product-item-photo shrink-0 flex w-fit justify-center bg-white">
+                            <?php else: ?>
+                                <span class="product-item-photo shrink-0">
+                                <?php endif; ?>
+                                <?= $block->getImage($block->getProductForThumbnail(), 'cart_page_product_thumbnail')
+                                    ->setTemplate('Magento_Catalog::product/image.phtml')
+                                    ->toHtml() ?>
+                                <?php if ($block->hasProductUrl()): ?>
+                            </a>
+                        <?php else: ?>
+                            </span>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="flex flex-col gap-y-2 justify-between w-full">
+                        <div class="product-item-details sm:flex gap-2.5 justify-between">
+                            <strong class="product-item-name break-all flex">
+                                <?php if ($block->hasProductUrl()): ?>
+                                    <a class="text-base text-teak-ink line-clamp-2 font-medium leading-snug hover:text-teak-green"
+                                        href="<?= $escaper->escapeUrl($block->getProductUrl()) ?>"><?= $escaper->escapeHtml($block->getProductName()) ?></a>
+                                <?php else: ?>
+                                    <?= $escaper->escapeHtml($block->getProductName()) ?>
+                                <?php endif; ?>
+                            </strong>
+
+                            <?php if ($messages = $block->getMessages()): ?>
+                                <?php foreach ($messages as $message): ?>
+                                    <div class="cart item message <?= $escaper->escapeHtmlAttr($message['type']) ?>">
+                                        <div><?= $escaper->escapeHtml($message['text']) ?></div>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="flex flex-wrap gap-2 items-start text-sm">
+                            <?php if ($sku): ?>
+                                <div class="text-teak-muted">
+                                    <span class="uppercase"><?= __('Sku: ') ?></span>
+                                    <span><?= $escaper->escapeHtml($sku) ?></span>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+
+                        <?php if ($options = $block->getOptionList()): ?>
+                            <ul class="mt-1 space-y-1 text-xs bg-teak-stone-light border border-[#F0F0F0] rounded-lg p-2.5 max-w-max">
+                                <?php foreach ($options as $option): ?>
+                                    <?php $formattedOptionValue = $block->getFormatedOptionValue($option) ?>
+                                    <li class="leading-tight">
+
+                                        <?php if (isset($formattedOptionValue['full_view'])): ?>
+                                            <span class="text-[#6B6B6B]">
+                                                <?= $escaper->escapeHtml($formattedOptionValue['full_view']) ?>
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="text-[#6B6B6B]">
+                                                <?= $escaper->escapeHtml($formattedOptionValue['value'], ['span', 'a']) ?>
+                                            </span>
+                                        <?php endif; ?>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php endif; ?>
+
+
+                        <div x-cloak x-data="{isVisible: $el.querySelector('.add-note textarea').value.trim().length > 0 }">
+                            <button @click.prevent="isVisible = true"
+                                x-show="!isVisible"
+                                role="button"
+                                class="add-note-quote text-sm text-teak-gold hover:underline hover:cursor-pointer">
+                                <?= $escaper->escapeHtml(__('Add Note')) ?>
+                            </button>
+                            <div class="add-note" x-show="isVisible">
+                                <div class="control">
+                                    <textarea id="cart-<?= $escaper->escapeHtmlAttr($item->getId()) ?>-note"
+                                        name="cart[<?= $escaper->escapeHtmlAttr($item->getId()) ?>][note]"
+                                        class="form-input w-full text-sm border border-teakea-light-gray rounded-lg focus:outline-none focus:ring-0 shadow-none"
+                                        aria-label="<?= $escaper->escapeHtml(__('Add Note')) ?>"
+                                        rows="3"
+                                        cols="25"><?= $escaper->escapeHtml($itemViewModel->retrieveCustomerNote($item->getAdditionalData())) ?></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start flex-col md:flex-row gap-2.5 cart-card-prices text-lg md:text-xl text-teak-ink leading-none font-garamond">
+
+                            <?php if ((float) $item->getPrice() || $itemViewModel->isAllowCustomizePrice()): ?>
+                                <?= $block->getRowTotalHtml($item) ?>
+                            <?php else: ?>
+                                <?= $escaper->escapeHtml(__('N/A')) ?>
+                            <?php endif; ?>
+                            <span x-cloak class="flex flex-row items-center unit-price">
+                                <span
+                                    class="flex items-center flex-col-reverse md:flex-row-reverse gap-1.5 text-base text-teak-muted font-normal"
+                                    x-data="{ qty: <?= (int)$block->getQty() ?> }"
+                                    x-show="qty > 1">
+                                    <?= $block->getUnitPriceHtml($item) ?> <?= $escaper->escapeHtml(__('Each')) ?>
+                                </span>
+                            </span>
+                        </div>
+
+                        <?php $addInfoBlock = $block->getProductAdditionalInformationBlock(); ?>
+                        <?php if ($addInfoBlock): ?>
+                            <?= $addInfoBlock->setItem($item)->toHtml() ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-row gap-1 md:gap-2.5 justify-between px-2 md:px-4 items-center border-t border-hair pt-3 mt-1">
+
+
+            <div class="qty flex justify-center items-center text-center w-fit h-fit">
+                <div class="qty flex items-center justify-center gap-1 md:gap-x-1.5 mt-0 border border-teak-muted rounded-lg">
+
+                    <button type="button"
+                        x-cloak
+                        class="qty-btn decrease p-1 relative overflow-hidden transition ease-in-out duration-300 rounded-md group"
+                        aria-label="<?= $escaper->escapeHtmlAttr(__('Decrease Quantity')) ?>"
+                        onclick="updateQty('cart-<?= $escaper->escapeHtmlAttr($item->getId()) ?>-qty', -1)">
+
+                        <span
+                            class="absolute inset-0 md:scale-0 transition-transform md:duration-300"></span>
+
+                        <span class="relative text-teak-ink">
+                            <svg class="w-4 h-4" viewBox="0 0 24 25" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20 12.5H4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </span>
+                    </button>
+
+
+                    <div class="control qty">
+                        <label class="mb-0"
+                            for="cart-<?= $escaper->escapeHtmlAttr($item->getId()) ?>-qty">
+                            <span class="label sr-only"><?= $escaper->escapeHtml(__('Qty')) ?></span>
+                            <input id="cart-<?= $escaper->escapeHtmlAttr($item->getId()) ?>-qty"
+                                name="cart[<?= $escaper->escapeHtmlAttr($item->getId()) ?>][qty]"
+                                value="<?= $escaper->escapeHtmlAttr($block->getQty()) ?>"
+                                type="number"
+                                x-cloak
+                                size="4"
+                                step="1"
+                                title="<?= $escaper->escapeHtmlAttr(__('Qty')) ?>"
+                                class="qty no-spinner w-10 h-9 text-sm text-center text-teak-ink font-medium border-none shadow-none"
+                                required="required"
+                                min="0"
+                                data-role="cart-item-qty"
+                                x-on:change.debounce.100ms="$event.target.form && $event.target.form.dispatchEvent(new Event('submit', { cancelable: true }));" />
+                        </label>
+                    </div>
+
+
+                    <button type="button"
+                        x-cloak
+                        class="qty-btn increase p-1 relative overflow-hidden transition ease-in-out duration-300 rounded-md group"
+                        aria-label=" <?= $escaper->escapeHtmlAttr(__('Increase Quantity')) ?>"
+                        onclick="updateQty('cart-<?= $escaper->escapeHtmlAttr($item->getId()) ?>-qty', 1)">
+
+                        <span
+                            class="absolute inset-0 md:scale-0 transition-transform md:duration-300"></span>
+                        <span class="relative text-teak-ink">
+                            <svg class="w-4 h-4" viewBox="0 0 24 25" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 4.5V20.5M20 12.5L4 12.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </span>
+                    </button>
+                </div>
+            </div>
+            <div class="item-actions">
+                <div class="gap-y-3 flex flex-row justify-center gap-x-1.5 items-center"
+                    x-cloak><?= /* @noEscape */
+                            $block->getActions($item) ?></div>
+            </div>
+        </div>
+    </div>
+</div>

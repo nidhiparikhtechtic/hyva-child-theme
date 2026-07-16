@@ -1,0 +1,54 @@
+<?php
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\CurrentProduct;
+use Magento\Catalog\Model\Product;
+use Hyva\Theme\ViewModel\ProductPrice;
+use Magento\Catalog\Pricing\Price\FinalPrice;
+use Magento\Framework\Escaper;
+
+/** @var \Magento\Framework\View\Element\Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var CurrentProduct $currentProduct */
+$currentProduct = $viewModels->require(CurrentProduct::class);
+
+/** @var ProductPrice $productPriceViewModel */
+$productPriceViewModel = $viewModels->require(ProductPrice::class);
+
+
+/** @var Product $product */
+$product = $block->getData('product') ?: $currentProduct->get();
+
+if (!$product || !$product->getId()) {
+    return;
+}
+
+$finalPrice = $productPriceViewModel->getPriceValue(FinalPrice::PRICE_CODE, $product);
+?>
+
+<script>
+    if (!window.gtmTrackedEvents) window.gtmTrackedEvents = {};
+
+    if (!window.gtmTrackedEvents['view_item']) {
+        window.gtmTrackedEvents['view_item'] = true;
+
+        window.dataLayer = window.dataLayer || [];
+
+        window.dataLayer.push({
+            event: "view_item",
+            ecommerce: {
+                items: [{
+                    item_name: "<?= $escaper->escapeJs($product->getName()) ?>",
+                    item_id: "<?= $product->getId() ?>",
+                    price: "<?= (float)$finalPrice ?>",
+                    item_category: "<?= implode(',', $product->getCategoryIds()) ?>",
+                    item_list_name: "Product Page"
+                }]
+            }
+        });
+    }
+</script>

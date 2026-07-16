@@ -1,0 +1,31 @@
+.snap {
+    -ms-scroll-snap-type: x mandatory;
+    scroll-snap-type: x mandatory;
+    -ms-overflow-style: none;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    & > div {
+        scroll-snap-align: start;
+    }
+}
+
+.home-slider .price-box.price-final_price {
+    @apply flex gap-x-1.5 flex-col-reverse md:flex-row-reverse justify-end items-baseline;
+}
+
+.minimal-price-link {
+    @apply flex items-center;
+}
+
+.old-price {
+    @apply gap-x-1;
+}
+
+.old-price .price-container{
+    @apply line-through;
+}

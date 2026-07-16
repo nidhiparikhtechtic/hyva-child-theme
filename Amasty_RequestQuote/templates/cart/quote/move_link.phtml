@@ -1,0 +1,27 @@
+<?php
+
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Request a Quote Hyva Compatibility
+ */
+
+use Amasty\RequestQuote\Block\Cart\Quote\Move;
+use Magento\Framework\Escaper;
+
+/** @var Move $block */
+/** @var Escaper $escaper */
+
+$formData = json_decode($block->getPostData(), true);
+?>
+<form action="<?= $escaper->escapeUrl($formData['action']) ?>" method="post">
+    <?= $block->getBlockHtml('formkey'); ?>
+    <input type="hidden" name="data" value='<?=
+                                            /** @noEscape */
+                                            json_encode($formData['data']) ?>' />
+    <button type="submit"
+        class="amquote-addto-button amasty-quote-link w-full btn btn-secondary rounded-lg text-base font-semibold py-4 px-6 my-4 checkout justify-center text-center"
+        title="<?= $escaper->escapeHtmlAttr(__('Request a Quote')) ?>">
+        <?= $escaper->escapeHtml(__('Request a Quote')) ?>
+    </button>
+</form>

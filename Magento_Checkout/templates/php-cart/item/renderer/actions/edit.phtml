@@ -1,0 +1,45 @@
+<?php
+
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsSolid;
+use Magento\Checkout\Block\Cart\Item\Renderer\Actions\Edit;
+use Magento\Framework\Escaper;
+
+/** @var Edit $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var HeroiconsSolid $heroicons */
+$heroicons = $viewModels->require(HeroiconsSolid::class);
+$item = $block->getItem();
+
+if ($item->getProductType() === 'configurable') {
+    $productOptions = $item->getProduct()->getTypeInstance()->getOrderOptions($item->getProduct());
+    $productName = $productOptions["simple_name"];
+} else {
+    $productName = $item->getName();
+}
+?>
+<?php if ($block->isProductVisibleInSiteVisibility()): ?>
+    <a
+        class="flex items-center gap-1 text-xs action action-edit text-teak-muted hover:text-teak-green leading-4 relative overflow-hidden transition ease-in-out duration-300 group"
+        href="<?= $escaper->escapeUrl($block->getConfigureUrl()) ?>"
+        aria-label="<?= $escaper->escapeHtmlAttr(__('Edit %1', $productName)) ?>">
+        <!-- <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10.0312 5.23541C10.4438 5.99982 10.9664 6.70111 11.584 7.31647V7.31744C12.1992 7.9352 12.9007 8.45841 13.665 8.87115L8.29785 14.2403C7.82205 14.7161 7.61797 14.9179 7.39746 15.0899L7.39648 15.0909C7.19551 15.2479 6.98177 15.3877 6.75781 15.5098L6.53125 15.626C6.40493 15.6861 6.27398 15.7393 6.09473 15.8038L5.36719 16.0508L2.06934 17.1505L2.06836 17.1514C2.02429 17.1661 1.97686 17.1679 1.93164 17.1573C1.88631 17.1466 1.84445 17.1238 1.81152 17.0909C1.77862 17.058 1.75577 17.0161 1.74512 16.9708C1.73449 16.9255 1.73716 16.8782 1.75195 16.834V16.8331L2.85156 13.5352C3.06428 12.8971 3.15642 12.6247 3.27637 12.3721C3.42297 12.0648 3.603 11.7744 3.8125 11.5059C3.98461 11.2852 4.18692 11.0807 4.66309 10.6046L10.0312 5.23541ZM14.1113 2.22076C14.7929 2.22079 15.4467 2.49174 15.9287 2.97369C16.4107 3.45565 16.6816 4.10949 16.6816 4.79108C16.6816 5.47267 16.4106 6.12646 15.9287 6.60846L15.4854 7.05084C14.6669 6.72383 13.9221 6.23339 13.2988 5.60651L13.2969 5.60358L13.0439 5.33795C12.5363 4.77253 12.1334 4.12125 11.8516 3.4151L12.2939 2.97369C12.7759 2.49179 13.4297 2.22076 14.1113 2.22076Z" stroke="#0A0A0A" stroke-width="1.21154" />
+        </svg> -->
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"></path>
+        </svg>
+        <?= __('Update') ?>
+    </a>
+<?php endif ?>

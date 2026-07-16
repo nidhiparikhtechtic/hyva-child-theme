@@ -1,0 +1,191 @@
+<?php
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\StoreConfig;
+use Magento\Checkout\Block\Cart\Totals;
+use Magento\Framework\Escaper;
+
+/** @var Escaper $escaper */
+/** @var Totals $block */
+/** @var ViewModelRegistry $viewModels */
+
+$storeConfigViewModel = $viewModels->require(StoreConfig::class);
+$totalsSort = $storeConfigViewModel->getStoreConfig('sales/totals_sort');
+?>
+
+<script>
+    function initCartTotals() {
+        return {
+
+            /* ===============================
+               DEFAULT HYVA TOTALS LOGIC
+            =============================== */
+
+            totalsData: window.checkoutConfig.totalsData,
+            quoteData: window.checkoutConfig.quoteData,
+            shippingMethod: window.checkoutConfig.selectedShippingMethod,
+            totalsSort: <?=
+                        /** @noEscape */
+                        json_encode($totalsSort) ?>,
+            isLoading: false,
+
+            wrapperClass: 'grid grid-cols-[1.5fr_1fr] md:grid-cols-2 gap-x-1 py-3 border-b border-gray-300 text-fg-secondary',
+            wrapperClassTotals: 'mt-4 grid grid-cols-[1.5fr_1fr] md:grid-cols-2 gap-x-1 py-3 text-xl font-semibold',
+
+            /* ===============================
+               FREE SHIPPING CONFIG
+            =============================== */
+
+            threshold: 300,
+            remaining: null,
+            progress: 0,
+            eligibleCountries: ['NL', 'BE'],
+            storeDefaultCountry: '<?= $escaper->escapeJs($storeConfigViewModel->getStoreConfig("general/country/default")) ?>',
+
+            /* ===============================
+               SORT SEGMENTS
+            =============================== */
+
+            getSortedSegments() {
+                const segments = this.totalsData.total_segments;
+
+                return Array.from(segments).sort((a, b) => {
+                    const valueA = this.totalsSort[a.code] || 0;
+                    const valueB = this.totalsSort[b.code] || 0;
+                    return valueA - valueB;
+                })
+            },
+
+            getTotals() {
+                return this.totalsData
+            },
+
+            updateTotals(totalsData) {
+                this.totalsData = totalsData
+            },
+
+            updateShippingMethod(shippingMethod) {
+                this.shippingMethod = shippingMethod;
+            },
+
+            /* ===============================
+               FREE SHIPPING CALCULATION
+            =============================== */
+
+            calculateFreeShipping() {
+
+                if (!this.totalsData || typeof this.totalsData.subtotal_incl_tax === 'undefined') {
+                    this.remaining = null;
+                    return;
+                }
+
+                const subtotal = parseFloat(this.totalsData.subtotal_incl_tax);
+
+                if (isNaN(subtotal)) {
+                    this.remaining = null;
+                    return;
+                }
+
+                const country = this.storeDefaultCountry;
+
+                if (!this.eligibleCountries.includes(country)) {
+                    this.remaining = null;
+                    return;
+                }
+
+                this.remaining = Math.max(this.threshold - subtotal, 0);
+                this.progress = Math.min((subtotal / this.threshold) * 100, 100);
+            },
+
+            /* ===============================
+               INIT
+            =============================== */
+
+            init() {
+                this.calculateFreeShipping();
+            },
+
+            excludingTaxMessage: '<?= $escaper->escapeJs(__('Excl. Tax')) ?>',
+            includingTaxMessage: '<?= $escaper->escapeJs(__('Incl. Tax')) ?>',
+
+            eventListeners: {
+
+                ['@update-totals.window']($event) {
+                    this.updateTotals($event.detail.data)
+                    this.calculateFreeShipping()
+                },
+
+                ['@update-shipping-method.window']($event) {
+                    this.updateShippingMethod($event.detail.method)
+                },
+
+                ['@update-totals-start.window']() {
+                    this.isLoading = true;
+                },
+
+                ['@update-totals-end.window']() {
+                    this.isLoading = false;
+                }
+            }
+        }
+    }
+</script>
+
+<div
+    id="cart-totals"
+    class="cart-totals relative my-4"
+    x-data="initCartTotals()"
+    x-init="init()"
+    x-bind="eventListeners">
+
+    <!-- ===============================
+         FREE SHIPPING BLOCK
+         (Appears Above Checkout Button)
+    =============================== -->
+
+    <template x-if="remaining !== null">
+        <div class="mt-4 bg-white border border-gray-300 rounded-lg p-4">
+
+            <template x-if="remaining > 0">
+                <div>
+                    <div class="flex gap-1 text-xs font-mono font-medium text-teak-ink mb-2">
+                        <svg class="w-3.5 h-3.5 text-teak-gold" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M3 7h13v8h-1.5a2.5 2.5 0 0 0-5 0H8a2.5 2.5 0 0 0-5 0H3V7zm15 2h2.5L23 12v3h-1a2.5 2.5 0 0 0-5 0h-1V9zM6 17.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm12 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"></path>
+                        </svg>
+                        <div>
+                            <?= $escaper->escapeHtml(__('Only € ')) ?>
+                            <span x-text="remaining.toFixed(2)"></span>
+                            <?= $escaper->escapeHtml(__(' more for free delivery')) ?>
+                        </div>
+                    </div>
+
+                    <div class="w-full bg-gray-200 rounded h-2">
+                        <div
+                            class="bg-gradient-to-r from-teak-gold to-teak-green h-2 rounded transition-all duration-500"
+                            :style="'width:' + progress + '%'">
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <template x-if="remaining <= 0">
+                <p class="text-sm font-semibold text-green-600">
+                    <?= $escaper->escapeHtml(__('🎉 You qualify for free delivery!')) ?>
+                </p>
+            </template>
+
+        </div>
+    </template>
+
+    <?= $block->getBlockHtml('block-loader') ?>
+
+    <!-- TOTAL SEGMENTS -->
+    <template x-for="(segment, index) in getSortedSegments()" :key="index">
+        <div>
+            <?= $block->getChildHtml(); ?>
+        </div>
+    </template>
+
+</div>

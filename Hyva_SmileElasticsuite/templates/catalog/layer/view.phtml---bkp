@@ -1,0 +1,197 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\LayeredNavigation\Block\Navigation;
+
+// phpcs:disable Generic.Files.LineLength.TooLong
+
+/** @var $block Navigation */
+/** @var $escaper Escaper */
+?>
+<?php if ($block->canShowBlock()) : ?>
+<!--    modal-->
+    <div class="mt-2 ml-0 md:ml-0 p-2 sm:p-5 lg:pl-0 xl:pl-0" x-data="{ modelOpen: false }">
+        <button @click="modelOpen =!modelOpen" class="flex items-center justify-center rounded-full rounded-br-none py-3 md:py2 px-5 md:px-10 text-white hover:text-black ml-auto bg-[#2F2F2F] hover:bg-[#E1E1E1] cursor-pointer fill-white hover:fill-black">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="mr-2 h-5">
+                <path d="M40 64C24.2 64 9.9 73.3 3.5 87.7s-3.8 31.3 6.8 43L112 243.8V368c0 10.1 4.7 19.6 12.8 25.6l64 48c9.7 7.3 22.7 8.4 33.5 3s17.7-16.5 17.7-28.6V243.8l101.7-113c10.6-11.7 13.2-28.6 6.8-43S327.8 64 312 64H40zM352 384c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H352zM320 256c0 17.7 14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H352c-17.7 0-32 14.3-32 32zM416 64c-17.7 0-32 14.3-32 32s14.3 32 32 32h64c17.7 0 32-14.3 32-32s-14.3-32-32-32H416z"/>
+            </svg>
+            <span class="hidden sm:flex">
+                <?= $escaper->escapeHtml(__('Shop By')) ?>
+            </span>
+        </button>
+
+        <div x-show="modelOpen" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="flex items-end justify-center min-h-screen px-4 text-center md:items-center sm:block sm:p-0">
+                <div x-cloak @click="modelOpen = false" x-show="modelOpen"
+                     x-transition:enter="transition ease-out duration-300 transform"
+                     x-transition:enter-start="opacity-0"
+                     x-transition:enter-end="opacity-100"
+                     x-transition:leave="transition ease-in duration-200 transform"
+                     x-transition:leave-start="opacity-100"
+                     x-transition:leave-end="opacity-0"
+                     class="fixed inset-0 transition-opacity bg-black bg-opacity-40" aria-hidden="true"
+                ></div>
+
+                <div x-cloak x-show="modelOpen"
+                     x-transition:enter="transition ease-out duration-300 transform"
+                     x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                     x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                     x-transition:leave="transition ease-in duration-200 transform"
+                     x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                     x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                     class="w-full max-w-xl p-8 my-20 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl 2xl:max-w-2xl ml-auto bg-white w-full ml-auto p-10 lg:pr-5 rounded-tl-0 rounded-bl-[100px] lg:rounded-l-[200px] lg:pl-20"
+                >
+                    <div class="flex items-center justify-between space-x-4">
+                        <button @click="modelOpen = false" class="ml-auto fill-white h-[45px] w-[45px] rounded-full bg-[#2F2F2F] hover:bg-[#E1E1E1] justify-center items-center flex cursor-pointer fill-white hover:fill-black">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512" class="">
+                                <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div>
+
+                        <div
+                            role="region"
+                            aria-label="<?= $escaper->escapeHtmlAttr(__('Product filters')) ?>"
+                            class="block border border-container md:border-0 my-6"
+                            x-data="initLayeredNavigation()"
+                            >
+<!--                            x-init="checkIsMobileResolution()"-->
+<!--                            @resize.window.debounce="checkIsMobileResolution()"-->
+<!--                            @visibilitychange.window.debounce="checkIsMobileResolution()"-->
+<!--                        >-->
+                            <h2>
+                                <div
+                                    class="block-title h-10 flex items-center justify-between"
+                                    :class="{ 'cursor-pointer' : isMobile }"
+                                    :role="isMobile ? 'button' : 'presentation'"
+                                    :aria-expanded="isMobile ? blockOpen : undefined"
+                                    :aria-controls="isMobile ? 'filters-content' : undefined"
+                                    :tabindex="isMobile ? 0 : undefined"
+                                    @click="blockOpen = !blockOpen"
+                                    @keydown.enter="blockOpen = !blockOpen"
+                                    @keydown.space="blockOpen = !blockOpen"
+                                >
+                <span class="text-primary text-md md:text-3xl font-medium uppercase">
+                    <?= $escaper->escapeHtml(__('Shop By')) ?>
+                </span>
+                                    <span class="py-1 px-1 bg-container-lighter rounded border border-container-darker hidden"
+                                          :class="{ 'block' : isMobile, 'hidden': !isMobile }">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         xmlns="http://www.w3.org/2000/svg"
+                         class="transition-transform transform duration-300 ease-in-out"
+                         :class="blockOpen ? 'rotate-180' : ''">
+                        <path d="M19 9L12 16L5 9" stroke="#4A5568" stroke-width="2" stroke-linecap="round"
+                              stroke-linejoin="round"/>
+                    </svg>
+                </span>
+                                </div>
+                            </h2>
+                            <div
+                                id="filters-content"
+                                class="block-content filter-content pt-3"
+                                x-show="isMobile && blockOpen || !isMobile"
+                            >
+                                <?php $filterIndex = 0; ?>
+                                <?php $activeFilters = json_decode($block->getActiveFilters()) ?>
+                                <?= $block->getChildHtml('state') ?>
+                                <a
+                                    href="#products-list"
+                                    class="sr-only focus:not-sr-only bg-blue-600 text-white px-12 py-4 text-center block rounded-sm"
+                                >
+                                    <?= $escaper->escapeHtml(__('Skip to product list')) ?>
+                                </a>
+                                <?php foreach ($block->getFilters() as $filter): ?>
+                                    <?php if ($filter->getItemsCount()): ?>
+                                        <?php $showOpen = in_array($filterIndex, $activeFilters) ?>
+                                        <div
+                                            role="group"
+                                            aria-labelledby="filter-option-<?= $filterIndex ?>-title"
+                                            class="filter-option card my-4"
+                                            x-data="{ open: <?= $showOpen ? 'true' : 'false' ?> }"
+                                        >
+                                            <h3
+                                                id="filter-option-<?= $filterIndex ?>-title"
+                                                class="filter-options-title"
+                                            >
+                                                <button
+                                                    class="flex justify-between items-center cursor-pointer hover:text-secondary-darker border-container w-full"
+                                                    :class="{ 'border-b pb-4': open }"
+                                                    @click="open = !open"
+                                                    aria-controls="filter-option-<?= $filterIndex ?>-content"
+                                                    :aria-expanded="open"
+                                                >
+                                <span class="title text-md md:text-lg font-semibold">
+                                    <?= $escaper->escapeHtml(__($filter->getName())) ?>
+                                    <span class="sr-only"><?= $escaper->escapeHtml(__(' filter')) ?></span>
+                                </span>
+                                                    <span class="py-1 px-1 rounded border border-container">
+                                    <svg
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        class="transition-transform transform duration-300 ease-in-out"
+                                        :class="open ? 'rotate-180' : ''"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            d="M19 9L12 16L5 9"
+                                            stroke="#4A5568"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        />
+                                    </svg>
+                                </span>
+                                                </button>
+                                            </h3>
+                                            <div
+                                                id="filter-option-<?= $filterIndex ?>-content"
+                                                class="filter-options-content pt-3 overflow-hidden"
+                                                x-show="open"
+                                            >
+                                                <?= /* @noEscape */ $block->getChildBlock('renderer')->render($filter) ?>
+                                            </div>
+                                        </div>
+                                        <?php $filterIndex++ ?>
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+<!--        end of modal area-->
+    </div>
+
+
+<!--borderforcoder-->
+
+
+    <script>
+        function initLayeredNavigation() {
+            return {
+                isMobile: false,
+                blockOpen: false,
+                checkIsMobileResolution: function () {
+                    this.isMobile = window.outerWidth < 768
+                }
+            }
+        }
+    </script>
+<?php endif; ?>

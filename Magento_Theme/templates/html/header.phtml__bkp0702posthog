@@ -1,0 +1,248 @@
+<?php
+
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Hyva\Theme\ViewModel\StoreConfig;
+use Magento\Checkout\Block\Cart\Sidebar as SidebarCart;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Escaper $escaper */
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var HeroiconsOutline $heroicons */
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+
+/** @var StoreConfig $storeConfig */
+$storeConfig = $viewModels->require(StoreConfig::class);
+$showMiniCart = $storeConfig->getStoreConfig(SidebarCart::XML_PATH_CHECKOUT_SIDEBAR_DISPLAY);
+
+$showCompare = $block->getShowCompare() !== null ? (bool) $block->getShowCompare() : false;
+$showWishlist = $block->getShowWishlist() !== null ? (bool) $block->getShowWishlist() : true;
+?>
+<!-- PostHog -->
+<script>
+    ! function(t, e) {
+        var o, n, p, r;
+        e.__SV || (window.posthog && window.posthog.__loaded) || (window.posthog = e, e._i = [],
+            e.init = function(i, s, a) {
+                function g(t, e) {
+                    var o = e.split(".");
+                    2 == o.length && (t = t[o[0]], e = o[1]),
+                        t[e] = function() {
+                            t.push([e].concat(Array.prototype.slice.call(arguments, 0)))
+                        }
+                }
+                (p = t.createElement("script")).type = "text/javascript",
+                    p.crossOrigin = "anonymous",
+                    p.async = !0,
+                    p.src = s.api_host.replace(".i.posthog.com", "-assets.i.posthog.com") + "/static/array.js",
+                    (r = t.getElementsByTagName("script")[0]).parentNode.insertBefore(p, r);
+
+                var u = e;
+                for (
+                    void 0 !== a ? u = e[a] = [] : a = "posthog",
+                    u.people = u.people || [],
+                    u.toString = function(t) {
+                        var e = "posthog";
+                        return "posthog" !== a && (e += "." + a), t || (e += " (stub)"), e
+                    },
+                    u.people.toString = function() {
+                        return u.toString(1) + ".people (stub)"
+                    },
+                    o = "init capture identify alias setPersonProperties group reset get_distinct_id get_session_id startSessionRecording stopSessionRecording".split(" "),
+                    n = 0; n < o.length; n++
+                ) g(u, o[n]);
+
+                e._i.push([i, s, a])
+            },
+            e.__SV = 1)
+    }(document, window.posthog || []);
+
+    posthog.init('phc_lmE4QjwdrqWHbVmeYY14AWSmw40hv6bsYVAPeoBv6WU', {
+        api_host: 'https://eu.i.posthog.com',
+        capture_pageview: true,
+        session_recording: {
+            recordConsoleLog: true,
+            networkPayloads: true
+        },
+        person_profiles: 'identified_only',
+        autocapture: true
+    });
+</script>
+<!-- /PostHog -->
+
+<?php if ($block->getCustomerId()): ?>
+    <script>
+        (function waitForPostHog() {
+            if (window.posthog && typeof window.posthog.identify === 'function') {
+                posthog.identify(
+                    '<?= (int) $block->getCustomerId() ?>', {
+                        email: '<?= $escaper->escapeJs($block->getCustomerEmail()) ?>',
+                        customer_type: 'logged_in'
+                    }
+                );
+            } else {
+                setTimeout(waitForPostHog, 100);
+            }
+        })();
+    </script>
+<?php endif; ?>
+
+<script>
+    function initHeader() {
+        return {
+            searchOpen: true,
+            cart: {},
+            isCartOpen: false,
+            getData(data) {
+                if (data.cart) {
+                    this.cart = data.cart
+                }
+            },
+            isCartEmpty() {
+                return !this.cart.summary_count
+            },
+            toggleCart(event) {
+                if (event.detail && event.detail.isOpen !== undefined) {
+                    this.isCartOpen = event.detail.isOpen
+                    if (!this.isCartOpen && this.$refs && this.$refs.cartButton) {
+                        this.$refs.cartButton.focus()
+                    }
+                } else {
+                    this.isCartOpen = true
+                }
+            }
+        }
+    }
+</script>
+<div id="header"
+    class="relative bg-black py-6 lg:py-0 border-b-[0.5px] border-black z-30 w-full"
+    x-data="initHeader()"
+    @private-content-loaded.window="getData(event.detail.data)">
+    <div class="relative container flex flex-wrap lg:flex-nowrap items-center justify-between w-full mx-auto mt-0">
+        <!--Logo-->
+        <div class="flex items-center gap-x-1 md:gap-x-2 lg:gap-x-5 justify-between">
+            <?= $block->getChildHtml('logo'); ?>
+
+            <div class="order-first lg:order-2 xl:ml-20">
+                <?= $block->getChildHtml('topmenu') ?>
+            </div>
+        </div>
+
+        <div class="flex items-center xl:gap-x-5 md:gap-x-3 gap-x-2 order-3 justify-end">
+            <?php if ($showCompare): ?>
+                <?= $block->getChildHtml('compare'); ?>
+            <?php endif; ?>
+
+
+            <!-- Search Icon (Mobile only) -->
+            <button
+                id="menu-search-icon"
+                class="rounded p-1 outline-offset-2 lg:hidden"
+                @click.prevent="searchOpen = !searchOpen"
+                aria-label="<?= $escaper->escapeHtmlAttr(__('Toggle search form')) ?>"
+                aria-haspopup="true"
+                :aria-expanded="searchOpen"
+                x-ref="searchButton">
+                <!-- icon -->
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path
+                        d="M13.8938 13.8676L17.5 17.5M15.8333 9.16667C15.8333 12.8486 12.8486 15.8333 9.16667 15.8333C5.48477 15.8333 2.5 12.8486 2.5 9.16667C2.5 5.48477 5.48477 2.5 9.16667 2.5C12.8486 2.5 15.8333 5.48477 15.8333 9.16667Z"
+                        stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </button>
+
+            <!-- Search -->
+            <div
+                class="lg:relative lg:flex lg:items-center lg:w-[250px] xl:w-[273px] lg:top-0 bg-[#282828] lg:rounded-lg
+                       absolute z-10 top-[53px] left-0 w-full"
+                id="search-content"
+                x-cloak
+                x-show="searchOpen || window.innerWidth >= 1024"
+                @click.outside="if (window.innerWidth < 1024) searchOpen = false"
+                @keydown.escape="if (window.innerWidth < 1024) { searchOpen = false; $refs.searchButton?.focus(); }">
+
+                <?= $block->getChildHtml('header-search'); ?>
+            </div>
+
+            <!-- Additional Header Elements -->
+            <?= $block->getChildHtml('additional') ?>
+
+            <!--Customer Icon & Dropdown-->
+            <?= $block->getChildHtml('customer') ?>
+
+            <?php if ($showWishlist): ?>
+                <?= $block->getChildHtml('wishlist') ?>
+            <?php endif ?>
+
+            <!--Cart Icon-->
+            <?php if ($showMiniCart): ?>
+                <button
+                    <?php else: ?>
+                    <a
+                    <?php endif ?>
+                    id="menu-cart-icon"
+                    class="relative inline-block rounded p-1 hover:bg-primary/10 outline-offset-2"
+                    x-ref="cartButton"
+                    :aria-disabled="isCartEmpty()"
+                    :aria-label="`
+                    <?= $escaper->escapeHtmlAttr($showMiniCart ? __('Toggle minicart') : __('View cart')) ?>,
+                    ${isCartEmpty()
+                        ? '<?= $escaper->escapeHtmlAttr(__('Cart is empty')) ?>'
+                        : cart.summary_count > 1
+                            ? hyva.str('<?= $escaper->escapeHtmlAttr(__('%1 items')) ?>', cart.summary_count)
+                            : hyva.str('<?= $escaper->escapeHtmlAttr(__('%1 item')) ?>', cart.summary_count)
+                    }`"
+                    <?php if ($showMiniCart): ?>
+                    @click.prevent="() => {
+                        $dispatch('toggle-cart', { isOpen: true })
+                    }"
+                    @toggle-cart.window="toggleCart($event)"
+                    :aria-expanded="isCartOpen"
+                    aria-haspopup="dialog"
+                    <?php else: ?>
+                    href="<?= $escaper->escapeUrl($block->getUrl('checkout/cart/index')) ?>"
+                    title="<?= $escaper->escapeHtmlAttr(__('View cart')) ?>"
+                    <?php endif ?>>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 10L18.5145 17.4276C18.3312 18.3439 18.2396 18.8021 18.0004 19.1448C17.7894 19.447 17.499 19.685 17.1613 19.8326C16.7783 20 16.3111 20 15.3766 20H8.62337C7.6889 20 7.22166 20 6.83869 19.8326C6.50097 19.685 6.2106 19.447 5.99964 19.1448C5.76041 18.8021 5.66878 18.3439 5.48551 17.4276L4 10M3 10H21M8 13V13.01M16 13V13.01M6 10L9 4M18 10L15 4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+
+                    <span
+                        x-text="cart.summary_count"
+                        x-show="!isCartEmpty()"
+                        x-cloak
+                        class="absolute -top-1.5 -right-1.5 h-5 px-2 py-1 rounded-full bg-teakea-terracotta text-white
+                        text-xs font-semibold leading-none text-center uppercase tabular-nums"
+                        aria-hidden="true"></span>
+                    <?php if ($showMiniCart): ?>
+                </button>
+            <?php else: ?>
+                </a>
+            <?php endif ?>
+            <div>
+                <?php echo $this->getLayout()
+                    ->createBlock("Magento\Framework\View\Element\Template")
+                    ->setTemplate("Magento_Store::switch/languages.phtml")
+                    ->toHtml(); ?>
+            </div>
+        </div>
+    </div>
+
+    <!--Cart Drawer-->
+    <?= $block->getChildHtml('cart-drawer'); ?>
+
+    <!--Authentication Pop-Up-->
+    <?= $block->getChildHtml('authentication-popup'); ?>
+</div>

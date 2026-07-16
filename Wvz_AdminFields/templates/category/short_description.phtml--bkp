@@ -1,0 +1,51 @@
+<?php
+/**
+ * Category view template
+ *
+ * @var $block \Magento\Catalog\Block\Category\View
+ *
+ */
+?>
+
+
+    <style>
+    .bg-cat-img {
+        background:url("<?= $imgUrl = $block->getCurrentCategory()->getImageUrl(); ?>");
+        object-fit: cover;
+        background-repeat: no-repeat;
+        background-size: 1650px;
+        background-position: center;
+
+        text-shadow: 0px 0px 5px black;
+        color: white;
+    }
+    </style>
+
+
+
+
+<?php if ($_description = $block->getCurrentCategory()->getInchooShortDescription()): ?>
+    <div x-data="{ expanded: false }" class="w-full">
+        <div class="category-shortdescription w-full bg-cat-img rounded-2xl rounded-tr-[150px] pb-0 mt-4 md:mt-0 pr-2 flex items-start flex-col min-h-[200px]">
+            <h1 class="page-title pl-8 mt-4">
+                <?= /* @escapeNotVerified */ $block->getCurrentCategory()->getName(); ?>
+            </h1>
+            <div x-cloak :class="expanded ? '' : 'max-h-24 overflow-hidden'" class="transition-max-height duration-500 ease-in-out">
+                <!-- Your dynamic content goes here, ensure it's part of this div to control the height -->
+                <?= /* @escapeNotVerified */ $this->helper('Magento\Catalog\Helper\Output')->categoryAttribute($block->getCurrentCategory(), $_description, 'inchoo_short_description') ?>
+            </div>
+            <button @click="expanded = !expanded" x-cloak class="ml-8 mt-2 py-2 px-4 bg-primary-darker hover:bg-[#E1E1E1] hover:text-black font-bold text-white rounded-full">
+                <span x-show="!expanded"><?= $escaper->escapeHtml(__('Read more')) ?></span>
+                <span x-show="expanded"><?= $escaper->escapeHtml(__('Read less')) ?></span>
+            </button>
+        </div>
+    </div>
+
+
+
+
+
+    <?php endif; ?>
+<!--$imgUrl = $block->getCurrentCategory()->getImageUrl();-->
+
+
